@@ -1,0 +1,25 @@
+services:
+  db-local:
+    image: postgres:17-alpine
+    container_name: ${PROJECT_NAME}-db-local
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+    volumes:
+      - db-local-data:/var/lib/postgresql/data
+      - ./database/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        - "psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c 'SELECT 1 FROM healthcheck.init;'"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - dev
+
+volumes:
+  db-local-data:
+    driver: local

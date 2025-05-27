@@ -1,2 +1,8 @@
+# Cache y python
 venv/
 node_modules/
+__pycache__/
+.pytest_cache/
+
+# Env files
+.env
