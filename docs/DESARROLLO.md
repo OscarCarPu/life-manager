@@ -10,6 +10,11 @@ Esto permitirá el desarrollo de cada feature de forma independiente y sin inter
 
 # Testing
 
-A parte de los [hooks](PRE_COMMIT_HOOKS.md) que se ejecutan al hacer commit, se utilizarán los siguientes tests:
+A parte de los [hooks](PRE_COMMIT_HOOKS.md) que se ejecutan al hacer commit, se ejecutaran los tests desde la raíz del proyecto.
 
-- **Integration tests**: Se ejecutarán tests de integración para verificar que las diferentes partes del sistema funcionan correctamente juntas: `pytest tests/integration`.
+Hará falta installar las dependencias de desarrollo:
+
+```bash
+pip install -r dev-requirements.txt
+pytest tests/
+```
