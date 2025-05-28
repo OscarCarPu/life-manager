@@ -3,22 +3,36 @@ CREATE TABLE IF NOT EXISTS categoria (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
     descripcion TEXT,
-    categoria_padre_id INTEGER REFERENCES categoria (id) ON DELETE CASCADE,
+    categoria_padre_id INTEGER REFERENCES categoria (id) ON DELETE RESTRICT,
+    slug VARCHAR(100) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Índices para mejorar el rendimiento de las consultas
 CREATE TABLE IF NOT EXISTS tarea (
     id SERIAL PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     fecha_vencimiento DATE,
     descripcion TEXT,
-    categoria_id INTEGER REFERENCES categoria (id) ON DELETE CASCADE,
+    slug VARCHAR(255) NOT NULL UNIQUE, -- Para URL amigables
+    categoria_id INTEGER REFERENCES categoria (id) ON DELETE SET NULL,
     estado VARCHAR(50) CHECK (
-        estado IN ('pendiente', 'completada', 'cancelada')
+        estado IN ('pendiente', 'completada', 'en_progreso', 'archivada')
     ) DEFAULT 'pendiente',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para mejorar el rendimiento de las consultas
+CREATE TABLE IF NOT EXISTS planificacion_tarea (
+    id SERIAL PRIMARY KEY,
+    tarea_id INTEGER REFERENCES tarea (id) ON DELETE CASCADE,
+    fecha_planificada DATE NOT NULL,
+    prioridad INTEGER CHECK (prioridad >= 1 AND prioridad <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (tarea_id, fecha_planificada)
 );
 
 -- Función para actualizar el campo updated_at automáticamente
@@ -39,5 +53,11 @@ EXECUTE FUNCTION UPDATE_UPDATED_AT_COLUMN();
 -- Trigger para la tabla tarea
 CREATE TRIGGER update_tarea_updated_at
 BEFORE UPDATE ON tarea
+FOR EACH ROW
+EXECUTE FUNCTION UPDATE_UPDATED_AT_COLUMN();
+
+-- Trigger para la tabla planificacion_tarea
+CREATE TRIGGER update_planificacion_tarea_updated_at
+BEFORE UPDATE ON planificacion_tarea
 FOR EACH ROW
 EXECUTE FUNCTION UPDATE_UPDATED_AT_COLUMN();

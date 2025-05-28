@@ -10,11 +10,14 @@ load_dotenv(os.path.join(project_root, ".env"))
 
 POSTGRES_HOST = "localhost"
 POSTGRES_PORT = 5432
-REQUIRED_TABLES = ["categoria", "tarea"]
+REQUIRED_TABLES = ["categoria", "tarea", "planificacion_tarea"]
 
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 POSTGRES_DB = os.getenv("POSTGRES_DB")
+
+SUPABASE_url = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 
 @pytest.mark.usefixtures("docker_postgres_service")
@@ -61,3 +64,29 @@ def test_local_db_connection():
         pytest.fail(f"Error de base de datos: {e}")
     except Exception as e:
         pytest.fail(f"Error inesperado durante la prueba de DB local: {e}")
+
+
+def test_supabase_connection():
+    missing_env_vars = []
+    if not SUPABASE_url:
+        missing_env_vars.append("SUPABASE_URL")
+    if not SUPABASE_KEY:
+        missing_env_vars.append("SUPABASE_KEY")
+
+    if missing_env_vars:
+        pytest.fail(f"Faltan las siguientes variables de entorno: {', '.join(missing_env_vars)}")
+
+    logging.info("Conectando a Supabase...")
+    try:
+        from supabase import Client, create_client
+
+        supabase: Client = create_client(SUPABASE_url, SUPABASE_KEY)
+        logging.info("Conexión a Supabase exitosa.")
+        # Verificar si las tablas requeridas existen
+        logging.info(f"Verificando las tablas requeridas en Supabase: {', '.join(REQUIRED_TABLES)}")
+        for table in REQUIRED_TABLES:
+            # Seleccionamos una fila de la tabla para verificar su existencia
+            supabase.table(table).select("id").limit(0).execute()
+        logging.info("Todas las tablas requeridas están presentes en Supabase.")
+    except Exception as e:
+        pytest.fail(f"Error al conectar a Supabase: {e}")
