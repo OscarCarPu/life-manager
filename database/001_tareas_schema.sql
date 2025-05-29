@@ -4,9 +4,10 @@ CREATE TABLE IF NOT EXISTS categoria (
     nombre VARCHAR(100) NOT NULL UNIQUE,
     descripcion TEXT,
     categoria_padre_id INTEGER REFERENCES categoria (id) ON DELETE RESTRICT,
-    slug VARCHAR(100) NOT NULL UNIQUE,
+    slug VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (slug, categoria_padre_id)
 );
 
 -- Índices para mejorar el rendimiento de las consultas
@@ -15,13 +16,14 @@ CREATE TABLE IF NOT EXISTS tarea (
     titulo VARCHAR(255) NOT NULL,
     fecha_vencimiento DATE,
     descripcion TEXT,
-    slug VARCHAR(255) NOT NULL UNIQUE, -- Para URL amigables
+    slug VARCHAR(255) NOT NULL, -- Para URL amigables
     categoria_id INTEGER REFERENCES categoria (id) ON DELETE SET NULL,
     estado VARCHAR(50) CHECK (
         estado IN ('pendiente', 'completada', 'en_progreso', 'archivada')
     ) DEFAULT 'pendiente',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (slug, categoria_id)
 );
 
 -- Índices para mejorar el rendimiento de las consultas
