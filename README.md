@@ -8,7 +8,7 @@ Cada módulo estará aislado del resto, permitiendo un código más limpio y fá
 
 - `backend/`: Aquí ersidirá toda la lógica del backend.
 - `common/`: Aquí se guardarán módulos comunes y reutilizables en todo el proyecto
-- `database/`: Contendrá los archivos `.sql` que defninen la estructura de la base de datos.
+- `supabase/`: Contendrá los archivos `.sql` que defninen la estructura de la babse de datos de Supabase.
 - `docs/`: Aquí se guardará la documentación del proyecto, desde arquitectura, diseño y guías de uso.
 - `frontend/`: Aquí estará el frontend del proyecto.
 - `hardware/`: Aquí estarán los esquemas y el código de los dispositivos de hardware.

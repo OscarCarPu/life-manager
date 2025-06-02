@@ -4,5 +4,11 @@ node_modules/
 __pycache__/
 .pytest_cache/
 
+# Supabase
+package-lock.json
+package.json
+supabase/.gitignore
+supabase/config.toml
+
 # Env files
 .env
