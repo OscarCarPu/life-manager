@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS tarea (
 -- Índices para mejorar el rendimiento de las consultas
 CREATE TABLE IF NOT EXISTS planificacion_tarea (
     id SERIAL PRIMARY KEY,
-    tarea_id INTEGER REFERENCES tarea (id) ON DELETE CASCADE,
+    tarea_id INTEGER REFERENCES tarea (id) ON DELETE CASCADE NOT NULL,
     fecha_planificada DATE NOT NULL,
     prioridad INTEGER CHECK (prioridad >= 1 AND prioridad <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

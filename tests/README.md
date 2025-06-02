@@ -10,4 +10,4 @@ En la raíz del proyecto están ubicado [pytest.ini](../pytest.ini) y [dev-requi
 
 ### Integration Tests
 
-- [`test_db_connection`](integration/test_db_connection.py): Verifica la conexión a la base de datos y la creación de tablas.
+    - [`test_db_connection`](integration/test_db_connection.py): Verifica la conexión a la base de datos y la creación de tablas.
