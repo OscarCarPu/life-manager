@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS planificacion_tarea (
     id SERIAL PRIMARY KEY,
     tarea_id INTEGER REFERENCES tarea (id) ON DELETE CASCADE NOT NULL,
     fecha_planificada DATE NOT NULL,
+    hora_inicio TIME NULL,
+    hora_fin TIME NULL,
     prioridad INTEGER CHECK (prioridad >= 1 AND prioridad <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
