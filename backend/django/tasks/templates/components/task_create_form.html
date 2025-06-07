@@ -32,13 +32,7 @@
       {% for cat in categories %}
       <option
         value="{{ cat.id }}"
-        {%
-        if
-        category.id=""
-        ="cat.id"
-        %}selected{%
-        endif
-        %}
+        {% if category.id==cat.id %}selected{% endif %}
       >
         {{ cat.name }}
       </option>

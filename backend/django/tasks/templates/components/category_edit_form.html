@@ -35,13 +35,7 @@
       {% for cat in categories %}
       <option
         value="{{ cat.id }}"
-        {%
-        if
-        category.parent_category.id=""
-        ="cat.id"
-        %}selected{%
-        endif
-        %}
+        {% if category.parent_category.id==cat.id %}selected{%endif%}
       >
         {{ cat.name }}
       </option>

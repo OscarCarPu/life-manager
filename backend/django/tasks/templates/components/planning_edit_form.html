@@ -11,13 +11,7 @@
       {% for task in tasks %}
       <option
         value="{{ task.id }}"
-        {%
-        if
-        planning.task.id=""
-        ="task.id"
-        %}selected{%
-        endif
-        %}
+        {% if planning.task.id==task.id %}selected{% endif %}
       >
         {{ task.title }}
       </option>

@@ -2,12 +2,16 @@
   <div class="d-flex justify-content-between align-items-start">
     <div>
       <strong>{{ planning.task.title }}</strong>
-      {% if planning.start_hour %}<br /><small class="text-muted"
-        >{{ planning.start_hour|date:"H:i" }}{% if planning.end_hour %} - {{
-        planning.end_hour|date:"H:i" }}{% endif %}</small
-      >{% endif %} {% if planning.priority %}<br /><small class="text-info"
-        >Prioridad: {{ planning.priority }}</small
-      >{% endif %}
+      {% if planning.start_hour or planning.end_hour %}
+        <br /><small class="text-muted">
+          {% if planning.start_hour %}{{ planning.start_hour|date:"H:i" }}{% endif %}
+          {% if planning.start_hour and planning.end_hour %} - {% endif %}
+          {% if planning.end_hour %}{{ planning.end_hour|date:"H:i" }}{% endif %}
+        </small>
+      {% endif %}
+      {% if planning.priority %}
+        <br /><small class="text-info">Prioridad: {{ planning.priority }}</small>
+      {% endif %}
     </div>
     <div class="btn-group" role="group">
       <button

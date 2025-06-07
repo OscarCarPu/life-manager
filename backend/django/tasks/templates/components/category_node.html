@@ -62,8 +62,7 @@
     id="subcategories-{{ category.id }}"
     style="display: none"
   >
-    {% for subcategory in category.subcategories.all %} {% include
-    'components/category_node.html' with category=subcategory %} {% endfor %}
+    {% for subcategory in category.subcategories.all %} {% include 'components/category_node.html' with category=subcategory %} {% endfor %}
   </ul>
   {% endif %}
 </li>

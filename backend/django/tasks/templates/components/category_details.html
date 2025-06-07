@@ -23,8 +23,7 @@
   hx-target="#tasks-for-category-{{ category.id }}"
   hx-swap="innerHTML"
 >
-  {% for task in tasks %} {% include 'components/task_item.html' with task=task
-  %} {% empty %}
+  {% for task in tasks %} {% include 'components/task_item.html' with task=task %} {% empty %}
   <div class="text-muted text-center py-3">
     No hay tareas en esta categoría.
   </div>

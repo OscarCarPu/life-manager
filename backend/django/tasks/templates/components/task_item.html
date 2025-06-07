@@ -10,10 +10,7 @@
           <span
             class="badge {% if task.state == 'completed' %}bg-success {% elif task.state == 'in_progress' %}bg-warning {% elif task.state == 'archived' %}bg-secondary {% else %}bg-primary{% endif %}"
           >
-            {% if task.state == 'pending' %}Pendiente {% elif task.state ==
-            'in_progress' %}En Progreso {% elif task.state == 'completed'
-            %}Completada {% elif task.state == 'archived' %}Archivada {% endif
-            %}
+            {% if task.state == 'pending' %}Pendiente {% elif task.state == 'in_progress' %}En Progreso {% elif task.state == 'completed' %}Completada {% elif task.state == 'archived' %}Archivada {% endif %}
           </span>
           {% if task.due_date %}
           <span class="badge bg-info"
@@ -33,7 +30,7 @@
           data-bs-target="#htmxModal"
           title="Editar"
         >
-          ✏️
+          Editar
         </button>
         <button
           type="button"
@@ -45,7 +42,7 @@
           hx-on::after-request="htmx.trigger(document.body, 'taskDeleted')"
           title="Eliminar"
         >
-          🗑️
+          Eliminar
         </button>
       </div>
     </div>
