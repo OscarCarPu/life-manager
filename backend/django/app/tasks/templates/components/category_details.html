@@ -1,0 +1,32 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>{{ category.name }}</h3>
+  <button
+    class="btn btn-primary"
+    hx-get="{% url 'task_create_form_with_category' category.id %}"
+    hx-target="#htmxModalBody"
+    hx-swap="innerHTML"
+    data-bs-toggle="modal"
+    data-bs-target="#htmxModal"
+  >
+    + Añadir Tarea
+  </button>
+</div>
+
+{% if category.description %}
+<p class="text-muted">{{ category.description }}</p>
+{% endif %}
+
+<div
+  id="tasks-for-category-{{ category.id }}"
+  hx-get="{% url 'category_details_view' category.id %}"
+  hx-trigger="taskSaved from:body, taskDeleted from:body"
+  hx-target="#tasks-for-category-{{ category.id }}"
+  hx-swap="innerHTML"
+>
+  {% for task in tasks %} {% include 'components/task_item.html' with task=task
+  %} {% empty %}
+  <div class="text-muted text-center py-3">
+    No hay tareas en esta categoría.
+  </div>
+  {% endfor %}
+</div>

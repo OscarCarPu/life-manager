@@ -1,0 +1,37 @@
+<div id="planning-item-{{ planning.id }}" class="border-bottom pb-2 mb-2">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <strong>{{ planning.task.title }}</strong>
+      {% if planning.start_hour %}<br /><small class="text-muted"
+        >{{ planning.start_hour|date:"H:i" }}{% if planning.end_hour %} - {{
+        planning.end_hour|date:"H:i" }}{% endif %}</small
+      >{% endif %} {% if planning.priority %}<br /><small class="text-info"
+        >Prioridad: {{ planning.priority }}</small
+      >{% endif %}
+    </div>
+    <div class="btn-group" role="group">
+      <button
+        type="button"
+        class="btn btn-sm btn-warning"
+        hx-get="{% url 'planning_edit_form' planning.id %}"
+        hx-target="#htmxModalBody"
+        hx-swap="innerHTML"
+        data-bs-toggle="modal"
+        data-bs-target="#htmxModal"
+      >
+        Editar
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-danger"
+        hx-delete="{% url 'planning_delete' planning.id %}"
+        hx-confirm="¿Estás seguro de que quieres eliminar esta planificación?"
+        hx-target="#planning-item-{{ planning.id }}"
+        hx-swap="outerHTML"
+        hx-on="htmx:afterRequest: htmx.trigger(document.body, 'planningDeleted')"
+      >
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>

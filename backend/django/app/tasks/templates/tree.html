@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% block title %}Árbol de Categorías{% endblock %} {%
+block content %}
+<div class="row">
+  <div class="col-md-4">
+    <h2>Categorías</h2>
+    <div id="category-tree">
+      <ul class="list-group mb-3">
+        {% for category in categories %} {% include
+        'components/category_node.html' with category=category %} {% empty %}
+        <li class="list-group-item text-muted">No hay categorías aún.</li>
+        {% endfor %}
+      </ul>
+      <button
+        class="btn btn-sm btn-outline-primary w-100"
+        hx-get="{% url 'category_create_form' %}"
+        hx-target="#htmxModalBody"
+        data-bs-toggle="modal"
+        data-bs-target="#htmxModal"
+      >
+        + Añadir Categoría Raíz
+      </button>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <h2>Tareas</h2>
+    <div id="task-details">
+      <p class="text-muted">Selecciona una categoría para ver sus tareas.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para formularios HTMX -->
+<div
+  class="modal fade"
+  id="htmxModal"
+  tabindex="-1"
+  aria-labelledby="htmxModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="htmxModalLabel">Editar</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body" id="htmxModalBody">
+        <!-- Contenido dinámico cargado por HTMX -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.body.addEventListener("htmx:afterSwap", function (event) {
+    if (event.detail.target.id === "htmxModalBody") {
+      const modalElement = document.getElementById("htmxModal");
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  });
+</script>
+{% endblock %}

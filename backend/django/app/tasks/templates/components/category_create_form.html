@@ -1,0 +1,39 @@
+<form
+  hx-post="{% if parent_category %}{% url 'category_create_form_with_parent' parent_category.id %}{% else %}{% url 'category_create_form' %}{% endif %}"
+  hx-target="#category-tree ul"
+  hx-swap="beforeend"
+  hx-on::after-request="htmx.trigger(document.body, 'categorySaved'); htmx.closest(this, '.modal').querySelector('.btn-close').click()"
+>
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="id_name" class="form-label">Nombre de la Categoría:</label>
+    <input
+      type="text"
+      name="name"
+      id="id_name"
+      class="form-control"
+      required
+      maxlength="100"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="id_description" class="form-label">Descripción:</label>
+    <textarea
+      name="description"
+      id="id_description"
+      class="form-control"
+      rows="3"
+    ></textarea>
+  </div>
+  {% if parent_category %}
+  <div class="mb-3">
+    <p><strong>Categoría Padre:</strong> {{ parent_category.name }}</p>
+  </div>
+  {% endif %}
+  <div class="d-flex justify-content-end gap-2">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-primary">Crear Categoría</button>
+  </div>
+</form>

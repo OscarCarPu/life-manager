@@ -1,0 +1,79 @@
+{% extends 'base.html' %} {% block title %}Calendario{% endblock %} {% block
+content %}
+<h1 class="mb-4 text-center">Calendario - Próximos 14 días</h1>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row">
+      {% for day in days %}
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div
+          class="card h-100 {% if day.is_today %}border-primary shadow-sm{% endif %}"
+        >
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="card-title mb-0">
+              {{ day.day_name }}, {{ day.day_number }} de {{ day.month_name }}
+              {% if day.is_today %}<span class="badge bg-primary ms-2">Hoy</span
+              >{% endif %}
+            </h5>
+            <button
+              class="btn btn-sm btn-outline-primary"
+              hx-get="{% url 'planning_create_form' day.date_str %}"
+              hx-target="#htmxModalBody"
+              hx-swap="innerHTML"
+              data-bs-toggle="modal"
+              data-bs-target="#htmxModal"
+            >
+              + Añadir
+            </button>
+          </div>
+          <div class="card-body p-2">
+            <div
+              id="plannings-for-{{ day.date_str }}"
+              hx-get="{% url 'calendar_daily_view' day.date_str %}"
+              hx-trigger="load, planningSaved from:body, planningDeleted from:body"
+              hx-target="#plannings-for-{{ day.date_str }}"
+              hx-swap="innerHTML"
+            >
+              <div class="d-flex justify-content-center">
+                <div class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal para formularios HTMX -->
+<div
+  class="modal fade"
+  id="htmxModal"
+  tabindex="-1"
+  aria-labelledby="htmxModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="htmxModalLabel">Planificación</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" id="htmxModalBody">
+        <!-- Contenido dinámico cargado por HTMX -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
