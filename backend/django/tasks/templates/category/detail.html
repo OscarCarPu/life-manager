@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} Detail{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Category: {{ category.name }}</h1>
+    <p><strong>Description:</strong> {{ category.description|default:"-" }}</p>
+    <p><strong>Parent Category:</strong> {{ category.parent_category.name|default:"-" }}</p>
+    <p><strong>Created At:</strong> {{ category.created_at }}</p>
+    <p><strong>Updated At:</strong> {{ category.updated_at }}</p>
+
+    <div class="mt-4">
+        <a href="{% url 'category-update' category.pk %}" class="btn btn-warning me-2">Edit</a>
+        <a href="{% url 'category-delete' category.pk %}" class="btn btn-danger me-2">Delete</a>
+        <a href="{% url 'category-list' %}" class="btn btn-secondary">Back to Categories</a>
+    </div>
+{% endblock %}

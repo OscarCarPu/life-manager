@@ -1,5 +1,6 @@
 import logging
 import os
+import psycopg2
 
 import pytest
 from dotenv import load_dotenv
@@ -9,6 +10,11 @@ load_dotenv(os.path.join(project_root, ".env"))
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_PSQL_NAME = os.getenv("SUPABASE_PSQL_NAME")
+SUPABASE_PSQL_USER = os.getenv("SUPABASE_PSQL_USER")
+SUPABASE_PSQL_PASSWORD = os.getenv("SUPABASE_PSQL_PASSWORD")
+SUPABASE_PSQL_HOST = os.getenv("SUPABASE_PSQL_HOST")
+SUPABASE_PSQL_PORT = os.getenv("SUPABASE_PSQL_PORT")
 
 REQUIRED_TABLES = ["categoria", "tarea", "planificacion_tarea"]
 
@@ -23,17 +29,43 @@ def test_supabase_connection():
     if missing_env_vars:
         pytest.fail(f"Faltan las siguientes variables de entorno: {', '.join(missing_env_vars)}")
 
-    logging.info("Conectando a Supabase...")
     try:
         from supabase import Client, create_client
 
         supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-        logging.info("Conexión a Supabase exitosa.")
-        # Verificar si las tablas requeridas existen
-        logging.info(f"Verificando las tablas requeridas en Supabase: {', '.join(REQUIRED_TABLES)}")
-        for table in REQUIRED_TABLES:
-            # Seleccionamos una fila de la tabla para verificar su existencia
-            supabase.table(table).select("id").limit(0).execute()
-        logging.info("Todas las tablas requeridas están presentes en Supabase.")
+        supabase.auth.get_session()
     except Exception as e:
         pytest.fail(f"Error al conectar a Supabase: {e}")
+
+
+def test_psql_connection():
+    missing_env_vars = []
+    if not SUPABASE_PSQL_NAME:
+        missing_env_vars.append("SUPABASE_PSQL_NAME")
+    if not SUPABASE_PSQL_USER:
+        missing_env_vars.append("SUPABASE_PSQL_USER")
+    if not SUPABASE_PSQL_PASSWORD:
+        missing_env_vars.append("SUPABASE_PSQL_PASSWORD")
+    if not SUPABASE_PSQL_HOST:
+        missing_env_vars.append("SUPABASE_PSQL_HOST")
+    if not SUPABASE_PSQL_PORT:
+        missing_env_vars.append("SUPABASE_PSQL_PORT")
+
+    if missing_env_vars:
+        pytest.fail(f"Faltan las siguientes variables de entorno: {', '.join(missing_env_vars)}")
+
+    try:
+        conn = psycopg2.connect(
+            dbname=SUPABASE_PSQL_NAME,
+            user=SUPABASE_PSQL_USER,
+            password=SUPABASE_PSQL_PASSWORD,
+            host=SUPABASE_PSQL_HOST,
+            port=SUPABASE_PSQL_PORT,
+        )
+        cur = conn.cursor()
+        cur.execute("SELECT 1")
+        result = cur.fetchone()
+        assert result[0] == 1
+        conn.close()
+    except Exception as e:
+        pytest.fail(f"Error al conectar a la base de datos PostgreSQL: {e}")

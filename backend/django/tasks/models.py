@@ -11,6 +11,7 @@ class Category(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        managed = False
         db_table = "category"
         verbose_name_plural = "Categories"
         ordering = ["updated_at"]
@@ -38,7 +39,9 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        managed = False
         db_table = "task"
+        ordering = ["due_date", "updated_at"]
 
     def __str__(self):
         return self.title
@@ -56,6 +59,7 @@ class TaskPlanning(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        managed = False
         db_table = "task_planning"
         unique_together = ("task", "planned_date", "start_hour")
         ordering = ["planned_date", "start_hour", "priority"]
