@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # Tree URL
-    path('/', views.TreeView.as_view(), name='tree'),
+    path('', views.TreeView.as_view(), name='tree'),
 
     # Category URLs
     path('categories/', views.CategoryListView.as_view(), name='category-list'),
