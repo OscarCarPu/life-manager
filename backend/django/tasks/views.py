@@ -2,13 +2,31 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from .models import Category, Task, TaskPlanning
+from datetime import date, timedelta
 
-# Home View
-class HomeView(View):
-    template_name = 'home.html'
+# Tree View
+class TreeView(View):
+    template_name = 'tree.html'
 
     def get(self, request):
-        return render(request, self.template_name)
+        today = date.today()
+        days_to_show = 4
+        
+        daily_schedules = []
+        for i in range(days_to_show):
+            current_date = today + timedelta(days=i)
+            plannings_for_day = TaskPlanning.objects.filter(
+                planned_date=current_date
+            ).select_related('task').order_by('start_hour', 'priority')
+            daily_schedules.append({
+                'date': current_date,
+                'plannings': plannings_for_day
+            })
+        
+        context = {
+            'daily_schedules': daily_schedules
+        }
+        return render(request, self.template_name, context)
 
 # Category Views
 class CategoryListView(ListView):
@@ -51,13 +69,13 @@ class TaskDetailView(DetailView):
 
 class TaskCreateView(CreateView):
     model = Task
-    fields = ['title', 'due_date', 'description', 'category', 'state']
+    fields = ['title', 'due_date', 'description', 'category', 'state'] # Closed the list
     template_name = 'task/form.html'
     success_url = reverse_lazy('task-list')
 
 class TaskUpdateView(UpdateView):
     model = Task
-    fields = ['title', 'due_date', 'description', 'category', 'state']
+    fields = ['title', 'due_date', 'description', 'category', 'state'] # Closed the list
     template_name = 'task/form.html'
     success_url = reverse_lazy('task-list')
 
