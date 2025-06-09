@@ -22,10 +22,6 @@ repos:
       - id: detect-secrets
         name: detect secrets in code
         args: ["--baseline", ".secrets.baseline"]
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
   # Python hooks
   - repo: https://github.com/PyCQA/flake8
     rev: 7.2.0
@@ -57,3 +53,16 @@ repos:
         name: lint SQL files
         files: '\.(sql)$'
         args: ["--dialect", "postgres"]
+  # Django hooks
+  - repo: https://github.com/rtts/djhtml
+    rev: 3.0.8
+    hooks:
+      - id: djhtml
+        name: format Django HTML templates
+        files: ^backend/django/.*\.html$
+      - id: djcss
+        name: format Django CSS files
+        files: ^backend/django/.*\.css$
+      - id: djjs
+        name: format Django JavaScript files
+        files: ^backend/django/.*\.js$

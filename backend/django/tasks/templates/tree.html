@@ -3,41 +3,41 @@
 {% block title %}Tree View{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Daily Schedules</h1>
-    <div class="row">
-        {% for daily_schedule in daily_schedules %}
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3>{{ daily_schedule.date|date:"m-d" }}</h3>
+    <div class="container">
+        <h1>Daily Schedules</h1>
+        <div class="row">
+            {% for daily_schedule in daily_schedules %}
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>{{ daily_schedule.date|date:"m-d" }}</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if daily_schedule.plannings %}
+                                <ul class="list-group list-group-flush">
+                                    {% for planning in daily_schedule.plannings %}
+                                        <li class="list-group-item">
+                                            <strong>{{ planning.task.title }}</strong><br>
+                                            <small>
+                                                {{ planning.start_hour|time:"H:i" }} - {{ planning.end_hour|time:"H:i" }}
+                                                (Priority: {{ planning.priority }})
+                                            </small><br>
+                                            <a href="{% url 'taskplanning-detail' planning.pk %}" class="btn btn-primary btn-sm mt-1">Planning</a>
+                                            <a href="{% url 'task-detail' planning.task.pk %}" class="btn btn-secondary btn-sm mt-1">Task</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No tasks planned for this day.</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    {% if daily_schedule.plannings %}
-                    <ul class="list-group list-group-flush">
-                        {% for planning in daily_schedule.plannings %}
-                        <li class="list-group-item">
-                            <strong>{{ planning.task.title }}</strong><br>
-                            <small>
-                                {{ planning.start_hour|time:"H:i" }} - {{ planning.end_hour|time:"H:i" }}
-                                (Priority: {{ planning.priority }})
-                            </small><br>
-                            <a href="{% url 'taskplanning-detail' planning.pk %}" class="btn btn-primary btn-sm mt-1">Planning</a>
-                            <a href="{% url 'task-detail' planning.task.pk %}" class="btn btn-secondary btn-sm mt-1">Task</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>No tasks planned for this day.</p>
-                    {% endif %}
+            {% empty %}
+                <div class="col">
+                    <p>No plannings found for the upcoming days.</p>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col">
-            <p>No plannings found for the upcoming days.</p>
-        </div>
-        {% endfor %}
     </div>
-</div>
 {% endblock %}
