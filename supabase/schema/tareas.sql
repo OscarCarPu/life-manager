@@ -1,54 +1,58 @@
--- Schema for a task management system
-CREATE TABLE IF NOT EXISTS category (
+-- Schema para sistema de gestión de tareas
+CREATE TABLE IF NOT EXISTS categoria (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT,
-    parent_category_id INTEGER REFERENCES category (id) ON DELETE RESTRICT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes to improve query performance
-CREATE TABLE IF NOT EXISTS task (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    due_date DATE,
-    description TEXT,
-    category_id INTEGER REFERENCES category (id) ON DELETE SET NULL,
-    state VARCHAR(50) CHECK (
-        state IN ('pending', 'completed', 'in_progress', 'archived')
-    ) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Indexes to improve query performance
-CREATE TABLE IF NOT EXISTS task_planning (
-    id SERIAL PRIMARY KEY,
-    task_id INTEGER REFERENCES task (id) ON DELETE CASCADE NOT NULL,
-    planned_date DATE NOT NULL,
-    start_hour TIME NULL,
-    end_hour TIME NULL,
-    priority INTEGER CHECK (priority >= 1 AND priority <= 5),
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion TEXT,
+    categoria_padre_id INTEGER REFERENCES categoria (id) ON DELETE RESTRICT,
+    slug VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (task_id, planned_date, start_hour)
+    UNIQUE (slug, categoria_padre_id)
 );
 
--- Trigger for the category table
-CREATE TRIGGER update_category_updated_at
-BEFORE UPDATE ON category
+-- Índices para mejorar el rendimiento de las consultas
+CREATE TABLE IF NOT EXISTS tarea (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    fecha_vencimiento DATE,
+    descripcion TEXT,
+    slug VARCHAR(255) NOT NULL, -- Para URL amigables
+    categoria_id INTEGER REFERENCES categoria (id) ON DELETE SET NULL,
+    estado VARCHAR(50) CHECK (
+        estado IN ('pendiente', 'completada', 'en_progreso', 'archivada')
+    ) DEFAULT 'pendiente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (slug, categoria_id)
+);
+
+-- Índices para mejorar el rendimiento de las consultas
+CREATE TABLE IF NOT EXISTS planificacion_tarea (
+    id SERIAL PRIMARY KEY,
+    tarea_id INTEGER REFERENCES tarea (id) ON DELETE CASCADE NOT NULL,
+    fecha_planificada DATE NOT NULL,
+    hora_inicio TIME NULL,
+    hora_fin TIME NULL,
+    prioridad INTEGER CHECK (prioridad >= 1 AND prioridad <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (tarea_id, fecha_planificada)
+);
+
+-- Trigger para la tabla categoria
+CREATE TRIGGER update_categoria_updated_at
+BEFORE UPDATE ON categoria
 FOR EACH ROW
 EXECUTE FUNCTION UPDATE_UPDATED_AT_COLUMN();
 
--- Trigger for the task table
-CREATE TRIGGER update_task_updated_at
-BEFORE UPDATE ON task
+-- Trigger para la tabla tarea
+CREATE TRIGGER update_tarea_updated_at
+BEFORE UPDATE ON tarea
 FOR EACH ROW
 EXECUTE FUNCTION UPDATE_UPDATED_AT_COLUMN();
 
--- Trigger for the task_planning table
-CREATE TRIGGER update_task_planning_updated_at
-BEFORE UPDATE ON task_planning
+-- Trigger para la tabla planificacion_tarea
+CREATE TRIGGER update_planificacion_tarea_updated_at
+BEFORE UPDATE ON planificacion_tarea
 FOR EACH ROW
 EXECUTE FUNCTION UPDATE_UPDATED_AT_COLUMN();
