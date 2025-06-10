@@ -3,8 +3,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Calendar URL
+    path("", views.CalendarView.as_view(), name="calendar"),
     # Tree URL
-    path("", views.TreeView.as_view(), name="tree"),
+    path("tree/", views.TreeView.as_view(), name="tree"),
     # Category URLs
     path("categories/", views.CategoryListView.as_view(), name="category-list"),
     path("categories/<int:pk>/", views.CategoryDetailView.as_view(), name="category-detail"),

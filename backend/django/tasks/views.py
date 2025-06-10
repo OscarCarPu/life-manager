@@ -13,10 +13,24 @@ from django.views.generic import (
 
 from .models import Category, Task, TaskPlanning
 
-
 # Tree View
+
+
 class TreeView(View):
     template_name = "tree.html"
+
+    def get(self, request):
+        # Fetch root categories and subcategories
+        categories = Category.objects.filter(parent_category__isnull=True).prefetch_related(
+            "subcategories"
+        )
+        context = {"categories": categories}
+        return render(request, self.template_name, context)
+
+
+# Calendar View
+class CalendarView(View):
+    template_name = "calendar.html"
 
     def get(self, request):
         today = date.today()
