@@ -2,7 +2,7 @@
 
 -- Adding white color to category table
 ALTER TABLE category
-ADD COLUMN color CHAR(7) DEFAULT '#FFFFFF';
+ADD COLUMN color CHAR(7) DEFAULT '#3182ce';
 
 -- Create project table
 CREATE TABLE IF NOT EXISTS project (
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS project (
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     category_id INTEGER REFERENCES category (id) ON DELETE SET NULL,
-    color CHAR(7) DEFAULT '#ADD8E6',
+    color CHAR(7) DEFAULT '#f6e05e',
     expected_start_date DATE,
     expected_end_date DATE,
     state VARCHAR(50) CHECK (

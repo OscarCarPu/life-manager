@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS category (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
-    color CHAR(7) DEFAULT '#FFFFFF',
+    color CHAR(7) DEFAULT '#3182ce',
     parent_category_id INTEGER REFERENCES category (id) ON DELETE RESTRICT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS project (
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     category_id INTEGER REFERENCES category (id) ON DELETE SET NULL,
-    color CHAR(7) DEFAULT '#ADD8E6',
+    color CHAR(7) DEFAULT '#f6e05e',
     expected_start_date DATE,
     expected_end_date DATE,
     state VARCHAR(50) CHECK (

@@ -4,7 +4,7 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, null=False)
     description = models.TextField(blank=True, null=True)
-    color = models.CharField(max_length=7, default="#FFFFFF")
+    color = models.CharField(max_length=7, default="#3182CE")
     parent_category = models.ForeignKey(
         "self", on_delete=models.RESTRICT, null=True, blank=True, related_name="subcategories"
     )
@@ -34,7 +34,7 @@ class Project(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="projects"
     )
-    color = models.CharField(max_length=7, default="#ADD8E6")
+    color = models.CharField(max_length=7, default="#F6E05E")
     expected_start_date = models.DateField(null=True, blank=True)
     expected_end_date = models.DateField(null=True, blank=True)
     state = models.CharField(max_length=50, choices=STATE_CHOICES, default="not_started")

@@ -11,12 +11,34 @@ from .models import Category, TaskPlanning
 class TreeView(View):
     template_name = "tree.html"
 
+    def _get_category_tree(self, categories):
+        tree_nodes = {
+            category.id: {"category": category, "subcategories": []} for category in categories
+        }
+        root_nodes = []
+        for category in categories:
+            if category.parent_category is None:
+                root_nodes.append(tree_nodes[category.id])
+            else:
+                parent_id = category.parent_category.id
+                if parent_id in tree_nodes:
+                    tree_nodes[parent_id]["subcategories"].append(tree_nodes[category.id])
+
+        def sort_nodes(nodes):
+            nodes.sort(key=lambda x: x["category"].name.lower())
+            for node in nodes:
+                sort_nodes(node["subcategories"])
+
+        sort_nodes(root_nodes)
+
+        return root_nodes
+
     def get(self, request):
-        # Fetch root categories and subcategories
-        categories = Category.objects.filter(parent_category__isnull=True).prefetch_related(
-            "subcategories"
+        categories = (
+            Category.objects.select_related("parent_category").prefetch_related("projects").all()
         )
-        context = {"categories": categories}
+        root_categories = self._get_category_tree(categories)
+        context = {"root_categories": root_categories}
         return render(request, self.template_name, context)
 
 

@@ -1,0 +1,95 @@
+
+/* Main container overrides Bootstrap default for better spacing */
+.container {
+    max-width: 1600px; /* Wider container for more flexible block arrangements */
+}
+
+/* Styling for category blocks (cards) */
+.category-card {
+    border-width: 3px !important; /* Thicker borders for visual emphasis */
+    border-style: solid;
+    background-color: var(--card-bg);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth hover effects */
+    min-height: 120px; /* Ensure a minimum height for smaller cards */
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+    justify-content: flex-start; /* Align content to the top within the card */
+    align-items: flex-start; /* Align items to the start within the card */
+    text-align: left; /* Default text alignment */
+    min-width: 250px;
+}
+
+/* Hover effect for floating cards */
+.category-card:hover {
+    transform: translateY(-5px); /* Lift the card slightly */
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+}
+
+/* Category title within the card */
+.category-card .card-title {
+    color: var(--text-dark);
+    margin-bottom: 0.75rem; /* Space below title */
+    width: 100%; /* Ensure title takes full width */
+}
+
+/* Projects section styling */
+.projects-section {
+    width: 100%; /* Ensure projects section takes full width */
+    margin-bottom: 1rem; /* Space below projects before subcategories */
+}
+
+.projects-section h6 {
+    color: var(--text-muted);
+    margin-bottom: 0.5rem; /* Space below projects heading */
+}
+
+/* Styling for project links */
+.project-link {
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem; /* Vertical spacing between links */
+    padding-left: 0.75rem; /* Indent the link text */
+    border-left: 4px solid var(--border-default); /* Default left border for project links */
+    transition: border-left-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Smooth transitions */
+    color: var(--text-dark); /* Default text color for links */
+    text-decoration: none; /* No underline by default */
+    display: block; /* Make links block-level for margin and border */
+}
+
+.project-link:hover {
+    text-decoration: none; /* Ensure no underline on hover */
+    color: var(--link-hover-color); /* Change text color on hover */
+    /* The border-left-color will be set dynamically by JS for project.color */
+}
+
+/* Subcategories section styling */
+.subcategories-section {
+    width: 100%; /* Ensure subcategories section takes full width */
+    padding-top: 1rem; /* Space above subcategories section */
+    border-top: 1px solid var(--border-default); /* Separator line */
+    margin-top: 1rem; /* Space above the separator line */
+}
+
+.subcategories-section h6 {
+    color: var(--text-muted);
+    margin-bottom: 1rem; /* Space below subcategories heading */
+}
+
+/* Adjustments for nested rows to control gutter size for subcategories */
+.subcategories-section .row {
+    margin-left: -0.5rem; /* Adjust for smaller gutters */
+    margin-right: -0.5rem;
+}
+
+.subcategories-section .col-custom {
+    padding-left: 0.5rem; /* Adjust for smaller gutters */
+    padding-right: 0.5rem;
+}
+
+/* Helper classes for text shadow, useful if text is over very light/dark backgrounds */
+.text-shadow-light {
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.text-shadow-dark {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}

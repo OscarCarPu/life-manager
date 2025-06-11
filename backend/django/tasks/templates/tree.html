@@ -1,23 +1,22 @@
 {% extends "base.html" %}
 
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/tree.css' %}">
+{% endblock %}
+
 {% block title %}Tree View{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>Tree View</h1>
-        <div class="row">
-            <ul class="list-group">
-                {% for category in categories %}
-                    <li class="list-group-item">
-                        <h2>{{ category.name }}</h2>
-                        <ul>
-                            {% for subcategory in category.subcategories.all %}
-                                <li>{{ subcategory.name }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-            </ul>
+    <div class="container py-4">
+        <h1 class="text-center mb-5 text-dark fs-2 fw-bold">Tree View</h1>
+        <div class="row g-4 justify-content-center">
+            {% include "tree_components/tree_block.html" with nodes=root_categories is_root=True%}
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/tree.js' %}"></script>
 {% endblock %}
