@@ -1,352 +1,177 @@
---
--- Seed data for 'categoria' table
---
+-- Seed data for 'category' table
+INSERT INTO category (name, description, color, parent_category_id) VALUES
+('Work', 'Categoría para tareas y proyectos relacionados con el ámbito laboral.', '#FF5733', NULL),
+('Personal', 'Categoría para tareas y proyectos personales y del hogar.', '#33FF57', NULL),
+('Estudios', 'Categoría para actividades académicas y de aprendizaje.', '#3357FF', NULL),
+-- Child of 'Work'
+('Desarrollo de Software', 'Proyectos y tareas de programación y desarrollo.', '#FFBD33', 1),
+-- Child of 'Work'
+('Marketing', 'Actividades relacionadas con estrategias de marketing y promoción.', '#33FFBD', 1),
+('Hogar', 'Mantenimiento del hogar y tareas domésticas.', '#BD33FF', 2), -- Child of 'Personal'
+-- Child of 'Personal'
+('Salud y Bienestar', 'Actividades para el cuidado personal y la salud.', '#FF33BD', 2);
 
-INSERT INTO categoria (nombre, descripcion, slug) VALUES
-('Casa', 'Tareas y responsabilidades relacionadas con el hogar.', 'casa'),
-('Estudios', 'Actividades académicas y de aprendizaje.', 'estudios'),
-('Trabajo', 'Tareas profesionales y laborales.', 'trabajo'),
+-- Seed data for 'project' table
+INSERT INTO project (
+    name, description, category_id, color, expected_start_date, expected_end_date, state
+) VALUES
 (
-    'Desarrollo Personal',
-    'Actividades para crecimiento personal y bienestar.',
-    'desarrollo-personal'
+    'Nuevo Sitio Web', 'Desarrollo completo del sitio web corporativo.', (
+        SELECT id FROM category
+        WHERE name = 'Desarrollo de Software'
+    ), '#FFC300', '2025-06-15', '2025-09-30', 'in_progress'
+),
+(
+    'Campaña de Verano', 'Planificación y ejecución de la campaña de marketing estival.', (
+        SELECT id FROM category
+        WHERE name = 'Marketing'
+    ), '#DAF7A6', '2025-07-01', '2025-08-31', 'not_started'
+),
+(
+    'Reforma Cocina', 'Proyecto de renovación de la cocina.', (
+        SELECT id FROM category
+        WHERE name = 'Hogar'
+    ), '#FF5733', '2025-05-20', '2025-07-15', 'in_progress'
+),
+(
+    'Curso SQL Avanzado', 'Estudio intensivo de SQL avanzado y optimización de bases de datos.', (
+        SELECT id FROM category
+        WHERE name = 'Estudios'
+    ), '#33FF57', '2025-06-01', '2025-07-20', 'in_progress'
+),
+(
+    'Plan de Ejercicio', 'Rutina de ejercicios y dieta para mejorar la condición física.', (
+        SELECT id FROM category
+        WHERE name = 'Salud y Bienestar'
+    ), '#3357FF', '2025-06-10', '2025-12-31', 'in_progress'
+),
+(
+    'Migración a la Nube', 'Migración de la infraestructura actual a servicios cloud.', (
+        SELECT id FROM category
+        WHERE name = 'Desarrollo de Software'
+    ), '#AABBCC', '2025-04-01', '2025-06-10', 'completed'
+),
+(
+    'Organizar Documentos', 'Digitalización y organización de documentos personales.', (
+        SELECT id FROM category
+        WHERE name = 'Personal'
+    ), '#FFE4B5', '2025-06-05', '2025-06-15', 'in_progress'
 );
 
--- Subcategories (referencing parent categories)
-INSERT INTO categoria (nombre, descripcion, categoria_padre_id, slug) VALUES
+-- Seed data for 'task' table
+INSERT INTO task (title, due_date, description, project_id, state) VALUES
 (
-    'Limpieza', 'Tareas de limpieza y mantenimiento del hogar.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Casa'
-    ), 'limpieza'
-),
-(
-    'Finanzas Hogar', 'Gestión económica del hogar.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Casa'
-    ), 'finanzas-hogar'
-),
-(
-    'Proyectos Personales', 'Proyectos de mejora del hogar o personales.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Casa'
-    ), 'proyectos-personales'
-),
-(
-    'Universidad', 'Tareas y asignaturas universitarias.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Estudios'
-    ), 'universidad'
-),
-(
-    'Cursos Online', 'Cursos y aprendizaje autodidacta.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Estudios'
-    ), 'cursos-online'
-),
-(
-    'Reuniones', 'Preparación y asistencia a reuniones de trabajo.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Trabajo'
-    ), 'reuniones'
-),
-(
-    'Informes', 'Elaboración y revisión de informes y documentos.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Trabajo'
-    ), 'informes'
-),
-(
-    'Salud y Bienestar', 'Ejercicio, nutrición y cuidado personal.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Desarrollo Personal'
-    ), 'salud-bienestar'
-),
-(
-    'Lectura', 'Lectura de libros y artículos.', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Desarrollo Personal'
-    ), 'lectura'
-);
-
---
--- Seed data for 'tarea' table
---
-
-INSERT INTO tarea (titulo, descripcion, fecha_vencimiento, slug, categoria_id, estado) VALUES
--- Tareas de Casa
-(
-    'Limpiar baño a fondo',
-    'Sanitarios, ducha, suelo y espejos.',
-    '2025-06-05',
-    'limpiar-bano-fondo',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Limpieza'
-    ), 'pendiente'
-),
-(
-    'Hacer la compra semanal',
-    'Lista de la compra y visita al supermercado.',
-    '2025-06-02',
-    'compra-semanal',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Limpieza'
-    ), 'pendiente'
-),
-(
-    'Pagar factura de la luz',
-    'Comprobar recibo y realizar pago online.',
-    '2025-06-10',
-    'pagar-luz',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Finanzas Hogar'
-    ), 'pendiente'
-),
-(
-    'Organizar armario del salón',
-    'Sacar cosas, limpiar y redistribuir.',
-    NULL,
-    'organizar-armario-salon',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Proyectos Personales'
-    ), 'pendiente'
-),
-(
-    'Revisar presupuesto mensual',
-    'Análisis de ingresos y gastos.',
-    '2025-06-15',
-    'revisar-presupuesto-mensual',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Finanzas Hogar'
-    ), 'pendiente'
-),
-(
-    'Montar estantería nueva',
-    'Seguir instrucciones y fijar a la pared.',
-    '2025-06-20',
-    'montar-estanteria',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Proyectos Personales'
-    ), 'pendiente'
-),
-
--- Tareas de Estudios
-(
-    'Estudiar para examen de Bases de Datos',
-    'Repasar temas 1-5, hacer ejercicios.',
-    '2025-06-08',
-    'estudiar-bbdd',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Universidad'
-    ), 'pendiente'
-),
-(
-    'Preparar presentación de Historia',
-    'Investigar, estructurar y diseñar diapositivas.',
-    '2025-06-12',
-    'preparar-presentacion-historia',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Universidad'
-    ), 'pendiente'
-),
-(
-    'Ver lección 3 de curso de Python',
-    'Programación orientada a objetos.',
-    NULL,
-    'leccion-3-python',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Cursos Online'
-    ), 'pendiente'
-),
-(
-    'Hacer ejercicios de cálculo integral',
-    'Capítulo 7 del libro de texto.',
+    'Diseñar maqueta UI/UX',
     '2025-06-25',
-    'ejercicios-calculo',
+    'Crear wireframes y prototipos para el nuevo sitio web.',
     (
-        SELECT id FROM categoria
-        WHERE nombre = 'Universidad'
-    ), 'pendiente'
+        SELECT id FROM project
+        WHERE name = 'Nuevo Sitio Web'
+    ), 'in_progress'
 ),
 (
-    'Escribir resumen de artículo científico',
-    'Sobre la inteligencia artificial.',
-    '2025-06-18',
-    'resumen-articulo-ia',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Universidad'
-    ), 'pendiente'
-),
-
--- Tareas de Trabajo
-(
-    'Reunión semanal con equipo',
-    'Preparar puntos de agenda y participar.',
-    '2025-06-03',
-    'reunion-semanal-equipo',
-    (
-        SELECT id FROM categoria
-        WHERE nombre = 'Reuniones'
-    ), 'completada'
+    'Desarrollar backend', '2025-08-15', 'Implementar la lógica de negocio y la API.', (
+        SELECT id FROM project
+        WHERE name = 'Nuevo Sitio Web'
+    ), 'pending'
 ),
 (
-    'Enviar informe mensual de ventas',
-    'Recopilar datos y redactar análisis.',
-    '2025-06-07',
-    'enviar-informe-ventas',
+    'Investigar tendencias de mercado',
+    '2025-06-30',
+    'Análisis de la competencia y tendencias actuales de marketing.',
     (
-        SELECT id FROM categoria
-        WHERE nombre = 'Informes'
-    ), 'pendiente'
+        SELECT id FROM project
+        WHERE name = 'Campaña de Verano'
+    ), 'pending'
 ),
 (
-    'Preparar demo de nuevo producto',
-    'Configurar entorno y practicar presentación.',
+    'Comprar materiales', '2025-06-18', 'Adquirir azulejos, encimeras y electrodomésticos.', (
+        SELECT id FROM project
+        WHERE name = 'Reforma Cocina'
+    ), 'completed'
+),
+(
+    'Instalar gabinetes', '2025-07-05', 'Instalación de todos los gabinetes de la cocina.', (
+        SELECT id FROM project
+        WHERE name = 'Reforma Cocina'
+    ), 'in_progress'
+),
+(
+    'Estudiar subconsultas',
     '2025-06-14',
-    'preparar-demo-producto',
+    'Revisar ejemplos y practicar el uso de subconsultas en SQL.',
     (
-        SELECT id FROM categoria
-        WHERE nombre = 'Reuniones'
-    ), 'pendiente'
+        SELECT id FROM project
+        WHERE name = 'Curso SQL Avanzado'
+    ), 'in_progress'
 ),
 (
-    'Revisar propuesta de cliente X',
-    'Ajustar detalles y enviar feedback.',
-    '2025-06-06',
-    'revisar-propuesta-cliente-x',
+    'Planificar rutina semanal',
+    '2025-06-12',
+    'Definir los días y tipos de ejercicio para la semana.',
     (
-        SELECT id FROM categoria
-        WHERE nombre = 'Informes'
-    ), 'pendiente'
+        SELECT id FROM project
+        WHERE name = 'Plan de Ejercicio'
+    ), 'pending'
 ),
 (
-    'Responder emails pendientes',
-    'Gestionar bandeja de entrada.',
-    NULL,
-    'responder-emails-pendientes',
+    'Completar reporte de migración',
+    '2025-06-09',
+    'Redactar el informe final sobre la migración a la nube.',
     (
-        SELECT id FROM categoria
-        WHERE nombre = 'Trabajo'
-    ), 'pendiente'
-),
-
--- Tareas de Desarrollo Personal
-(
-    'Hacer 30 min de ejercicio', 'Rutina de fuerza o cardio.', NULL, 'ejercicio-30min', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Salud y Bienestar'
-    ), 'pendiente'
+        SELECT id FROM project
+        WHERE name = 'Migración a la Nube'
+    ), 'completed'
 ),
 (
-    'Leer capítulo de "El poder del hábito"',
-    'Libro de Charles Duhigg.',
-    NULL,
-    'leer-el-poder-del-habito',
+    'Escanear recibos antiguos',
+    '2025-06-10',
+    'Digitalizar recibos importantes de los últimos 5 años.',
     (
-        SELECT id FROM categoria
-        WHERE nombre = 'Lectura'
-    ), 'pendiente'
-),
-(
-    'Meditar 10 minutos', 'Sesión guiada de meditación.', NULL, 'meditar-10min', (
-        SELECT id FROM categoria
-        WHERE nombre = 'Salud y Bienestar'
-    ), 'pendiente'
+        SELECT id FROM project
+        WHERE name = 'Organizar Documentos'
+    ), 'in_progress'
 );
 
---
--- Seed data for 'planificacion_tarea' table
---
-
-INSERT INTO planificacion_tarea (tarea_id, fecha_planificada, prioridad) VALUES
--- Planificación para el 1 de Junio de 2025
+-- Seed data for 'task_planning' table
+INSERT INTO task_planning (task_id, planned_date, start_hour, end_hour, priority) VALUES
+(
+    (
+        SELECT id FROM task
+        WHERE title = 'Diseñar maqueta UI/UX'
+    ), '2025-06-12', '09:00:00', '13:00:00', 4
+),
+(
+    (
+        SELECT id FROM task
+        WHERE title = 'Diseñar maqueta UI/UX'
+    ), '2025-06-13', '09:00:00', '12:00:00', 4
+),
+(
+    (
+        SELECT id FROM task
+        WHERE title = 'Estudiar subconsultas'
+    ), '2025-06-11', '14:00:00', '16:00:00', 5
+),
+(
+    (
+        SELECT id FROM task
+        WHERE title = 'Estudiar subconsultas'
+    ), '2025-06-12', '10:00:00', '12:00:00', 5
+),
+(
+    (
+        SELECT id FROM task
+        WHERE title = 'Planificar rutina semanal'
+    ), '2025-06-12', '18:00:00', '19:00:00', 3
+),
 ((
-    SELECT id FROM tarea
-    WHERE titulo = 'Hacer la compra semanal'
-), '2025-06-01', 1),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Hacer 30 min de ejercicio'
-), '2025-06-01', 5),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Leer capítulo de "El poder del hábito"'
-), '2025-06-01', 4),
-
--- Planificación para el 2 de Junio de 2025
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Revisar propuesta de cliente X'
-), '2025-06-02', 1),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Estudiar para examen de Bases de Datos'
-), '2025-06-02', 2),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Responder emails pendientes'
-), '2025-06-02', 3),
-
--- Planificación para el 3 de Junio de 2025
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Limpiar baño a fondo'
-), '2025-06-03', 2),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Ver lección 3 de curso de Python'
-), '2025-06-03', 3),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Meditar 10 minutos'
-), '2025-06-03', 5),
-
--- Planificación para el 4 de Junio de 2025
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Enviar informe mensual de ventas'
-), '2025-06-04', 1),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Preparar presentación de Historia'
-), '2025-06-04', 2),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Organizar armario del salón'
-), '2025-06-04', 4),
-
--- Planificación para el 5 de Junio de 2025 (Tarea repetida en planificación)
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Estudiar para examen de Bases de Datos'
-), '2025-06-05', 1),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Hacer 30 min de ejercicio'
-), '2025-06-05', 5),
-
--- Planificación para el 6 de Junio de 2025
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Pagar factura de la luz'
-), '2025-06-06', 1),
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Preparar demo de nuevo producto'
-), '2025-06-06', 2),
-
--- Planificación para el 10 de Junio de 2025
-((
-    SELECT id FROM tarea
-    WHERE titulo = 'Revisar presupuesto mensual'
-), '2025-06-10', 1);
+    SELECT id FROM task
+    WHERE title = 'Instalar gabinetes'
+), '2025-06-15', '08:00:00', '17:00:00', 4),
+(
+    (
+        SELECT id FROM task
+        WHERE title = 'Escanear recibos antiguos'
+    ), '2025-06-10', '10:00:00', '11:30:00', 2
+);

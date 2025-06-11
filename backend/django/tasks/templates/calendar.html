@@ -22,8 +22,6 @@
                                                 {{ planning.start_hour|time:"H:i" }} - {{ planning.end_hour|time:"H:i" }}
                                                 (Priority: {{ planning.priority }})
                                             </small><br>
-                                            <a href="{% url 'taskplanning-detail' planning.pk %}" class="btn btn-primary btn-sm mt-1">Planning</a>
-                                            <a href="{% url 'task-detail' planning.task.pk %}" class="btn btn-secondary btn-sm mt-1">Task</a>
                                         </li>
                                     {% endfor %}
                                 </ul>

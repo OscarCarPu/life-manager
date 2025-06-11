@@ -4,6 +4,7 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, null=False)
     description = models.TextField(blank=True, null=True)
+    color = models.CharField(max_length=7, default="#FFFFFF")
     parent_category = models.ForeignKey(
         "self", on_delete=models.RESTRICT, null=True, blank=True, related_name="subcategories"
     )
@@ -14,7 +15,35 @@ class Category(models.Model):
         managed = False
         db_table = "category"
         verbose_name_plural = "Categories"
-        ordering = ["updated_at"]
+
+    def __str__(self):
+        return self.name
+
+
+class Project(models.Model):
+    STATE_CHOICES = [
+        ("not_started", "Not Started"),
+        ("in_progress", "In Progress"),
+        ("completed", "Completed"),
+        ("archived", "Archived"),
+    ]
+
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, unique=True, null=False)
+    description = models.TextField(blank=True, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="projects"
+    )
+    color = models.CharField(max_length=7, default="#ADD8E6")
+    expected_start_date = models.DateField(null=True, blank=True)
+    expected_end_date = models.DateField(null=True, blank=True)
+    state = models.CharField(max_length=50, choices=STATE_CHOICES, default="not_started")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = "project"
 
     def __str__(self):
         return self.name
@@ -31,8 +60,8 @@ class Task(models.Model):
     title = models.CharField(max_length=255, null=False)
     due_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="tasks"
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, null=True, blank=True, related_name="tasks"
     )
     state = models.CharField(max_length=50, choices=STATE_CHOICES, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -41,7 +70,7 @@ class Task(models.Model):
     class Meta:
         managed = False
         db_table = "task"
-        ordering = ["due_date", "updated_at"]
+        ordering = ["due_date"]
 
     def __str__(self):
         return self.title
@@ -61,7 +90,7 @@ class TaskPlanning(models.Model):
     class Meta:
         managed = False
         db_table = "task_planning"
-        unique_together = ("task", "planned_date", "start_hour")
+        unique_together = ("task", "planned_date")
         ordering = ["planned_date", "start_hour", "priority"]
 
     def __str__(self):
