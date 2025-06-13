@@ -9,6 +9,8 @@
         <title>{% block title %}CRUD Panel{% endblock %}</title>
         {% bootstrap_css %}
         <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        {% block styles %}
+        {% endblock %}
         <!-- Google Fonts Link -->
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     </head>
@@ -38,5 +40,7 @@
         </div>
         {% bootstrap_javascript %}
         <script src="{% static 'js/script.js' %}"></script>
+        {% block scripts %}
+        {% endblock %}
     </body>
 </html>

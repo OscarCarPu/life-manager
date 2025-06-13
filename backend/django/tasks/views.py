@@ -5,7 +5,13 @@ from django.views.generic import View
 
 from .models import Category, TaskPlanning
 
+
 # Tree View
+class BaseView(View):
+    template_name = "base.html"
+
+    def get(self, request):
+        return render(request, self.template_name)
 
 
 class TreeView(View):

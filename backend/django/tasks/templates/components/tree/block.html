@@ -1,0 +1,43 @@
+{% comment %}
+This template is used to render a block of nodes in a tree structure recursively.
+- 'nodes': list of nodes of the tree
+- 'is_root': boolean to check for adjusting styles
+{% endcomment %}
+<div class="categories-block">
+    {% for node in nodes %}
+        <div class="mb-4"
+             data-category-id="{{ node.category.id }}"
+             data-projects-count="{{ node.category.projects.count }}"
+             data-subcategories-count="{{ node.subcategories|length }}">
+            <div class="card category-card h-100 shadow-sm rounded-lg p-4"
+                 style="border-color: {{ node.category.color|default:'#dee2e6' }};">
+                <h4 class="card-title fw-bold text-dark mb-0">
+                    {{ node.category.name }}
+                </h4>
+
+                {% if node.category.projects and node.category.projects.count > 0 %}
+                    <div class="projects-section mt-3">
+                        <h6 class="text-muted mb-2">Projects:</h6>
+                        {% for project in node.category.projects.all %}
+                            <a href="#" class="project-link"
+                               style="border-left-color: {{ project.color|default:'#6c757d' }}; --project-color: {{ project.color|default:'#6c757d' }};">
+                                {{ project.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if node.category.projects and node.category.projects.count > 0 and node.subcategories and node.subcategories|length > 0 %}
+                    <hr>
+                {% endif %}
+
+                {% if node.subcategories and node.subcategories|length > 0 %}
+                    <div class="subcategories-section mt-auto">
+                        <h6 class="text-muted mb-3">Subcategories:</h6>
+                        {% include "components/tree/block.html" with nodes=node.subcategories %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
