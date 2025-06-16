@@ -43,7 +43,7 @@ repos:
         args: ["--line-length", "100"]
   # SQL hooks
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.0
+    rev: 3.4.1
     hooks:
       - id: sqlfluff-fix
         name: format SQL files
@@ -66,3 +66,14 @@ repos:
       - id: djjs
         name: format Django JavaScript files
         files: ^backend/django/.*\.js$
+  # Pytest test
+  - repo: local
+    hooks:
+      - id: pytest
+        name: run pytest tests
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit, pre-push]
+        args: ["--maxfail=1"]
