@@ -14,8 +14,8 @@
     flex-direction: row;
     gap: 10px;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: center;
+    align-items: stretch;
 }
 
 /* Category card */
