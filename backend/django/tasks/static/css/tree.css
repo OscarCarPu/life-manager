@@ -45,6 +45,40 @@
     width: 100%;
 }
 
+/* Category dropdown actions */
+.category-actions-dropdown {
+    background-color: transparent;
+    padding: .25rem .5rem;
+    border-radius: .25rem;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    color: var(--text-dark);
+}
+
+.category-actions-dropdown:hover,
+.category-actions-dropdown:focus{
+    background-color: var(--project-color);
+    opacity: 0.8;
+}
+
+.category-actions-dropdown:focus {
+    opacity: 1;
+}
+
+.category-actions-dropdown:hover .fas,
+.category-actions-dropdown:focus .fas,
+.category-actions-dropdown:active .fas,
+.category-actions-dropdown[aria-expanded="true"] .fas {
+    color: inherit;
+}
+
+.category-actions-dropdown.text-white-on-hover:hover {
+    color: var(--text-white);
+}
+
+.category-actions-dropdown.text-dark-on-hover:hover {
+    color: var(--text-dark);
+}
+
 /* Project section */
 .projects-section {
     width: 100%;

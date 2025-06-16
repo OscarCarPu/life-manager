@@ -1,28 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const categoryContainers = document.querySelectorAll('.col-custom');
+  // Apply color contrast to project links and dropdown button
+  function applyProjectLinkContrast() {
+    const projectLinks = document.querySelectorAll('.project-link');
 
-    function calculateContentWeight(containerElement) {
-    }
+    ColorContrast.applyOptimalTextColor(projectLinks, {
+      backgroundProperty: '--project-color',
+      whiteTextClass: 'text-white-on-hover',
+      darkTextClass: 'text-dark-on-hover',
+      whiteColor: '#ffffff',
+      darkColor: '#343a40'
+    });
 
-    function getColumnClasses(weight, isRoot) {
-    }
+    const dropdownCategory = document.querySelectorAll('.category-actions-dropdown');
 
-    function applyDynamicSizing() {
-    }
+    ColorContrast.applyOptimalTextColor(dropdownCategory, {
+      backgroundProperty: '--project-color',
+      whiteTextClass: 'text-white-on-hover',
+      darkTextClass: 'text-dark-on-hover',
+      whiteColor: '#ffffff',
+      darkColor: '#343a40'
+    });
+  };
 
-    // Apply color contrast to project links
-    function applyProjectLinkContrast() {
-        const projectLinks = document.querySelectorAll('.project-link');
-
-        ColorContrast.applyOptimalTextColor(projectLinks, {
-            backgroundProperty: '--project-color',
-            whiteTextClass: 'text-white-on-hover',
-            darkTextClass: 'text-dark-on-hover',
-            whiteColor: '#ffffff',
-            darkColor: '#343a40'
-        });
-    }
-
-    // Initialize color contrast
-    applyProjectLinkContrast();
+  // Initialize color contrast
+  applyProjectLinkContrast();
 });
