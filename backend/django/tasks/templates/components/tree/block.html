@@ -1,60 +1,65 @@
 {% comment %}
 This template is used to render a block of nodes in a tree structure recursively.
 - 'nodes': list of nodes of the tree
-- 'is_root': boolean to check for adjusting styles
 {% endcomment %}
-<div class="categories-block">
-    {% for node in nodes %}
-        <div class="mb-4"
-             data-category-id="{{ node.category.id }}"
-             data-projects-count="{{ node.category.projects.count }}"
-             data-subcategories-count="{{ node.subcategories|length }}">
-            <div class="card category-card h-100 shadow-sm rounded-lg p-4"
-                 style="border-color: {{ node.category.color|default:'#dee2e6' }};">
-                <h4 class="card-title fw-bold text-dark mb-0">
-                    {{ node.category.name }}
-                    <span class="float-end">
-                        <button type="button" class="btn btn-sm border-0 category-actions-dropdown"
-                                style="--project-color: {{ node.category.color|default:'#dee2e6' }};"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="False">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal"
-                               data-category-id="{{ node.category.id }}">Edit</a>
-                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#newSubcategoryModal"
-                               data-category-id="{{ node.category.id }}">New Subcategory</a>
-                            <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                               data-bs-target="#newProjectModal" data-category-id="{{ node.category.id }}">New Project</a>
-                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
-                               data-bs-target="#deleteCategoryModal" data-category-id="{{ node.category.id }}">Delete</a>
+<div class="categories-block" id="category-tree-content">
+    {% if nodes %}
+        {% for node in nodes %}
+            <div class="mb-4"
+                 data-category-id="{{ node.category.id }}"
+                 data-projects-count="{{ node.category.projects.count }}"
+                 data-subcategories-count="{{ node.subcategories|length }}">
+                <div class="card category-card h-100 shadow-sm rounded-lg p-4"
+                     style="border-color: {{ node.category.color|default:'#dee2e6' }};">
+                    <h4 class="card-title fw-bold text-dark mb-0">
+                        {{ node.category.name }}
+                        <span class="float-end">
+                            <button type="button" class="btn btn-sm border-0 category-actions-dropdown"
+                                    style="--project-color: {{ node.category.color|default:'#dee2e6' }};"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="False">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editCategoryModal"
+                                   data-category-id="{{ node.category.id }}">Edit</a>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#newSubcategoryModal"
+                                   data-category-id="{{ node.category.id }}">New Subcategory</a>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                   data-bs-target="#newProjectModal" data-category-id="{{ node.category.id }}">New Project</a>
+                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
+                                   data-bs-target="#deleteCategoryModal" data-category-id="{{ node.category.id }} ">Delete</a>
+                            </div>
+                        </span>
+                    </h4>
+
+                    {% if node.category.projects and node.category.projects.count > 0 %}
+                        <div class="projects-section mt-3">
+                            <h6 class="text-muted mb-2">Projects:</h6>
+                            {% for project in node.category.projects.all %}
+                                <a href="#" class="project-link"
+                                   style="border-left-color: {{ project.color|default:'#6c757d' }}; --project-color: {{ project.color|default:'#6c757d' }};">
+                                    {{ project.name }}
+                                </a>
+                            {% endfor %}
                         </div>
-                    </span>
-                </h4>
+                    {% endif %}
 
-                {% if node.category.projects and node.category.projects.count > 0 %}
-                    <div class="projects-section mt-3">
-                        <h6 class="text-muted mb-2">Projects:</h6>
-                        {% for project in node.category.projects.all %}
-                            <a href="#" class="project-link"
-                               style="border-left-color: {{ project.color|default:'#6c757d' }}; --project-color: {{ project.color|default:'#6c757d' }};">
-                                {{ project.name }}
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                    {% if node.category.projects and node.category.projects.count > 0 and node.subcategories and node.subcategories|length > 0 %}
+                        <hr>
+                    {% endif %}
 
-                {% if node.category.projects and node.category.projects.count > 0 and node.subcategories and node.subcategories|length > 0 %}
-                    <hr>
-                {% endif %}
-
-                {% if node.subcategories and node.subcategories|length > 0 %}
-                    <div class="subcategories-section mt-auto">
-                        <h6 class="text-muted mb-3">Subcategories:</h6>
-                        {% include "components/tree/block.html" with nodes=node.subcategories %}
-                    </div>
-                {% endif %}
+                    {% if node.subcategories and node.subcategories|length > 0 %}
+                        <div class="subcategories-block ps-4 mt-3">
+                            {% include "components/tree/block.html" with nodes=node.subcategories %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center p-5">
+            <p class="lead text-muted">No categories yet.</p>
+            <p>You can start by creating a top-level category.</p>
         </div>
-    {% endfor %}
+    {% endif %}
 </div>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% include "components/tree/delete-category.html" %}
 {% load static %}
 
 {% block styles %}
@@ -11,7 +11,9 @@
 {% block content %}
     <div class="tree-view-area">
         <h1 class="text-center mb-5 text-dark fs-2 fw-bold">Category Tree</h1>
-        {% include "components/tree/block.html" with nodes=root_categories %}
+        <div id="category-tree-container" hx-get="{% url 'category_block' %}" hx-trigger="load, categoryListChanged from:body" hx-swap="innerHTML">
+            Loading categories...
+        </div>
     </div>
 {% endblock %}
 

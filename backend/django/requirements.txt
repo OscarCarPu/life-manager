@@ -4,3 +4,4 @@ python-decouple
 gunicorn
 django-bootstrap5
 whitenoise
+htmx

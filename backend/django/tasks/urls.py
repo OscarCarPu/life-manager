@@ -7,5 +7,6 @@ urlpatterns = [
     path("", views.CalendarView.as_view(), name="calendar"),
     # Tree URL
     path("tree/", views.TreeView.as_view(), name="tree"),
-    path("base", views.BaseView.as_view(), name="base"),
+    path("tree/categories-block/", views.CategoryBlockView.as_view(), name="category_block"),
+    path("categories/<int:pk>/delete/", views.CategoryDeleteView.as_view(), name="category_delete"),
 ]

@@ -1,21 +1,25 @@
 from datetime import date, timedelta
 
-from django.shortcuts import render
-from django.views.generic import View
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import DeleteView, TemplateView, View
 
 from .models import Category, TaskPlanning
 
 
-# Tree View
-class BaseView(View):
-    template_name = "base.html"
+class TreeView(View):
+    template_name = "tree.html"
 
     def get(self, request):
         return render(request, self.template_name)
 
 
-class TreeView(View):
-    template_name = "tree.html"
+# Tree Utils Views
+
+
+class CategoryBlockView(TemplateView):
+    template_name = "components/tree/block.html"
 
     def _get_category_tree(self, categories):
         tree_nodes = {
@@ -39,13 +43,37 @@ class TreeView(View):
 
         return root_nodes
 
-    def get(self, request):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         categories = (
-            Category.objects.select_related("parent_category").prefetch_related("projects").all()
+            Category.objects.select_related("parent_category")
+            .prefetch_related("subcategories")
+            .all()
         )
-        root_categories = self._get_category_tree(categories)
-        context = {"root_categories": root_categories}
-        return render(request, self.template_name, context)
+        context["nodes"] = self._get_category_tree(categories)
+        return context
+
+
+class CategoryDeleteView(DeleteView):
+    model = Category
+    template_name = "components/tree/delete-category.html"
+
+    def get_success_url(self):
+        messages.success(self.request, f"Category '{str(self.object)}' deleted successfully.")
+        return reverse_lazy("tree_view")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["category"] = self.object
+        return context
+
+    def form_valid(self, form):
+        messages.info(self.request, f"Attempting to delete category '{str(self.object)}'.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, f"Could not delete category '{str(self.object)}'.")
+        return redirect("tree_view")
 
 
 # Calendar View

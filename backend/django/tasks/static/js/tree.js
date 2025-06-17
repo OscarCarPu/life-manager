@@ -24,4 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialize color contrast
   applyProjectLinkContrast();
+  // afterSwap and hx-trigger
+  document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.target.id === 'category-tree-container') {
+      applyProjectLinkContrast();
+    }
+  });
 });
