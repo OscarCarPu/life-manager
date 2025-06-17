@@ -8,6 +8,15 @@
     width: 100%;
 }
 
+/* Contrast color */
+.text-white-on-hover {
+    color: var(--text-white);
+}
+
+.text-dark-on-hover {
+    color: var(--text-dark);
+}
+
 /* Category block */
 .categories-block {
     display: flex;
@@ -55,7 +64,9 @@
 }
 
 .category-actions-dropdown:hover,
-.category-actions-dropdown:focus{
+.category-actions-dropdown:focus,
+.category-actions-dropdown:active,
+.category-actions-dropdown[aria-expanded="true"] {
     background-color: var(--project-color);
     opacity: 0.8;
 }
@@ -71,13 +82,6 @@
     color: inherit;
 }
 
-.category-actions-dropdown.text-white-on-hover:hover {
-    color: var(--text-white);
-}
-
-.category-actions-dropdown.text-dark-on-hover:hover {
-    color: var(--text-dark);
-}
 
 /* Project section */
 .projects-section {
@@ -113,13 +117,6 @@
     background-size: 100% 100%;
 }
 
-.project-link.text-white-on-hover:hover {
-    color: var(--text-white);
-}
-
-.project-link.text-dark-on-hover:hover {
-    color: var(--text-dark);
-}
 
 /* Subcategories styling */
 .subcategories-section {
@@ -149,6 +146,13 @@
 
 .text-shadow-dark {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+.project-link.text-white-on-hover:hover {
+    color: var(--text-white);
+}
+
+.project-link.text-dark-on-hover:hover {
+    color: var(--text-dark);
 }
 
 /* HR styling for tree view */
