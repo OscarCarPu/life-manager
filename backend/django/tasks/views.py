@@ -1,9 +1,9 @@
 from datetime import date, timedelta
+from http import HTTPStatus
 
-from django.contrib import messages
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import DeleteView, TemplateView, View
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import TemplateView, View
 
 from .models import Category, TaskPlanning
 
@@ -54,26 +54,34 @@ class CategoryBlockView(TemplateView):
         return context
 
 
-class CategoryDeleteView(DeleteView):
-    model = Category
-    template_name = "components/tree/delete-category.html"
+class CategoryDeleteModalView(View):
+    template_name = "components/tree/delete_modal.html"
 
-    def get_success_url(self):
-        messages.success(self.request, f"Category '{str(self.object)}' deleted successfully.")
-        return reverse_lazy("tree_view")
+    def get(self, request, id, *args, **kwargs):
+        """Handle modal rendering"""
+        try:
+            category = get_object_or_404(Category, id=id)
+        except Http404:
+            return HttpResponse("Category not found.", status=HTTPStatus.NOT_FOUND)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["category"] = self.object
-        return context
+        context = {"category": category}
+        return render(request, self.template_name, context)
 
-    def form_valid(self, form):
-        messages.info(self.request, f"Attempting to delete category '{str(self.object)}'.")
-        return super().form_valid(form)
+    def post(self, request, id, *args, **kwargs):
+        """Handle post deletion request"""
+        try:
+            category = get_object_or_404(Category, id=id)
+        except Http404:
+            response = HttpResponse("Category not found.")
+            response.status_code = HTTPStatus.NOT_FOUND
+            response["HX-Trigger"] = "closeModal"
+            return response
 
-    def form_invalid(self, form):
-        messages.error(self.request, f"Could not delete category '{str(self.object)}'.")
-        return redirect("tree_view")
+        category.delete()
+        response = HttpResponse("Category deleted successfully.")
+        response.status_code = HTTPStatus.OK
+        response["HX-Trigger"] = "categoryListChanged, closeModal"
+        return response
 
 
 # Calendar View

@@ -8,5 +8,9 @@ urlpatterns = [
     # Tree URL
     path("tree/", views.TreeView.as_view(), name="tree"),
     path("tree/categories-block/", views.CategoryBlockView.as_view(), name="category_block"),
-    path("categories/<int:pk>/delete/", views.CategoryDeleteView.as_view(), name="category_delete"),
+    path(
+        "categories/<int:id>/delete-modal/",
+        views.CategoryDeleteModalView.as_view(),
+        name="category_delete_modal",
+    ),
 ]

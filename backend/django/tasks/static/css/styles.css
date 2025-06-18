@@ -24,3 +24,25 @@ hr {
   border: 1px solid gray;
   width: 100%;
 }
+
+#htmx-modal-dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-width: 50vw;
+}
+
+#htmx-modal-dialog .modal-content-wrapper {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}
+
+#htmx-modal-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+#htmx-modal-dialog {
+  display: none;
+}

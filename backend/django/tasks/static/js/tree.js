@@ -20,14 +20,23 @@ document.addEventListener('DOMContentLoaded', function() {
       whiteColor: '#ffffff',
       darkColor: '#343a40'
     });
-  };
+  }
 
   // Initialize color contrast
   applyProjectLinkContrast();
-  // afterSwap and hx-trigger
+
+  // Re-apply color contrast after HTMX swaps
   document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.target.id === 'category-tree-container') {
       applyProjectLinkContrast();
     }
+  });
+
+  // Re-apply color contrast after category list changes
+  document.body.addEventListener('categoryListChanged', function(event) {
+    // Small delay to ensure DOM is updated
+    setTimeout(function() {
+      applyProjectLinkContrast();
+    }, 100);
   });
 });

@@ -37,10 +37,13 @@
             </div>
         </nav>
         <div class="container">
-            {% bootstrap_messages %}
+            <div id="messages-container">
+                {% bootstrap_messages %}
+            </div>
             {% block content %}
             {% endblock %}
         </div>
+        <dialog id="htmx-modal-dialog"></dialog>
         {% bootstrap_javascript %}
         <script src="https://unpkg.com/htmx.org@1.9.12"></script>
         <script src="{% static 'js/script.js' %}"></script>
