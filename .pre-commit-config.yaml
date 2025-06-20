@@ -76,4 +76,11 @@ repos:
         pass_filenames: false
         always_run: true
         stages: [pre-commit, pre-push]
-        args: ["--maxfail=1"]
+        args: ["--maxfail=1", "./tests"]
+      - id: django-test
+        name: run Django tests
+        entry: python backend/django/manage.py test
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit, pre-push]

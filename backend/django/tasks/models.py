@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -12,7 +13,7 @@ class Category(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        managed = settings.IS_TESTING
         db_table = "category"
         verbose_name_plural = "Categories"
 
@@ -42,7 +43,7 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        managed = settings.IS_TESTING
         db_table = "project"
 
     def __str__(self):
@@ -68,7 +69,7 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        managed = settings.IS_TESTING
         db_table = "task"
         ordering = ["due_date"]
 
@@ -88,7 +89,7 @@ class TaskPlanning(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        managed = settings.IS_TESTING
         db_table = "task_planning"
         unique_together = ("task", "planned_date")
         ordering = ["planned_date", "start_hour", "priority"]

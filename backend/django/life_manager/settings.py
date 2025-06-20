@@ -1,6 +1,9 @@
+import sys
 from pathlib import Path
 
 from decouple import config
+
+IS_TESTING = "test" in sys.argv  # For testing database managed
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +26,6 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
