@@ -26,8 +26,10 @@ This template is used to render a block of nodes in a tree structure recursively
                                    data-category-id="{{ node.category.id }}">New Subcategory</a>
                                 <a class="dropdown-item" href="#" data-bs-toggle="modal"
                                    data-bs-target="#newProjectModal" data-category-id="{{ node.category.id }}">New Project</a>
-                                <a class="dropdown-item text-danger" href="#" hx-get="{% url 'category_delete_modal' node.category.id %}"
-                                   hx-target="#htmx-modal-dialog" hx-swap="innerHTML">Delete</a>
+                                <a class="dropdown-item text-danger" href="#"
+                                   hx-get="{% url 'category_delete_modal' node.category.id %}"
+                                   hx-target="#htmx-modal-dialog"
+                                   hx-swap="innerHTML">Delete</a>
                             </div>
                         </span>
                     </h4>

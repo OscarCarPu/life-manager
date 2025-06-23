@@ -3,3 +3,6 @@ psycopg2-binary
 pre-commit
 pytest
 supabase
+django
+python-decouple
+django-bootstrap5

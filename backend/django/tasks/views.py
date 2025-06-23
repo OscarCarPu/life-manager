@@ -72,15 +72,13 @@ class CategoryDeleteModalView(View):
         try:
             category = get_object_or_404(Category, id=id)
         except Http404:
-            response = HttpResponse("Category not found.")
-            response.status_code = HTTPStatus.NOT_FOUND
+            response = HttpResponse("Category not found.", status=HTTPStatus.NOT_FOUND)
             response["HX-Trigger"] = "closeModal"
             return response
 
         category.delete()
-        response = HttpResponse("Category deleted successfully.")
-        response.status_code = HTTPStatus.OK
-        response["HX-Trigger"] = "categoryListChanged, closeModal"
+        response = HttpResponse("")
+        response["HX-Redirect"] = "/tree/"
         return response
 
 

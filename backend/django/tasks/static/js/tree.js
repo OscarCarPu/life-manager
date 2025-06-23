@@ -31,12 +31,4 @@ document.addEventListener('DOMContentLoaded', function() {
       applyProjectLinkContrast();
     }
   });
-
-  // Re-apply color contrast after category list changes
-  document.body.addEventListener('categoryListChanged', function(event) {
-    // Small delay to ensure DOM is updated
-    setTimeout(function() {
-      applyProjectLinkContrast();
-    }, 100);
-  });
 });

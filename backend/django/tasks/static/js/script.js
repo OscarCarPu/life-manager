@@ -13,12 +13,6 @@ function htmxModalDialog() {
     modalDialog.style.display = 'none';
     modalDialog.innerHTML = '';
   });
-
-  document.body.addEventListener('closeModal', function() {
-    modalDialog.close();
-    modalDialog.style.display = 'none';
-    modalDialog.innerHTML = '';
-  });
 }
 
 htmxModalDialog();
