@@ -1,10 +1,12 @@
 from datetime import date, timedelta
 from http import HTTPStatus
 
+from django.db import IntegrityError
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, View
 
+from .forms import CategoryForm
 from .models import Category, TaskPlanning
 
 
@@ -52,6 +54,64 @@ class CategoryBlockView(TemplateView):
         )
         context["nodes"] = self._get_category_tree(categories)
         return context
+
+
+class CategoryModalFormView(View):
+    template_name = "components/tree/category_form_modal.html"
+
+    def get(self, request, *args, **kwargs):
+        parent_id = kwargs.get("parent_id")
+        category_id = kwargs.get("id")
+        context = {}
+        category = None
+        parent_category = None
+
+        if category_id:
+            category = get_object_or_404(Category, id=category_id)
+            form = CategoryForm(instance=category)
+        else:
+            if parent_id:
+                parent_category = get_object_or_404(Category, id=parent_id)
+                form = CategoryForm(initial={"parent_category": parent_category})
+            else:
+                form = CategoryForm()
+
+        context["form"] = form
+        context["category"] = category
+        context["parent_category"] = parent_category
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        parent_id = kwargs.get("parent_id")
+        category_id = kwargs.get("id")
+        category = None
+        parent_category = None
+
+        if parent_id:
+            parent_category = get_object_or_404(Category, id=parent_id)
+        if category_id:
+            category = get_object_or_404(Category, id=category_id)
+
+        form_data = request.POST.copy()
+        if parent_category and not category_id:
+            form_data["parent_category"] = parent_category.id
+
+        form = CategoryForm(form_data, instance=category)
+
+        if form.is_valid():
+            try:
+                form.save()
+                response = HttpResponse("")
+                response["HX-Redirect"] = "/tree/"
+                return response
+            except IntegrityError:
+                form.add_error(None, "An unexpected database error occurred. Please try again.")
+        context = {
+            "form": form,
+            "category": category,
+            "parent_category": parent_category,
+        }
+        return render(request, self.template_name, context)
 
 
 class CategoryDeleteModalView(View):

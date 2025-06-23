@@ -1,0 +1,56 @@
+<div class="modal-content-wrapper">
+  <form hx-post="{% url 'project_create_modal' category.id %}"
+        hx-target="body"
+        hx-swap="none">
+    {% csrf_token %}    <h3 class="text-dark mb-4">Create New Project</h3>
+
+    <div class="mb-3">
+      <label for="project-name" class="form-label text-dark">Project Name <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="project-name" name="name" required maxlength="100" placeholder="Enter project name">
+    </div>
+
+    <div class="mb-3">
+      <label for="project-description" class="form-label text-dark">Description</label>
+      <textarea class="form-control" id="project-description" name="description" rows="3" placeholder="Optional project description"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="project-color" class="form-label text-dark">Color</label>
+      <input type="color" class="form-control form-control-color" id="project-color" name="color" value="#F6E05E">
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="project-start-date" class="form-label text-dark">Expected Start Date</label>
+        <input type="date" class="form-control" id="project-start-date" name="expected_start_date">
+      </div>
+      <div class="col-md-6">
+        <label for="project-end-date" class="form-label text-dark">Expected End Date</label>
+        <input type="date" class="form-control" id="project-end-date" name="expected_end_date">
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="project-state" class="form-label text-dark">State</label>
+      <select class="form-select" id="project-state" name="state">
+        <option value="not_started" selected>Not Started</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <p class="text-muted mb-2">Category: <strong>{{ category.name }}</strong></p>
+      <input type="hidden" name="category" value="{{ category.id }}">
+    </div>
+
+    <div class="modal-actions">
+      <button type="submit" class="btn btn-primary">Create Project</button>
+      <button type="button" class="btn btn-secondary"
+              onclick="document.getElementById('htmx-modal-dialog').close();">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

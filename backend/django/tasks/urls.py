@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -8,6 +8,16 @@ urlpatterns = [
     # Tree URL
     path("tree/", views.TreeView.as_view(), name="tree"),
     path("tree/categories-block/", views.CategoryBlockView.as_view(), name="category_block"),
+    re_path(
+        r"^tree/categories/create/(?:(?P<parent_id>\d+)/)?$",
+        views.CategoryModalFormView.as_view(),
+        name="category_create",
+    ),
+    path(
+        "tree/categories/<int:id>/edit/",
+        views.CategoryModalFormView.as_view(),
+        name="category_edit_modal",
+    ),
     path(
         "categories/<int:id>/delete-modal/",
         views.CategoryDeleteModalView.as_view(),
