@@ -15,9 +15,7 @@ class CategoryForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "color": forms.TextInput(
-                attrs={"class": "form-control", "pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"}
-            ),
+            "color": forms.ColorInput(attrs={"class": "form-control", "style": "width: 100px;"}),
         }
 
     # You can add custom validation here if needed

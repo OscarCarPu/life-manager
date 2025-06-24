@@ -6,4 +6,4 @@ npx supabase start
 
 echo "Iniciando contenedores"
 
-docker compose up -d --wait --build
+docker compose up --wait --build
