@@ -57,7 +57,7 @@ class CategoryBlockView(TemplateView):
 
 
 class CategoryModalFormView(View):
-    template_name = "components/tree/category_form_modal.html"
+    template_name = "components/modals/category_form_modal.html"
 
     def get(self, request, *args, **kwargs):
         parent_id = kwargs.get("parent_id")
@@ -115,7 +115,7 @@ class CategoryModalFormView(View):
 
 
 class CategoryDeleteModalView(View):
-    template_name = "components/tree/delete_modal.html"
+    template_name = "components/modals/delete_modal.html"
 
     def get(self, request, id, *args, **kwargs):
         """Handle modal rendering"""
