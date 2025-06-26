@@ -61,7 +61,6 @@ This template is used to render a modal form for creating or editing a category.
                     </div>
                 {% endif %}
             </div>
-            {# You might want to display parent_category as a hidden input if it's set for a new subcategory #}
             {% if form.parent_category.value %}
                 <input type="hidden" name="{{ form.parent_category.name }}" value="{{ form.parent_category.value }}">
             {% endif %}

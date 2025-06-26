@@ -23,4 +23,9 @@ urlpatterns = [
         views.CategoryDeleteModalView.as_view(),
         name="category_delete_modal",
     ),
+    path(
+        "tree/categories/<int:category_id>/projects/create/",
+        views.ProjectCreateModalView.as_view(),
+        name="project_create_modal",
+    ),
 ]

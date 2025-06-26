@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import TemplateView, View
 
-from .forms import CategoryForm
+from .forms import CategoryForm, ProjectForm
 from .models import Category, TaskPlanning
 
 
@@ -112,6 +112,32 @@ class CategoryModalFormView(View):
             "category": category,
             "parent_category": parent_category,
         }
+        return render(request, self.template_name, context)
+
+
+class ProjectCreateModalView(View):
+    template_name = "components/modals/new_project_modal.html"
+
+    def get(self, request, category_id, *args, **kwargs):
+        category = get_object_or_404(Category, id=category_id)
+        form = ProjectForm(initial={"category": category})
+        context = {"form": form, "category": category}
+        return render(request, self.template_name, context)
+
+    def post(self, request, category_id, *args, **kwargs):
+        category = get_object_or_404(Category, id=category_id)
+        form = ProjectForm(request.POST)
+
+        if form.is_valid():
+            try:
+                form.save()
+                response = HttpResponse("")
+                response["HX-Redirect"] = reverse("tree")
+                return response
+            except IntegrityError:
+                form.add_error(None, "A project with this name already exists.")
+
+        context = {"form": form, "category": category}
         return render(request, self.template_name, context)
 
 

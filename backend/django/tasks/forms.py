@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Category
+from .models import Category, Project
 
 
 class CategoryForm(forms.ModelForm):
@@ -35,3 +35,34 @@ class CategoryForm(forms.ModelForm):
                 f"A category with the name '{name}' already exists.",
             )
         return cleaned_data
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = [
+            "name",
+            "description",
+            "color",
+            "category",
+            "expected_start_date",
+            "expected_end_date",
+            "state",
+        ]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Enter project name"}
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Optional project description",
+                }
+            ),
+            "color": forms.ColorInput(attrs={"class": "form-control form-control-color"}),
+            "expected_start_date": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "expected_end_date": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "state": forms.Select(attrs={"class": "form-select"}),
+            "category": forms.HiddenInput(),
+        }
