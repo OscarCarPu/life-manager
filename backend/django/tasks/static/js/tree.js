@@ -1,24 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Apply color contrast to project links and dropdown button
-  function applyProjectLinkContrast() {
+  // Apply color contrast to project links and dropdown button only on hover
+  function setupProjectLinkContrast() {
     const projectLinks = document.querySelectorAll('.project-link');
 
-    ColorContrast.applyOptimalTextColor(projectLinks, {
-      backgroundProperty: '--project-color',
-      whiteTextClass: 'text-white-on-hover',
-      darkTextClass: 'text-dark-on-hover',
-      whiteColor: '#ffffff',
-      darkColor: '#343a40'
+    projectLinks.forEach(element => {
+      const backgroundColor = getComputedStyle(element).getPropertyValue('--project-color').trim();
+      ColorContrast.applyContrastClass(element, backgroundColor, true);
     });
 
     const dropdownCategory = document.querySelectorAll('.category-actions-dropdown');
 
-    ColorContrast.applyOptimalTextColor(dropdownCategory, {
-      backgroundProperty: '--project-color',
-      whiteTextClass: 'text-white-on-hover',
-      darkTextClass: 'text-dark-on-hover',
-      whiteColor: '#ffffff',
-      darkColor: '#343a40'
+    dropdownCategory.forEach(element => {
+      const backgroundColor = getComputedStyle(element).getPropertyValue('--project-color').trim();
+      ColorContrast.applyContrastClass(element, backgroundColor, true);
     });
   }
 
@@ -36,13 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Initialize
-  applyProjectLinkContrast();
+  setupProjectLinkContrast();
   adjustDescriptionWidth();
 
   // Re-apply after HTMX swaps
   document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.target.id === 'category-tree-container' || event.target.closest('#category-tree-container')) {
-      applyProjectLinkContrast();
+      setupProjectLinkContrast();
       adjustDescriptionWidth();
     }
   });

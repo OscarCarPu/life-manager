@@ -9,12 +9,18 @@
 }
 
 /* Contrast color */
-.text-white-on-hover {
-    color: var(--text-white);
+.text-white-on-hover:hover,
+.text-white-on-hover:focus,
+.text-white-on-hover:active,
+.text-white-on-hover[aria-expanded="true"] {
+    color: var(--text-white) !important;
 }
 
-.text-dark-on-hover {
-    color: var(--text-dark);
+.text-dark-on-hover:hover,
+.text-dark-on-hover:focus,
+.text-dark-on-hover:active,
+.text-dark-on-hover[aria-expanded="true"] {
+    color: var(--text-dark) !important;
 }
 
 /* Category block */

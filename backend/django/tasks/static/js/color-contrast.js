@@ -140,6 +140,32 @@ class ColorContrast {
     static getOptimalTextColor(backgroundColor, whiteColor = "#ffffff", darkColor = "#343a40") {
         return this.shouldUseWhiteText(backgroundColor, whiteColor, darkColor) ? 'white' : 'dark';
     }
+
+    /**
+     * Apply color contrast classes to element based on background color
+     * @param {HTMLElement} element - Element to apply classes to
+     * @param {string} backgroundColor - Background color to check against
+     * @param {boolean} isHoverEffect - Whether this is for hover/focus effects
+     * @param {string} whiteColor - Hex color for white text (default: "#ffffff")
+     * @param {string} darkColor - Hex color for dark text (default: "#343a40")
+     */
+    static applyContrastClass(element, backgroundColor, isHoverEffect = false, whiteColor = "#ffffff", darkColor = "#343a40") {
+        if (!backgroundColor || backgroundColor === '') return;
+
+        const useWhiteText = this.shouldUseWhiteText(backgroundColor, whiteColor, darkColor);
+
+        // Remove existing classes
+        element.classList.remove('text-white-on-hover', 'text-dark-on-hover');
+
+        // Add appropriate class
+        if (isHoverEffect) {
+            if (useWhiteText) {
+                element.classList.add('text-white-on-hover');
+            } else {
+                element.classList.add('text-dark-on-hover');
+            }
+        }
+    }
 }
 
 // Export for use in other modules
