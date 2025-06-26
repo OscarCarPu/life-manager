@@ -22,13 +22,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Initialize color contrast
-  applyProjectLinkContrast();
+  function adjustDescriptionWidth() {
+    document.querySelectorAll('.category-description').forEach(desc => {
+      const card = desc.closest('.category-card');
+      if (card) {
+        const cardStyle = window.getComputedStyle(card);
+        const paddingLeft = parseFloat(cardStyle.paddingLeft);
+        const paddingRight = parseFloat(cardStyle.paddingRight);
+        const contentWidth = card.clientWidth - paddingLeft - paddingRight;
+        desc.style.maxWidth = contentWidth + 'px';
+      }
+    });
+  }
 
-  // Re-apply color contrast after HTMX swaps
+  // Initialize
+  applyProjectLinkContrast();
+  adjustDescriptionWidth();
+
+  // Re-apply after HTMX swaps
   document.body.addEventListener('htmx:afterSwap', function(event) {
-    if (event.target.id === 'category-tree-container') {
+    if (event.target.id === 'category-tree-container' || event.target.closest('#category-tree-container')) {
       applyProjectLinkContrast();
+      adjustDescriptionWidth();
     }
   });
 });

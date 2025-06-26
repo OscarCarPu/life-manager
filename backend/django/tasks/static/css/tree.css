@@ -54,6 +54,20 @@
     width: 100%;
 }
 
+/* Category description */
+
+.category-description {
+    max-width: 0px; /* Set by JS */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: max-width 0.5s ease-in-out;
+}
+
+
 /* Category dropdown actions */
 .category-actions-dropdown {
     background-color: transparent;

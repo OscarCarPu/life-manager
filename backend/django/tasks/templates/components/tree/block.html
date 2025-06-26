@@ -5,13 +5,13 @@ This template is used to render a block of nodes in a tree structure recursively
 <div class="categories-block" id="category-tree-content">
     {% if nodes %}
         {% for node in nodes %}
-            <div class="mb-4"
+            <div class="mb-3"
                  data-category-id="{{ node.category.id }}"
                  data-projects-count="{{ node.category.projects.count }}"
                  data-subcategories-count="{{ node.subcategories|length }}">
-                <div class="card category-card h-100 shadow-sm rounded-lg p-4"
+                <div class="card category-card h-100 shadow-sm rounded-lg p-3"
                      style="border-color: {{ node.category.color|default:'#dee2e6' }};">
-                    <h4 class="card-title fw-bold text-dark mb-0">
+                    <h5 class="card-title fw-bold text-dark mb-0">
                         {{ node.category.name }}
                         <span class="float-end">
                             <button type="button" class="btn btn-sm border-0 category-actions-dropdown"
@@ -38,26 +38,31 @@ This template is used to render a block of nodes in a tree structure recursively
                                    hx-swap="innerHTML">Delete</a>
                             </div>
                         </span>
-                    </h4>
+                    </h5>
 
-                    {% if node.category.projects and node.category.projects.count > 0 %}
-                        <div class="projects-section mt-3">
-                            <h6 class="text-muted mb-2">Projects:</h6>
+                    {% if node.category.description %}
+                        <p class="card-text text-muted small mt-2 category-description">{{ node.category.description }}</p>
+                    {% endif %}
+
+                    {% if node.category.projects.all or node.subcategories %}
+                        <hr class="my-1">
+                    {% endif %}
+
+                    {% if node.category.projects.all %}
+                        <div class="projects-section mt-2">
                             {% for project in node.category.projects.all %}
-                                <a href="#" class="project-link"
-                                   style="border-left-color: {{ project.color|default:'#6c757d' }}; --project-color: {{ project.color|default:'#6c757d' }};">
-                                    {{ project.name }}
-                                </a>
+                                <div class="project-item mb-2">
+                                    <a href="#" class="project-link fw-bold"
+                                       style="border-left-color: {{ project.color|default:'#6c757d' }}; --project-color: {{ project.color|default:'#6c757d' }};">
+                                        {{ project.name }}
+                                    </a>
+                                </div>
                             {% endfor %}
                         </div>
                     {% endif %}
 
-                    {% if node.category.projects and node.category.projects.count > 0 and node.subcategories and node.subcategories|length > 0 %}
-                        <hr>
-                    {% endif %}
-
-                    {% if node.subcategories and node.subcategories|length > 0 %}
-                        <div class="subcategories-block ps-4 mt-3">
+                    {% if node.subcategories %}
+                        <div class="subcategories-block ps-4 mt-2">
                             {% include "components/tree/block.html" with nodes=node.subcategories %}
                         </div>
                     {% endif %}
