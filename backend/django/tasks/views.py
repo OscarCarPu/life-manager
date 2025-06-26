@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.db import IntegrityError
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.generic import TemplateView, View
 
 from .forms import CategoryForm
@@ -102,7 +103,7 @@ class CategoryModalFormView(View):
             try:
                 form.save()
                 response = HttpResponse("")
-                response["HX-Redirect"] = "/tree/"
+                response["HX-Redirect"] = reverse("tree")
                 return response
             except IntegrityError:
                 form.add_error(None, "An unexpected database error occurred. Please try again.")
@@ -138,7 +139,7 @@ class CategoryDeleteModalView(View):
 
         category.delete()
         response = HttpResponse("")
-        response["HX-Redirect"] = "/tree/"
+        response["HX-Redirect"] = reverse("tree")
         return response
 
 
