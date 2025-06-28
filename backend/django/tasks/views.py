@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView, View
 
 from .forms import CategoryForm, ProjectForm
-from .models import Category, TaskPlanning
+from .models import Category, Project, TaskPlanning
 
 
 class TreeView(View):
@@ -167,6 +167,30 @@ class CategoryDeleteModalView(View):
         response = HttpResponse("")
         response["HX-Redirect"] = reverse("tree")
         return response
+
+
+# Project View
+class ProjectView(View):
+    template_name = "project.html"
+
+    def get(self, request, id):
+        project = get_object_or_404(Project.objects.prefetch_related("tasks"), id=id)
+        context = {
+            "project": project,
+        }
+        return render(request, self.template_name, context)
+
+
+class TaskCreateModalView(View):
+    pass
+
+
+class TaskEditModalView(View):
+    pass
+
+
+class TaskDeleteModalView(View):
+    pass
 
 
 # Calendar View

@@ -28,4 +28,21 @@ urlpatterns = [
         views.ProjectCreateModalView.as_view(),
         name="project_create_modal",
     ),
+    # Project URL
+    path("project/<int:id>/", views.ProjectView.as_view(), name="project"),
+    path(
+        "project/<int:id>/task/create",
+        views.TaskCreateModalView.as_view(),
+        name="task_create_modal",
+    ),
+    path(
+        "project/<int:id>/task/<int:task_id>/edit",
+        views.TaskEditModalView.as_view(),
+        name="task_edit_modal",
+    ),
+    path(
+        "project/<int:id>/task/<int:task_id>/delete-modal",
+        views.TaskDeleteModalView.as_view(),
+        name="task_delete_modal",
+    ),
 ]

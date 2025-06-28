@@ -52,7 +52,8 @@ This template is used to render a block of nodes in a tree structure recursively
                         <div class="projects-section mt-2">
                             {% for project in node.category.projects.all %}
                                 <div class="project-item mb-2">
-                                    <a href="#" class="project-link fw-bold"
+                                    <a href="{% url 'project' project.id %}"
+                                       class="project-link fw-bold"
                                        style="border-left-color: {{ project.color|default:'#6c757d' }}; --project-color: {{ project.color|default:'#6c757d' }};">
                                         {{ project.name }}
                                     </a>

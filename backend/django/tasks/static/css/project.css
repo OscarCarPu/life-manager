@@ -1,0 +1,43 @@
+
+/* Indicator for project color */
+.project-color-indicator {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}
+
+/* Badge styling for project and task states */
+.badge.bg-not_started, .badge.bg-pending {
+    background-color: #6c757d !important;
+}
+
+.badge.bg-in_progress {
+    background-color: #0d6efd !important;
+}
+
+.badge.bg-completed {
+    background-color: #198754 !important;
+}
+
+.badge.bg-archived {
+    background-color: #6f42c1 !important;
+}
+
+/* Card hover effect for tasks */
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Ensure consistent card height in rows */
+.row-cols-md-2 > .col,
+.row-cols-lg-3 > .col {
+    display: flex;
+}
+
+.row-cols-md-2 > .col .card,
+.row-cols-lg-3 > .col .card {
+    flex-grow: 1;
+}
