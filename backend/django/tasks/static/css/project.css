@@ -1,43 +1,120 @@
+/* General project view styling */
+.project-view-area {
+    background-color: var(--bg-color);
+    min-height: calc(100vh - 56px - 2rem); /* 100vh - navbar - padding base.html */
+    padding: 2rem 1rem;
+    width: 100%;
+    max-width: 1200px; /* Adjusted max-width */
+    margin: 0 auto;
+}
 
-/* Indicator for project color */
-.project-color-indicator {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid #ccc;
+/* Project header */
+.project-header {
+    text-align: left;
+    margin-bottom: 2.5rem; /* Increased margin */
+    padding-bottom: 1.5rem; /* Increased padding */
+    border-bottom: 1px solid var(--border-default);
+}
+
+.project-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.project-category-path a {
+    text-decoration: none;
+}
+
+.project-category-path a:hover {
+    text-decoration: underline;
+}
+
+.details-subtitle {
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.project-meta-info {
+    background-color: transparent; /* Removed background */
+    padding: 0; /* Removed padding */
+    border-radius: 0;
+    height: 100%;
+}
+
+.meta-item {
+    margin-bottom: 1.5rem; /* Increased margin */
+}
+
+.meta-item:last-child {
+    margin-bottom: 0;
+}
+
+.meta-item .meta-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.meta-item p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0;
+}
+
+.tasks-section {
+    margin-top: 3rem;
+}
+
+/* Task card styling - more like tree.css */
+.task-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-default);
+    border-left: 4px solid var(--project-color);
+    transition: all 0.3s ease-in-out;
+    box-shadow: var(--shadow-sm);
+    border-radius: 8px;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--project-color);
+}
+
+.task-card .card-title {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.task-card .btn {
+    color: var(--text-muted);
+    padding: .25rem .5rem;
+    transition: color 0.2s ease-in-out;
+}
+
+.task-card .btn:hover {
+    color: var(--project-color);
 }
 
 /* Badge styling for project and task states */
 .badge.bg-not_started, .badge.bg-pending {
-    background-color: #6c757d !important;
+    background-color: var(--not-started-color) !important;
 }
 
 .badge.bg-in_progress {
-    background-color: #0d6efd !important;
+    background-color: var(--in-progress-color) !important;
 }
 
 .badge.bg-completed {
-    background-color: #198754 !important;
+    background-color: var(--completed-color) !important;
 }
 
 .badge.bg-archived {
-    background-color: #6f42c1 !important;
-}
-
-/* Card hover effect for tasks */
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    transition: all 0.2s ease-in-out;
-}
-
-/* Ensure consistent card height in rows */
-.row-cols-md-2 > .col,
-.row-cols-lg-3 > .col {
-    display: flex;
-}
-
-.row-cols-md-2 > .col .card,
-.row-cols-lg-3 > .col .card {
-    flex-grow: 1;
+    background-color: var(--archived-color-alt) !important;
 }

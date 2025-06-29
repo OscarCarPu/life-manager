@@ -7,6 +7,18 @@
   --link-color: #007bff;
   --link-hover-color: #0056b3;
   --border-default: #dee2e6;
+  --info-color: #0d6efd;
+  --success-color: #198754;
+  --archived-color: #6f42c1;
+
+  /* State Colors */
+  --not-started-color: var(--text-muted);
+  --in-progress-color: var(--info-color);
+  --completed-color: var(--success-color);
+  --archived-color-alt: var(--archived-color);
+
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
 }
 
 body {

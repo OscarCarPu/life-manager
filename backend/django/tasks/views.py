@@ -175,8 +175,17 @@ class ProjectView(View):
 
     def get(self, request, id):
         project = get_object_or_404(Project.objects.prefetch_related("tasks"), id=id)
+
+        category_path = []
+        if project.category:
+            current_category = project.category
+            while current_category:
+                category_path.insert(0, current_category)
+                current_category = current_category.parent_category
+
         context = {
             "project": project,
+            "category_path": category_path,
         }
         return render(request, self.template_name, context)
 

@@ -8,58 +8,69 @@
 {% block title %}Project: {{ project.name }}{% endblock %}
 
 {% block content %}
-  <div class="container py-5">
-    <div class="d-flex align-items-center mb-4">
-      <div class="project-color-indicator me-3" style="background-color: {{ project.color }};"></div>
-      <h1 class="display-4 mb-0">{{ project.name }}</h1>
-    </div>
-
-    <div class="card mb-5 shadow-sm">
-      <div class="card-header bg-light">
-        <h4 class="mb-0">Project Details</h4>
-      </div>
-      <div class="card-body">
-        <p class="card-text"><strong>Description:</strong> {{ project.description|default:"No description provided." }}</p>
-        <p class="card-text"><strong>Category:</strong> {{ project.category.name|default:"N/A" }}</p>
-        <p class="card-text"><strong>Status:</strong> <span class="badge bg-{{ project.state|lower }}">{{ project.get_state_display }}</span></p>
-        <p class="card-text"><strong>Expected Start Date:</strong> {{ project.expected_start_date|date:"F j, Y"|default:"N/A" }}</p>
-        <p class="card-text"><strong>Expected End Date:</strong> {{ project.expected_end_date|date:"F j, Y"|default:"N/A" }}</p>
-        <p class="card-text text-muted small">Created: {{ project.created_at|date:"F j, Y, P" }} | Last Updated: {{ project.updated_at|date:"F j, Y, P" }}</p>
-      </div>
-    </div>
-
-    <hr class="my-5">
-
-    <h2 class="mb-4">Tasks</h2>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-      {% for task in project.tasks.all %}
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="card-title mb-0">{{ task.title }}</h5>
-              <span class="badge bg-{{ task.state|lower }}">{{ task.get_state_display }}</span>
+  <div class="project-view-area" style="--project-color: {{ project.color }};">
+    <div class="row">
+      <div class="col-12">
+        <div class="project-header mb-5">
+          <div class="project-category-path text-muted small mb-2">
+            {% for category in category_path %}
+              <a href="{% url 'tree' %}#category-{{ category.id }}" class="text-muted">{{ category.name }}</a>
+              {% if not forloop.last %}
+                <span class="mx-1">/</span>
+              {% endif %}
+            {% empty %}
+              <span>No category</span>
+            {% endfor %}
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h1 class="project-title mb-1">{{ project.name }}</h1>
+              <p class="text-secondary mb-0">{{ project.description|default:"No description provided."|linebreaksbr }}</p>
             </div>
-            <div class="card-body">
-              <p class="card-text">{{ task.description|default:"No description available for this task." }}</p>
-              <p class="card-text"><strong>Due Date:</strong> {{ task.due_date|date:"F j, Y"|default:"N/A" }}</p>
-            </div>
-            <div class="card-footer d-flex justify-content-end">
-              <a href="#" class="btn btn-outline-primary btn-sm me-2" title="Edit Task">
-                <i class="fas fa-edit"></i> Edit
-              </a>
-              <a href="#" class="btn btn-outline-danger btn-sm" title="Delete Task">
-                <i class="fas fa-trash"></i> Delete
-              </a>
+            <div class="flex-shrink-0 ms-4 text-end">
+              <div class="mb-2">
+                <span class="badge bg-{{ project.state|lower }} fs-6">{{ project.get_state_display }}</span>
+              </div>
+              <div class="text-muted small">
+                <span>{{ project.expected_start_date|date:"M j, Y"|default:"N/A" }}</span>
+                <span>-</span>
+                <span>{{ project.expected_end_date|date:"M j, Y"|default:"N/A" }}</span>
+              </div>
             </div>
           </div>
         </div>
-      {% empty %}
-        <div class="col-12">
-          <div class="alert alert-info" role="alert">
-            No tasks have been added to this project yet.
+
+        <div class="tasks-section">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for task in project.tasks.all %}
+              <div class="col">
+                <div class="card task-card h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <h5 class="card-title fw-bold">{{ task.title }}</h5>
+                      <span class="badge bg-{{ task.state|lower }}">{{ task.get_state_display }}</span>
+                    </div>
+                    <p class="card-text small text-muted">{{ task.description|default:"No description." }}</p>
+                  </div>
+                  <div class="card-footer bg-transparent border-0 pb-3 d-flex justify-content-between align-items-center">
+                    <span class="small text-muted">Due: {{ task.due_date|date:"M j, Y"|default:"N/A" }}</span>
+                    <div>
+                      <a href="#" class="btn btn-sm btn-outline-secondary border-0" title="Edit Task"><i class="fas fa-edit"></i></a>
+                      <a href="#" class="btn btn-sm btn-outline-danger border-0" title="Delete Task"><i class="fas fa-trash"></i></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                  No tasks have been added to this project yet.
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
-      {% endfor %}
+      </div>
     </div>
   </div>
 {% endblock %}
