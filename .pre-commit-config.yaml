@@ -70,6 +70,6 @@ repos:
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
-        name: format HTML, CSS, and JS files
-        files: ^backend/flask/(templates|static)/.*\.(html|css|js)$
+        name: format CSS, and JS files
+        files: ^backend/flask/(templates|static)/.*\.(css|js)$
         args: ["--tab-width", "2"]
