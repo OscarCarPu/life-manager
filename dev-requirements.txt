@@ -1,8 +1,12 @@
 python-dotenv
 psycopg2-binary
 pre-commit
-pytest
 supabase
-django
 python-decouple
-django-bootstrap5
+fastapi
+uvicorn[standard]
+flask
+sqlalchemy
+requests
+gunicorn
+Flask-Babel

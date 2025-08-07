@@ -1,17 +1,24 @@
 services:
-  django-web:
-    build: ./backend/django
+  fastapi:
+    build:
+      context: ./backend
+      dockerfile: fastapi/Dockerfile
     volumes:
-      - ./backend/django:/app
-    ports:
-      - "8000:8000"
+      - ./backend/fastapi:/app
+      - ./backend/common:/app/common
     env_file:
       - ./.env
-      - ./backend/django/.env
+      - ./backend/fastapi/.env
     network_mode: host
-    healthcheck:
-      test: ["CMD", "python", "/app/healthcheck.py"]
-      interval: 60s
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+
+  flask:
+    build:
+      context: ./backend
+      dockerfile: flask/Dockerfile
+    volumes:
+      - ./backend/flask:/app
+      - ./backend/common:/app/common
+    env_file:
+      - ./.env
+      - ./backend/flask/.env
+    network_mode: host

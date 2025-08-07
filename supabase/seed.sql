@@ -1,177 +1,147 @@
--- Seed data for 'category' table
-INSERT INTO category (name, description, color, parent_category_id) VALUES
-('Work', 'Categoría para tareas y proyectos relacionados con el ámbito laboral.', '#FF5733', NULL),
-('Personal', 'Categoría para tareas y proyectos personales y del hogar.', '#33FF57', NULL),
-('Estudios', 'Categoría para actividades académicas y de aprendizaje.', '#3357FF', NULL),
--- Child of 'Work'
-('Desarrollo de Software', 'Proyectos y tareas de programación y desarrollo.', '#FFBD33', 1),
--- Child of 'Work'
-('Marketing', 'Actividades relacionadas con estrategias de marketing y promoción.', '#33FFBD', 1),
-('Hogar', 'Mantenimiento del hogar y tareas domésticas.', '#BD33FF', 2), -- Child of 'Personal'
--- Child of 'Personal'
-('Salud y Bienestar', 'Actividades para el cuidado personal y la salud.', '#FF33BD', 2);
+-- seed.sql - Extended demo data
 
--- Seed data for 'project' table
-INSERT INTO project (
-    name, description, category_id, color, expected_start_date, expected_end_date, state
-) VALUES
+-- Categories
+INSERT INTO category (name, description, color) VALUES
+('Finance', 'Financial management and accounting tasks.', '#48bb78'),
+('Marketing', 'Digital and traditional marketing initiatives.', '#ed8936'),
+('Health & Wellness', 'Personal health, fitness, and well-being.', '#9f7aea');
+
+-- Subcategories
+INSERT INTO category (name, description, color, parent_category_id) VALUES
 (
-    'Nuevo Sitio Web', 'Desarrollo completo del sitio web corporativo.', (
+    'Budgeting', 'Monthly and annual budget planning.', '#4299e1', (
         SELECT id FROM category
-        WHERE name = 'Desarrollo de Software'
-    ), '#FFC300', '2025-06-15', '2025-09-30', 'in_progress'
+        WHERE name = 'Finance'
+    )
 ),
 (
-    'Campaña de Verano', 'Planificación y ejecución de la campaña de marketing estival.', (
+    'Social Media', 'Content creation and scheduling for social media platforms.', '#f6ad55', (
         SELECT id FROM category
         WHERE name = 'Marketing'
-    ), '#DAF7A6', '2025-07-01', '2025-08-31', 'not_started'
-),
-(
-    'Reforma Cocina', 'Proyecto de renovación de la cocina.', (
-        SELECT id FROM category
-        WHERE name = 'Hogar'
-    ), '#FF5733', '2025-05-20', '2025-07-15', 'in_progress'
-),
-(
-    'Curso SQL Avanzado', 'Estudio intensivo de SQL avanzado y optimización de bases de datos.', (
-        SELECT id FROM category
-        WHERE name = 'Estudios'
-    ), '#33FF57', '2025-06-01', '2025-07-20', 'in_progress'
-),
-(
-    'Plan de Ejercicio', 'Rutina de ejercicios y dieta para mejorar la condición física.', (
-        SELECT id FROM category
-        WHERE name = 'Salud y Bienestar'
-    ), '#3357FF', '2025-06-10', '2025-12-31', 'in_progress'
-),
-(
-    'Migración a la Nube', 'Migración de la infraestructura actual a servicios cloud.', (
-        SELECT id FROM category
-        WHERE name = 'Desarrollo de Software'
-    ), '#AABBCC', '2025-04-01', '2025-06-10', 'completed'
-),
-(
-    'Organizar Documentos', 'Digitalización y organización de documentos personales.', (
-        SELECT id FROM category
-        WHERE name = 'Personal'
-    ), '#FFE4B5', '2025-06-05', '2025-06-15', 'in_progress'
+    )
 );
 
--- Seed data for 'task' table
-INSERT INTO task (title, due_date, description, project_id, state) VALUES
+-- Projects
+INSERT INTO project (
+    name, description, category_id, state, expected_start_date, expected_end_date
+) VALUES
 (
-    'Diseñar maqueta UI/UX',
-    '2025-06-25',
-    'Crear wireframes y prototipos para el nuevo sitio web.',
+    'Q4 Marketing Campaign',
+    'Develop and execute a new marketing campaign for the fourth quarter.',
     (
-        SELECT id FROM project
-        WHERE name = 'Nuevo Sitio Web'
-    ), 'in_progress'
+        SELECT id FROM category
+        WHERE name = 'Marketing'
+    ), 'in_progress', '2025-10-01', '2025-12-31'
 ),
 (
-    'Desarrollar backend', '2025-08-15', 'Implementar la lógica de negocio y la API.', (
-        SELECT id FROM project
-        WHERE name = 'Nuevo Sitio Web'
-    ), 'pending'
+    'Personal Fitness Goal', 'Train for a 10k run.', (
+        SELECT id FROM category
+        WHERE name = 'Health & Wellness'
+    ), 'in_progress', '2025-09-01', '2025-11-01'
 ),
 (
-    'Investigar tendencias de mercado',
-    '2025-06-30',
-    'Análisis de la competencia y tendencias actuales de marketing.',
-    (
-        SELECT id FROM project
-        WHERE name = 'Campaña de Verano'
-    ), 'pending'
-),
-(
-    'Comprar materiales', '2025-06-18', 'Adquirir azulejos, encimeras y electrodomésticos.', (
-        SELECT id FROM project
-        WHERE name = 'Reforma Cocina'
-    ), 'completed'
-),
-(
-    'Instalar gabinetes', '2025-07-05', 'Instalación de todos los gabinetes de la cocina.', (
-        SELECT id FROM project
-        WHERE name = 'Reforma Cocina'
-    ), 'in_progress'
-),
-(
-    'Estudiar subconsultas',
-    '2025-06-14',
-    'Revisar ejemplos y practicar el uso de subconsultas en SQL.',
-    (
-        SELECT id FROM project
-        WHERE name = 'Curso SQL Avanzado'
-    ), 'in_progress'
-),
-(
-    'Planificar rutina semanal',
-    '2025-06-12',
-    'Definir los días y tipos de ejercicio para la semana.',
-    (
-        SELECT id FROM project
-        WHERE name = 'Plan de Ejercicio'
-    ), 'pending'
-),
-(
-    'Completar reporte de migración',
-    '2025-06-09',
-    'Redactar el informe final sobre la migración a la nube.',
-    (
-        SELECT id FROM project
-        WHERE name = 'Migración a la Nube'
-    ), 'completed'
-),
-(
-    'Escanear recibos antiguos',
-    '2025-06-10',
-    'Digitalizar recibos importantes de los últimos 5 años.',
-    (
-        SELECT id FROM project
-        WHERE name = 'Organizar Documentos'
-    ), 'in_progress'
+    'Monthly Budget Review', 'Review and update the family budget for the month.', (
+        SELECT id FROM category
+        WHERE name = 'Budgeting'
+    ), 'not_started', '2025-08-01', '2025-08-05'
 );
 
--- Seed data for 'task_planning' table
+-- Tasks for the new projects
+INSERT INTO task (title, description, project_id, state, due_date) VALUES
+(
+    'Define campaign target audience',
+    'Identify the key demographics for the Q4 marketing campaign.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Q4 Marketing Campaign'
+    ), 'completed', '2025-10-07'
+),
+(
+    'Create social media content calendar',
+    'Plan and schedule all social media posts for the campaign.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Q4 Marketing Campaign'
+    ), 'in_progress', '2025-10-15'
+),
+(
+    'Hire a graphic designer', 'Find and hire a freelance graphic designer for ad creatives.', (
+        SELECT id FROM project
+        WHERE name = 'Q4 Marketing Campaign'
+    ), 'pending', '2025-10-10'
+),
+(
+    'Plan running schedule', 'Create a weekly training plan for the 10k.', (
+        SELECT id FROM project
+        WHERE name = 'Personal Fitness Goal'
+    ), 'in_progress', '2025-09-05'
+),
+(
+    'Research running shoes', 'Look for suitable running shoes online and in stores.', (
+        SELECT id FROM project
+        WHERE name = 'Personal Fitness Goal'
+    ), 'pending', '2025-09-01'
+),
+(
+    'Review last month''s expenses', 'Gather all receipts and bank statements from last month.', (
+        SELECT id FROM project
+        WHERE name = 'Monthly Budget Review'
+    ), 'pending', '2025-08-03'
+);
+
+-- Task Planning with varied priorities and times
 INSERT INTO task_planning (task_id, planned_date, start_hour, end_hour, priority) VALUES
+-- Planning for "Create social media content calendar"
 (
     (
         SELECT id FROM task
-        WHERE title = 'Diseñar maqueta UI/UX'
-    ), '2025-06-12', '09:00:00', '13:00:00', 4
+        WHERE title = 'Create social media content calendar'
+    ), '2025-10-10', '14:00:00', '17:00:00', 1
 ),
 (
     (
         SELECT id FROM task
-        WHERE title = 'Diseñar maqueta UI/UX'
-    ), '2025-06-13', '09:00:00', '12:00:00', 4
+        WHERE title = 'Create social media content calendar'
+    ), '2025-10-11', '09:00:00', '12:00:00', 1
 ),
+-- Planning for "Plan running schedule"
 (
     (
         SELECT id FROM task
-        WHERE title = 'Estudiar subconsultas'
-    ), '2025-06-11', '14:00:00', '16:00:00', 5
+        WHERE title = 'Plan running schedule'
+    ), '2025-08-28', '19:00:00', '20:00:00', 3
 ),
+-- Planning for "Review last month's expenses"
 (
     (
         SELECT id FROM task
-        WHERE title = 'Estudiar subconsultas'
-    ), '2025-06-12', '10:00:00', '12:00:00', 5
+        WHERE title = 'Review last month''s expenses'
+    ), '2025-08-02', '10:00:00', '11:30:00', 2
+);
+
+-- Notes for new projects and tasks
+INSERT INTO note (content, project_id, task_id) VALUES
+(
+    'The campaign will focus heavily on Instagram and TikTok.', (
+        SELECT id FROM project
+        WHERE name = 'Q4 Marketing Campaign'
+    ), NULL
 ),
 (
-    (
-        SELECT id FROM task
-        WHERE title = 'Planificar rutina semanal'
-    ), '2025-06-12', '18:00:00', '19:00:00', 3
+    'Make sure the training plan includes rest days and cross-training.', (
+        SELECT id FROM project
+        WHERE name = 'Personal Fitness Goal'
+    ), NULL
 ),
-((
-    SELECT id FROM task
-    WHERE title = 'Instalar gabinetes'
-), '2025-06-15', '08:00:00', '17:00:00', 4),
 (
-    (
+    'Remember to check for local running stores before buying online.', NULL, (
         SELECT id FROM task
-        WHERE title = 'Escanear recibos antiguos'
-    ), '2025-06-10', '10:00:00', '11:30:00', 2
+        WHERE title = 'Research running shoes'
+    )
+),
+(
+    'The goal is to reduce discretionary spending by 10% this month.', (
+        SELECT id FROM project
+        WHERE name = 'Monthly Budget Review'
+    ), NULL
 );

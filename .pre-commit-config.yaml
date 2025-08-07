@@ -22,28 +22,40 @@ repos:
       - id: detect-secrets
         name: detect secrets in code
         args: ["--baseline", ".secrets.baseline"]
-  # Python hooks
+  # Python linting hooks (specific to each backend)
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: flake8
-        name: lint Python files
-        args: ["--max-line-length=100"]
+        name: lint FastAPI Python files
+        files: ^backend/fastapi/.*\.py$
+        args: ["--max-line-length=100", "--extend-ignore=E203,W503"]
+      - id: flake8
+        name: lint Flask Python files
+        files: ^backend/flask/.*\.py$
+        args: ["--max-line-length=100", "--extend-ignore=E203,W503"]
+      - id: flake8
+        name: lint common Python files
+        files: ^backend/common/.*\.py$
+        args: ["--max-line-length=100", "--extend-ignore=E203,W503"]
+  # Python formatting hooks (shared across all backend code)
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.1
     hooks:
       - id: isort
         name: sort Python imports
+        files: ^backend/.*\.py$
         args: ["--profile", "black"]
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:
       - id: black
         name: format Python files
+        files: ^backend/.*\.py$
         args: ["--line-length", "100"]
   # SQL hooks
   - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.1
+    rev: 3.4.2
     hooks:
       - id: sqlfluff-fix
         name: format SQL files
@@ -53,34 +65,11 @@ repos:
         name: lint SQL files
         files: '\.(sql)$'
         args: ["--dialect", "postgres"]
-  # Django hooks
-  - repo: https://github.com/rtts/djhtml
-    rev: 3.0.8
+  # Frontend hooks for Flask templates and static files
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
     hooks:
-      - id: djhtml
-        name: format Django HTML templates
-        files: ^backend/django/.*\.html$
-      - id: djcss
-        name: format Django CSS files
-        files: ^backend/django/.*\.css$
-      - id: djjs
-        name: format Django JavaScript files
-        files: ^backend/django/.*\.js$
-  # Pytest test
-  - repo: local
-    hooks:
-      - id: pytest
-        name: run pytest tests
-        entry: pytest
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [pre-commit, pre-push]
-        args: ["--maxfail=1", "./tests"]
-      - id: django-test
-        name: run Django tests
-        entry: python backend/django/manage.py test
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [pre-commit, pre-push]
+      - id: prettier
+        name: format HTML, CSS, and JS files
+        files: ^backend/flask/(templates|static)/.*\.(html|css|js)$
+        args: ["--tab-width", "2"]

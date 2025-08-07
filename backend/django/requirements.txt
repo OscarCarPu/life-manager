@@ -1,7 +1,0 @@
-Django~=5.2
-psycopg2-binary
-python-decouple
-gunicorn
-django-bootstrap5
-whitenoise
-htmx

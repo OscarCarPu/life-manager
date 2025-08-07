@@ -39,12 +39,22 @@ pre-commit run # Solo lo ejecuta en los archivos modificados
 
 ## Hooks de Python
 
-- `flake8`: Verifica el estilo del código Python.
-- `isort`: Ordena las importaciones de Python.
-- `black`: Formatea el código Python.
+El proyecto utiliza una estructura de backend modular con FastAPI y Flask:
+
+- **Linting específico por backend**: `flake8` verifica el estilo del código con patrones específicos para:
+  - FastAPI (`/backend/fastapi/`)
+  - Flask (`/backend/flask/`)
+  - Código común (`/backend/common/`)
+- **Formateo compartido**: Aplicado a todo el código backend (`/backend/`)
+  - `isort`: Ordena las importaciones de Python
+  - `black`: Formatea el código Python
 
 ## Hooks de SQL
 
 - `sqlfluff`: Contiene un [`.sqlfluff`](../.sqlfluff) para configuraciones personalizadas.
   - `sqlfluff-fix`: Verifica el estilo y la sintaxis de los archivos SQL.
   - `sqlfluff-lint`: Ejecuta `sqlfluff` en modo de linting.
+
+## Hooks de Frontend
+
+- `prettier`: Formatea archivos HTML, CSS y JavaScript en las plantillas y archivos estáticos de Flask ubicados en `/backend/flask/templates/` y `/backend/flask/static/`.
