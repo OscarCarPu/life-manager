@@ -55,6 +55,47 @@ def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_
     return db_category
 
 
+@router.put("/categories/{category_id}", response_model=schemas.Category)
+def update_category(
+    category_id: int, category_data: schemas.CategoryUpdate, db: Session = Depends(get_db)
+):
+    db_category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    if not db_category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    # Validate parent category exists if provided
+    if category_data.parent_category_id:
+        parent_category = (
+            db.query(models.Category)
+            .filter(models.Category.id == category_data.parent_category_id)
+            .first()
+        )
+        if not parent_category:
+            raise HTTPException(status_code=400, detail="Parent category not found")
+
+    # Check if category name already exists (excluding current category)
+    if category_data.name:
+        existing_category = (
+            db.query(models.Category)
+            .filter(models.Category.name == category_data.name, models.Category.id != category_id)
+            .first()
+        )
+        if existing_category:
+            raise HTTPException(status_code=400, detail="Category name already exists")
+
+    update_data = category_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_category, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_category)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
+    return db_category
+
+
 @router.delete("/categories/{category_id}")
 def delete_category(category_id: int, db: Session = Depends(get_db)):
     category = db.query(models.Category).filter(models.Category.id == category_id).first()
@@ -107,6 +148,45 @@ def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)
     return db_project
 
 
+@router.put("/projects/{project_id}", response_model=schemas.Project)
+def update_project(
+    project_id: int, project_data: schemas.ProjectUpdate, db: Session = Depends(get_db)
+):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not db_project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Validate category exists if provided
+    if project_data.category_id:
+        category = (
+            db.query(models.Category).filter(models.Category.id == project_data.category_id).first()
+        )
+        if not category:
+            raise HTTPException(status_code=400, detail="Category not found")
+
+    # Check if project name already exists (excluding current project)
+    if project_data.name:
+        existing_project = (
+            db.query(models.Project)
+            .filter(models.Project.name == project_data.name, models.Project.id != project_id)
+            .first()
+        )
+        if existing_project:
+            raise HTTPException(status_code=400, detail="Project name already exists")
+
+    update_data = project_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_project, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_project)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
+    return db_project
+
+
 @router.delete("/projects/{project_id}")
 def delete_project(project_id: int, db: Session = Depends(get_db)):
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
@@ -149,6 +229,31 @@ def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
+    return db_task
+
+
+@router.put("/tasks/{task_id}", response_model=schemas.Task)
+def update_task(task_id: int, task_data: schemas.TaskUpdate, db: Session = Depends(get_db)):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Validate project exists if provided
+    if task_data.project_id:
+        project = db.query(models.Project).filter(models.Project.id == task_data.project_id).first()
+        if not project:
+            raise HTTPException(status_code=400, detail="Project not found")
+
+    update_data = task_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_task, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_task)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
     return db_task
 
 
@@ -209,6 +314,101 @@ def create_task_planning(task_planning: schemas.TaskPlanningCreate, db: Session 
     return db_task_planning
 
 
+@router.put("/task_planning/{task_planning_id}", response_model=schemas.TaskPlanning)
+def update_task_planning(
+    task_planning_id: int,
+    task_planning_data: schemas.TaskPlanningUpdate,
+    db: Session = Depends(get_db),
+):
+    db_task_planning = (
+        db.query(models.TaskPlanning).filter(models.TaskPlanning.id == task_planning_id).first()
+    )
+    if not db_task_planning:
+        raise HTTPException(status_code=404, detail="TaskPlanning not found")
+
+    # Validate task exists if provided
+    if task_planning_data.task_id:
+        task = db.query(models.Task).filter(models.Task.id == task_planning_data.task_id).first()
+        if not task:
+            raise HTTPException(status_code=400, detail="Task not found")
+
+    # Check if task planning for this date already exists (excluding current planning)
+    if task_planning_data.planned_date and task_planning_data.task_id:
+        existing_planning = (
+            db.query(models.TaskPlanning)
+            .filter(
+                models.TaskPlanning.task_id == task_planning_data.task_id,
+                models.TaskPlanning.planned_date == task_planning_data.planned_date,
+                models.TaskPlanning.id != task_planning_id,
+            )
+            .first()
+        )
+        if existing_planning:
+            raise HTTPException(
+                status_code=400, detail="Task planning for this date already exists"
+            )
+
+    update_data = task_planning_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_task_planning, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_task_planning)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
+    return db_task_planning
+
+
+@router.patch("/task_planning/{task_planning_id}", response_model=schemas.TaskPlanning)
+def patch_task_planning(
+    task_planning_id: int,
+    task_planning_data: schemas.TaskPlanningUpdate,
+    db: Session = Depends(get_db),
+):
+    db_task_planning = (
+        db.query(models.TaskPlanning).filter(models.TaskPlanning.id == task_planning_id).first()
+    )
+    if not db_task_planning:
+        raise HTTPException(status_code=404, detail="TaskPlanning not found")
+
+    # Validate task exists if provided
+    if task_planning_data.task_id:
+        task = db.query(models.Task).filter(models.Task.id == task_planning_data.task_id).first()
+        if not task:
+            raise HTTPException(status_code=400, detail="Task not found")
+
+    # Check if task planning for this date already exists (excluding current planning)
+    if task_planning_data.planned_date and task_planning_data.task_id:
+        existing_planning = (
+            db.query(models.TaskPlanning)
+            .filter(
+                models.TaskPlanning.task_id == task_planning_data.task_id,
+                models.TaskPlanning.planned_date == task_planning_data.planned_date,
+                models.TaskPlanning.id != task_planning_id,
+            )
+            .first()
+        )
+        if existing_planning:
+            raise HTTPException(
+                status_code=400, detail="Task planning for this date already exists"
+            )
+
+    # Only update fields that are provided (exclude_unset=True)
+    update_data = task_planning_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_task_planning, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_task_planning)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
+    return db_task_planning
+
+
 @router.delete("/task_planning/{task_planning_id}")
 def delete_task_planning(task_planning_id: int, db: Session = Depends(get_db)):
     task_planning = (
@@ -256,6 +456,35 @@ def create_note(note: schemas.NoteCreate, db: Session = Depends(get_db)):
     db.add(db_note)
     db.commit()
     db.refresh(db_note)
+    return db_note
+
+
+@router.put("/notes/{note_id}", response_model=schemas.Note)
+def update_note(note_id: int, note_data: schemas.NoteUpdate, db: Session = Depends(get_db)):
+    db_note = db.query(models.Note).filter(models.Note.id == note_id).first()
+    if not db_note:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    # Validate task or project exists if provided
+    if note_data.task_id:
+        task = db.query(models.Task).filter(models.Task.id == note_data.task_id).first()
+        if not task:
+            raise HTTPException(status_code=400, detail="Task not found")
+    elif note_data.project_id:
+        project = db.query(models.Project).filter(models.Project.id == note_data.project_id).first()
+        if not project:
+            raise HTTPException(status_code=400, detail="Project not found")
+
+    update_data = note_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_note, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_note)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
     return db_note
 
 

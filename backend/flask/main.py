@@ -52,10 +52,22 @@ def calendar():
         for planning in plannings_four_days:
             plannings_by_day[planning.planned_date].append(planning)
 
-    return render_template("calendar.html", planning_by_day=plannings_by_day)
+    api_base_url = get_api_base_url()
+    return render_template(
+        "calendar.html", planning_by_day=plannings_by_day, api_base_url=api_base_url
+    )
 
 
 @app.route("/projects")
 def projects():
     projects
     return render_template("projects.html")
+
+
+def get_api_base_url():
+    """Get the API base URL based on environment"""
+    stage = os.getenv("STAGE", "dev")
+    if stage == "dev":
+        return "http://localhost:8000"
+    else:
+        return "https://api.yourdomain.com"

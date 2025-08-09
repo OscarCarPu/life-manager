@@ -27,10 +27,6 @@
   background-color: #f8f9fa;
 }
 
-.planning-item:hover .priority-fill {
-  transform: scaeX(1.05);
-}
-
 .priority-line {
   position: absolute;
   bottom: 0;
@@ -55,4 +51,32 @@
 .no-plannings {
   font-style: italic;
   color: #6c757d;
+}
+
+/* Drag and drop styles */
+
+.planning-item[draggable="true"] {
+  cursor: grab;
+}
+
+.planning-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.planning-item.dragging {
+  opacity: 0.5;
+}
+
+.drop-zone {
+  transition: all 0.3s ease;
+}
+
+.drop-zone.drag-over {
+  background-color: #e3f2fd;
+  border: 2px dashed #2196f3;
+  transform: scale(1.02);
+}
+
+.drop-zone.drag-over .card-header {
+  background-color: #bbdefb;
 }

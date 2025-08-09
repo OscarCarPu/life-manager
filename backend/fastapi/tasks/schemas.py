@@ -22,6 +22,11 @@ class CategoryCreate(CategoryBase):
     pass
 
 
+class CategoryUpdate(CategoryBase):
+    name: Optional[str] = None
+    color: Optional[str] = None
+
+
 class Category(CategoryBase):
     id: int
     created_at: Optional[datetime]
@@ -45,6 +50,12 @@ class ProjectCreate(ProjectBase):
     pass
 
 
+class ProjectUpdate(ProjectBase):
+    name: Optional[str] = None
+    color: Optional[str] = None
+    state: Optional[ProjectState] = None
+
+
 class Project(ProjectBase):
     id: int
     created_at: Optional[datetime]
@@ -64,6 +75,11 @@ class TaskBase(BaseModel):
 
 class TaskCreate(TaskBase):
     pass
+
+
+class TaskUpdate(TaskBase):
+    title: Optional[str] = None
+    state: Optional[TaskState] = None
 
 
 class Task(TaskBase):
@@ -93,6 +109,11 @@ class TaskPlanningCreate(TaskPlanningBase):
     pass
 
 
+class TaskPlanningUpdate(TaskPlanningBase):
+    task_id: Optional[int] = None
+    planned_date: Optional[date] = None
+
+
 class TaskPlanning(TaskPlanningBase):
     id: int
     created_at: Optional[datetime]
@@ -110,6 +131,10 @@ class NoteBase(BaseModel):
 
 class NoteCreate(NoteBase):
     pass
+
+
+class NoteUpdate(NoteBase):
+    content: Optional[str] = None
 
 
 class Note(NoteBase):
