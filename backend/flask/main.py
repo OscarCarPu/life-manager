@@ -68,6 +68,6 @@ def get_api_base_url():
     """Get the API base URL based on environment"""
     stage = os.getenv("STAGE", "dev")
     if stage == "dev":
-        return "http://localhost:8000"
+        return "http://localhost:8001"
     else:
         return "https://api.yourdomain.com"

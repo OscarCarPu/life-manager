@@ -1,3 +1,4 @@
+/* General Styles */
 .calendar-container {
   padding: 1rem;
 }
@@ -8,6 +9,12 @@
   color: #343a40;
 }
 
+.no-plannings {
+  font-style: italic;
+  color: #6c757d;
+}
+
+/* Card and List items */
 .animated-card {
   border-radius: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -27,6 +34,7 @@
   background-color: #f8f9fa;
 }
 
+/* Priority Styles */
 .priority-line {
   position: absolute;
   bottom: 0;
@@ -48,13 +56,7 @@
   border-radius: 2px;
 }
 
-.no-plannings {
-  font-style: italic;
-  color: #6c757d;
-}
-
-/* Drag and drop styles */
-
+/* Drag and drop */
 .planning-item[draggable="true"] {
   cursor: grab;
 }
