@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from common.database import get_db_context as get_db
 from common.tasks.models import TaskPlanning
-from flask import Flask, render_template
+from flask import Flask, jsonify, render_template
 from flask_babel import Babel
 from sqlalchemy.orm import selectinload
 
@@ -19,6 +19,11 @@ if os.getenv("STAGE") == "dev":
     app.jinja_env.cache = {}
 
 babel = Babel(app)
+
+
+@app.route("/healthcheck")
+def healthcheck():
+    return jsonify({"status": "ok"})
 
 
 @app.route("/")
