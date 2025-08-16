@@ -1,0 +1,26 @@
+.hidden {
+  display: none !important;
+}
+
+.alert-custom {
+  top: 20px;
+  right: 20px;
+  z-index: 1050;
+}
+
+/* Fade out animation for notifications */
+.alert.fade {
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.4s ease-out;
+}
+
+.alert.fade-out {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.alert.show {
+  opacity: 1;
+  transform: translateX(0);
+}

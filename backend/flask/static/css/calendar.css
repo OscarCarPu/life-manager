@@ -110,6 +110,22 @@
   color: #495057;
 }
 
+.priority-indicator.priority-1 {
+  background-color: #ffd700;
+}
+.priority-indicator.priority-2 {
+  background-color: #ffc107;
+}
+.priority-indicator.priority-3 {
+  background-color: #ffa07a;
+}
+.priority-indicator.priority-4 {
+  background-color: #ff4500;
+}
+.priority-indicator.priority-5 {
+  background-color: #dc3545;
+}
+
 /* Enhanced drag states */
 .action-zone.drag-over .action-text,
 .action-zone.drag-over .priority-label {
@@ -182,6 +198,31 @@
     transform 0.3s ease-in-out;
   transform-origin: left;
   border-radius: 2px;
+}
+
+.priority-fill.priority-0 {
+  width: 0%;
+  background-color: #ccc;
+}
+.priority-fill.priority-1 {
+  width: 7%;
+  background-color: #ffd700;
+}
+.priority-fill.priority-2 {
+  width: 25%;
+  background-color: #ffc107;
+}
+.priority-fill.priority-3 {
+  width: 50%;
+  background-color: #ffa07a;
+}
+.priority-fill.priority-4 {
+  width: 80%;
+  background-color: #ff4500;
+}
+.priority-fill.priority-5 {
+  width: 100%;
+  background-color: #dc3545;
 }
 
 /* Drag and drop */

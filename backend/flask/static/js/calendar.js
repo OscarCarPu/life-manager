@@ -1,13 +1,87 @@
-let draggedElement = null;
-let draggedPlanningId = null;
-let originalDate = null;
+const localConfig = {
+  CLASSES: {
+    DRAGGING: "dragging",
+    DRAG_OVER: "drag-over",
+    NO_PLANNINGS: "no-plannings",
+    DRAG_OVER_TEXT: "drag-over-text",
+    PLANNING_ITEM: "planning-item",
+  },
+  DATA_ATTRIBUTES: {
+    PLANNING_ID: "data-planning-id",
+    CURRENT_DATE: "data-current-date",
+    ACTION: "data-action",
+    PRIORITY: "data-priority",
+    DATE: "data-date",
+  },
+};
 
+const state = {
+  draggedElement: null,
+  draggedPlanningId: null,
+  originalDate: null,
+};
+
+//handle DOM changes for "no planning"
+function handleNoPlannings(container) {
+  const remainingPlannings = container.querySelectorAll(
+    `.${localConfig.CLASSES.PLANNING_ITEM}`,
+  ).length;
+
+  let noPlanningsItem = container.querySelector(
+    `.${localConfig.CLASSES.NO_PLANNINGS}`,
+  );
+
+  if (remainingPlannings === 0) {
+    if (!noPlanningsItem) {
+      noPlanningsItem = document.createElement("li");
+      noPlanningsItem.className = `list-group-item text-center text-muted ${localConfig.CLASSES.NO_PLANNINGS}`;
+      noPlanningsItem.textContent = "No plannings for this day.";
+      container.appendChild(noPlanningsItem);
+    }
+  } else {
+    if (noPlanningsItem) {
+      noPlanningsItem.remove();
+    }
+  }
+}
+
+// Handle API requests
+async function makeApiRequest(url, method, body = null) {
+  try {
+    const options = {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+    };
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `Failed to ${method.toLowerCase()}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`Erro with API request:`, error);
+    showNotification(`Error: ${error.message}`, "danger");
+    throw error;
+  }
+}
+
+// Event handlers
 function dragStart(event) {
-  draggedElement = event.target;
-  draggedPlanningId = event.target.getAttribute("data-planning-id");
-  originalDate = event.target.getAttribute("data-current-date");
+  state.draggedElement = event.target;
+  state.draggedPlanningId = event.target.getAttribute(
+    localConfig.DATA_ATTRIBUTES.PLANNING_ID,
+  );
+  state.originalDate = event.target.getAttribute(
+    localConfig.DATA_ATTRIBUTES.CURRENT_DATE,
+  );
 
-  event.target.classList.add("dragging");
+  event.target.classList.add(localConfig.CLASSES.DRAGGING);
   event.dataTransfer.effectAllowed = "move";
   event.dataTransfer.setData("text/html", event.target.outerHTML);
 }
@@ -17,377 +91,205 @@ function allowDrop(event) {
   event.dataTransfer.dropEffect = "move";
 }
 
-function dragEnter(event) {
+function handleDragOverState(event, add = true) {
   event.preventDefault();
-  const dropZone = event.currentTarget;
-  if (dropZone.classList.contains("drop-zone")) {
-    dropZone.classList.add("drag-over");
+  const target = event.currentTarget;
+  const className = localConfig.CLASSES.DRAG_OVER;
 
-    const noPlannings = dropZone.querySelector(".no-plannings");
+  if (add) {
+    target.classList.add(className);
+    const noPlannings = target.querySelector(
+      `.${localConfig.CLASSES.NO_PLANNINGS}`,
+    );
     if (noPlannings) {
       noPlannings.textContent = "Drop here to move planning";
-      noPlannings.classList.add("drag-over-text");
+      noPlannings.classList.add(localConfig.CLASSES.DRAG_OVER_TEXT);
+    }
+  } else {
+    // Avoid flicker
+    const rect = target.getBoundingClientRect();
+    const isInside =
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom;
+    if (!isInside) {
+      target.classList.remove(className);
+      const noPlannings = target.querySelector(
+        `.${localConfig.CLASSES.NO_PLANNINGS}`,
+      );
+      if (noPlannings) {
+        noPlannings.textContent = "No plannings for this day.";
+        noPlannings.classList.remove(localConfig.CLASSES.DRAG_OVER_TEXT);
+      }
     }
   }
 }
 
-function dragLeave(event) {
-  const dropZone = event.currentTarget;
-  const rect = dropZone.getBoundingClientRect();
-  const x = event.clientX;
-  const y = event.clientY;
-
-  if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-    dropZone.classList.remove("drag-over");
-
-    const noPlannings = dropZone.querySelector(".no-plannings");
-    if (noPlannings) {
-      noPlannings.textContent = "No plannings for this day.";
-      noPlannings.classList.remove("drag-over-text");
-    }
-  }
-}
-
-// Nuevas funciones para las zonas de acción
-function dragEnterAction(event) {
-  event.preventDefault();
-  const actionZone = event.currentTarget;
-  actionZone.classList.add("drag-over");
-}
-
-function dragLeaveAction(event) {
-  const actionZone = event.currentTarget;
-  const rect = actionZone.getBoundingClientRect();
-  const x = event.clientX;
-  const y = event.clientY;
-
-  if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-    actionZone.classList.remove("drag-over");
-  }
-}
-
-// Nueva función para manejar drops en zonas de acción
-function dropAction(event) {
-  event.preventDefault();
-  const actionZone = event.currentTarget;
-  const action = actionZone.getAttribute("data-action");
-
-  actionZone.classList.remove("drag-over");
-
-  if (draggedElement) {
-    draggedElement.classList.remove("dragging");
-  }
-
-  if (action === "delete") {
-    deleteTaskPlanning(draggedPlanningId);
-  } else if (action === "priority") {
-    const priority = parseInt(actionZone.getAttribute("data-priority"));
-    updateTaskPlanningPriority(draggedPlanningId, priority);
-  }
-}
-
-function drop(event) {
+async function drop(event) {
   event.preventDefault();
   const dropZone = event.currentTarget;
-  const newDate = dropZone.getAttribute("data-date");
+  const newDate = dropZone.getAttribute(localConfig.DATA_ATTRIBUTES.DATE);
 
-  dropZone.classList.remove("drag-over");
-  if (draggedElement) {
-    draggedElement.classList.remove("dragging");
-  }
-
-  const noPlannings = dropZone.querySelector(".no-plannings");
+  // Clean drag-over
+  dropZone.classList.remove(localConfig.CLASSES.DRAG_OVER);
+  const noPlannings = dropZone.querySelector(
+    `.${localConfig.CLASSES.NO_PLANNINGS}`,
+  );
   if (noPlannings) {
     noPlannings.textContent = "No plannings for this day.";
-    noPlannings.classList.remove("drag-over-text");
+    noPlannings.classList.remove(localConfig.CLASSES.DRAG_OVER_TEXT);
   }
 
-  if (newDate === originalDate) {
-    return;
+  if (newDate === state.originalDate) {
+    return; // No change in date, do nothing
   }
 
-  updateTaskPlanning(draggedPlanningId, newDate, originalDate);
-}
-
-// Función para eliminar planning
-async function deleteTaskPlanning(planningId) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/tasks/task_planning/${planningId}`,
-      {
-        method: "DELETE",
-      },
+    await makeApiRequest(
+      `${API_BASE_URL}/tasks/task_planning/${state.draggedPlanningId}`,
+      "PATCH",
+      { planned_date: newDate },
     );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || "Failed to delete planning");
-    }
-
-    // Remover elemento del DOM
-    if (draggedElement) {
-      const container = draggedElement.parentElement;
-      draggedElement.remove();
-
-      // Verificar si necesitamos mostrar "no plannings"
-      const remainingPlannings = container.querySelectorAll(".planning-item");
-      if (remainingPlannings.length === 0) {
-        const noPlanningsItem = document.createElement("li");
-        noPlanningsItem.className =
-          "list-group-item text-center text-muted no-plannings";
-        noPlanningsItem.textContent = "No plannings for this day.";
-        container.appendChild(noPlanningsItem);
-      }
-    }
-
-    showNotification("Planning deleted successfully!", "success");
+    movePlanningInDOM(state.draggedElement, newDate, state.originalDate);
+    showNotification("Planning moved successfully", "success");
   } catch (error) {
-    console.error("Error deleting planning:", error);
-    showNotification(`Error: ${error.message}`, "error");
+    console.error("Error in new date planning:", error);
+    showNotification(`Error: ${error.message}`, "danger");
   } finally {
-    draggedElement = null;
-    draggedPlanningId = null;
-    originalDate = null;
+    state.draggedElement = null;
+    state.draggedPlanningId = null;
+    state.originalDate = null;
   }
 }
 
-// Función para actualizar prioridad
-async function updateTaskPlanningPriority(planningId, priority) {
+async function dropAction(event) {
+  event.preventDefault();
+  const actionZone = event.currentTarget;
+  const action = actionZone.getAttribute(localConfig.DATA_ATTRIBUTES.ACTION);
+  actionZone.classList.remove(localConfig.CLASSES.DRAG_OVER);
+
+  if (!state.draggedElement) return;
+
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/tasks/task_planning/${planningId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          priority: priority,
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || "Failed to update priority");
-    }
-
-    // Actualizar la visualización de prioridad en el DOM
-    if (draggedElement) {
-      const priorityFill = draggedElement.querySelector(".priority-fill");
+    if (action === "delete") {
+      await makeApiRequest(
+        `${API_BASE_URL}/tasks/task_planning/${state.draggedPlanningId}`,
+        "DELETE",
+      );
+      const container = state.draggedElement.parentElement;
+      state.draggedElement.remove();
+      handleNoPlannings(container);
+      showNotification("Planning deleted successfully", "success");
+    } else if (action === "priority") {
+      const priority = parseInt(
+        actionZone.getAttribute(localConfig.DATA_ATTRIBUTES.PRIORITY),
+      );
+      await makeApiRequest(
+        `${API_BASE_URL}/tasks/task_planning/${state.draggedPlanningId}`,
+        "PATCH",
+        { priority: priority },
+      );
+      const priorityFill = state.draggedElement.querySelector(".priority-fill");
       if (priorityFill) {
-        const priorityColors = [
-          "#FFD700",
-          "#FFC107",
-          "#FFA07A",
-          "#FF4500",
-          "#DC3545",
-        ];
-        priorityFill.style.width = `${(priority / 5) * 100}%`;
-        priorityFill.style.backgroundColor = priorityColors[priority - 1];
+        priorityFill.className = `priority-fill priority-${priority}`;
+        priorityFill.setAttribute("data-priority", priority);
       }
+      showNotification("Planning priority updated successfully", "success");
     }
-
-    showNotification(`Priority updated to ${priority}!`, "success");
   } catch (error) {
-    console.error("Error updating priority:", error);
-    showNotification(`Error: ${error.message}`, "error");
+    console.error("ERror in dropAction:", error);
+    showNotification(`Error: ${error.message}`, "danger");
   } finally {
-    draggedElement = null;
-    draggedPlanningId = null;
-    originalDate = null;
+    state.draggedElement = null;
+    state.draggedPlanningId = null;
+    state.originalDate = null;
   }
 }
 
-async function updateTaskPlanning(planningId, newDate, oldDate) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/tasks/task_planning/${planningId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          planned_date: newDate,
-        }),
-      },
+// Move planning in DOM
+function movePlanningInDOM(element, newDate, oldDate) {
+  const oldContainer = document.getElementById(`plannings-${oldDate}`);
+  const newContainer = document.getElementById(`plannings-${newDate}`);
+
+  if (!oldContainer || !newContainer) {
+    console.error("Invalid containers for planning move");
+    return;
+  }
+
+  element.setAttribute(localConfig.DATA_ATTRIBUTES.CURRENT_DATE, newDate);
+  element.classList.remove(localConfig.CLASSES.DRAGGING);
+
+  newContainer.appendChild(element);
+  handleNoPlannings(newContainer);
+  handleNoPlannings(oldContainer);
+
+  const sortPlannings = (container) => {
+    const plannings = Array.from(
+      container.querySelectorAll(`.${localConfig.CLASSES.PLANNING_ITEM}`),
     );
+    plannings.sort((a, b) => {
+      const hourA = a.querySelector(".planning-hour").textContent.trim();
+      const hourB = b.querySelector(".planning-hour").textContent.trim();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || "Failed to update planning");
-    }
+      const getStartHour = (timeText) => {
+        if (!timeText) return 1500;
+        const match = timeText.match(/^(\d{1,2}):?(\d{2})?/);
+        if (!match) return 1500;
+        const hour = parseInt(match[1]);
+        const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
+        return hour * 60 + minute;
+      };
 
-    const updatedPlanning = await response.json();
-
-    movePlanningInDOM(draggedElement, newDate, oldDate);
-
-    showNotification("Planning moved successfully!", "success");
-  } catch (error) {
-    console.error("Error updating planning:", error);
-    showNotification(`Error: ${error.message}`, "error");
-  } finally {
-    draggedElement = null;
-    draggedPlanningId = null;
-    originalDate = null;
-  }
-}
-
-function movePlanningInDOM(element, newDate, oldDate) {
-  const oldContainer = document.getElementById(`plannings-${oldDate}`);
-  const newContainer = document.getElementById(`plannings-${newDate}`);
-
-  if (!oldContainer || !newContainer) {
-    console.error("Could not find containers for date movement");
-    return;
-  }
-
-  element.setAttribute("data-current-date", newDate);
-  element.classList.remove("dragging");
-
-  const noPlannings = newContainer.querySelector(".no-plannings");
-  if (noPlannings) {
-    noPlannings.remove();
-  }
-
-  newContainer.appendChild(element);
-
-  const plannings = Array.from(newContainer.querySelectorAll(".planning-item"));
-  plannings.sort((a, b) => {
-    const hourA = a.querySelector(".planning-hour").textContent.trim();
-    const hourB = b.querySelector(".planning-hour").textContent.trim();
-
-    const getStartHour = (timeText) => {
-      if (timeText === "All day") return 24;
-      const match = timeText.match(/^(\d{1,2}):?(\d{2})?/);
-      if (match) {
-        const hours = parseInt(match[1]);
-        const minutes = parseInt(match[2]) || 0;
-        return hours + minutes / 60;
+      const startA = getStartHour(hourA);
+      const startB = getStartHour(hourB);
+      if (startA !== startB) {
+        return startA - startB;
       }
-      return 25;
-    };
 
-    const startA = getStartHour(hourA);
-    const startB = getStartHour(hourB);
-    if (startA !== startB) {
-      return startA - startB;
-    }
-
-    const priorityA =
-      parseInt(a.querySelector(".priority-fill").style.width) || 0;
-    const priorityB =
-      parseInt(b.querySelector(".priority-fill").style.width) || 0;
-    return priorityB - priorityA;
-  });
-
-  plannings.forEach((planning) => newContainer.appendChild(planning));
-
-  const remainingPlannings = oldContainer.querySelectorAll(
-    ".planning-item:not(.no-plannings)",
-  );
-  if (remainingPlannings.length === 0) {
-    const noPlanningsItem = document.createElement("li");
-    noPlanningsItem.className =
-      "list-group-item text-center text-muted no-plannings";
-    noPlanningsItem.textContent = "No plannings for this day.";
-    oldContainer.appendChild(noPlanningsItem);
-  }
+      const priorityA =
+        parseInt(a.querySelector(".priority-fill").style.width) || 0;
+      const priorityB =
+        parseInt(b.querySelector(".priority-fill").style.width) || 0;
+      return priorityB - priorityA;
+    });
+    plannings.forEach((planning) => container.appendChild(planning));
+  };
+  sortPlannings(newContainer);
 }
 
-function movePlanningInDOM(element, newDate, oldDate) {
-  const oldContainer = document.getElementById(`plannings-${oldDate}`);
-  const newContainer = document.getElementById(`plannings-${newDate}`);
-
-  if (!oldContainer || !newContainer) {
-    console.error("Could not find containers for date movement");
-    return;
+// Cleanup
+document.addEventListener("dragend", () => {
+  if (state.draggedElement) {
+    state.draggedElement.classList.remove(localConfig.CLASSES.DRAGGING);
   }
-
-  element.setAttribute("data-current-date", newDate);
-  element.classList.remove("dragging");
-
-  const noPlannings = newContainer.querySelector(".no-plannings");
-  if (noPlannings) {
-    noPlannings.remove();
-  }
-
-  newContainer.appendChild(element);
-
-  const plannings = Array.from(newContainer.querySelectorAll(".planning-item"));
-  plannings.sort((a, b) => {
-    const hourA = a.querySelector(".planning-hour").textContent.trim();
-    const hourB = b.querySelector(".planning-hour").textContent.trim();
-
-    const getStartHour = (timeText) => {
-      if (!timeText) return 1480;
-      const match = timeText.match(/^(\d{1,2})(:?\d{2})?/);
-      if (!match) return 1480; // Default to a high value if no match
-      const hour = parseInt(match[1]);
-      const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
-      return hour * 60 + minute;
-    };
-
-    const startA = getStartHour(hourA);
-    const startB = getStartHour(hourB);
-    if (startA !== startB) {
-      return startA - startB;
-    }
-
-    const priorityA =
-      parseInt(a.querySelector(".priority-fill").style.width) || 0;
-    const priorityB =
-      parseInt(b.querySelector(".priority-fill").style.width) || 0;
-    return priorityB - priorityA;
-  });
-
-  const remainingPlannings = oldContainer.querySelectorAll(
-    ".planning-item:not(.no-plannings)",
-  );
-  if (remainingPlannings.length === 0) {
-    const noPlanningsItem = document.createElement("li");
-    noPlanningsItem.className =
-      "list-group-item text-center text-muted no-plannings";
-    noPlanningsItem.textContent = "No plannings for this day.";
-    oldContainer.appendChild(noPlanningsItem);
-  }
-}
-
-function showNotification(message, type = "info") {
-  // Crear el elemento de notificación
-  const notification = document.createElement("div");
-  notification.className = `alert alert-${type === "success" ? "success" : type === "error" ? "danger" : "info"} alert-dismissible fade show position-fixed`;
-  notification.style.top = "20px";
-  notification.style.right = "20px";
-  notification.style.zIndex = "1050";
-  notification.innerHTML = `
-    ${message}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  `;
-
-  document.body.appendChild(notification);
-
-  // Auto-remover después de 3 segundos
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.remove();
-    }
-  }, 3000);
-}
-
-document.addEventListener("dragend", function (event) {
-  if (draggedElement) {
-    draggedElement.classList.remove("dragging");
-  }
-
-  // Limpiar todas las zonas de drop
   document.querySelectorAll(".drop-zone, .action-zone").forEach((zone) => {
-    zone.classList.remove("drag-over");
-    const noPlannings = zone.querySelector(".no-plannings");
+    zone.classList.remove(localConfig.CLASSES.DRAG_OVER);
+    const noPlannings = zone.querySelector(
+      `.${localConfig.CLASSES.NO_PLANNINGS}`,
+    );
     if (noPlannings) {
       noPlannings.textContent = "No plannings for this day.";
-      noPlannings.classList.remove("drag-over-text");
+      noPlannings.classList.remove(localConfig.CLASSES.DRAG_OVER_TEXT);
     }
   });
+});
+
+// Assign event listeners
+document.querySelectorAll(".drop-zone").forEach((zone) => {
+  zone.addEventListener("dragover", allowDrop);
+  zone.addEventListener("dragenter", (e) => handleDragOverState(e, true));
+  zone.addEventListener("dragleave", (e) => handleDragOverState(e, false));
+  zone.addEventListener("drop", drop);
+});
+
+document.querySelectorAll(".action-zone").forEach((zone) => {
+  zone.addEventListener("dragover", allowDrop);
+  zone.addEventListener("dragenter", (e) => handleDragOverState(e, true));
+  zone.addEventListener("dragleave", (e) => handleDragOverState(e, false));
+  zone.addEventListener("drop", dropAction);
+});
+
+document.querySelectorAll(".planning-item").forEach((item) => {
+  item.addEventListener("dragstart", dragStart);
 });

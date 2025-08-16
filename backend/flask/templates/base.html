@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title> {% block title %}{% endblock %} | Life Manager</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     {% block styles %}{% endblock %}
   </head>
   <body>
@@ -38,7 +39,13 @@
     <div class="container-fluid">
       {% block main %}{% endblock %}
     </div>
+
+    <div class="alert hidden alert-custom alert-dismissible fade position-fixed" id="alert">
+      <p id="alert-message"></p>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

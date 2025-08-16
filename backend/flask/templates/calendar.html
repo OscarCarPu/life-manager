@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block title %}Calendar{% endblock %}
 {% block main %}
   <div class="calendar-container">
@@ -9,11 +10,7 @@
         <div class="sidebar-actions">
           <!-- Zona de eliminar -->
           <div class="action-zone delete-zone"
-               data-action="delete"
-               ondrop="dropAction(event)"
-               ondragover="allowDrop(event)"
-               ondragenter="dragEnterAction(event)"
-               ondragleave="dragLeaveAction(event)">
+               data-action="delete">
             <div class="action-icon">
               <i class="fas fa-trash-alt"></i>
             </div>
@@ -23,16 +20,11 @@
           <!-- Zona de prioridades -->
           <div class="priority-section">
             <h6 class="priority-title">Priority</h6>
-            {% set priority_colors = ["#FFD700", "#FFC107", "#FFA07A", "#FF4500", "#DC3545"] %}
             {% for priority in range(1, 6) %}
               <div class="action-zone priority-zone"
                    data-action="priority"
-                   data-priority="{{ priority }}"
-                   ondrop="dropAction(event)"
-                   ondragover="allowDrop(event)"
-                   ondragenter="dragEnterAction(event)"
-                   ondragleave="dragLeaveAction(event)">
-                <div class="priority-indicator" style="background-color: {{ priority_colors[priority - 1] }};">
+                   data-priority="{{ priority }}">
+                <div class="priority-indicator priority-{{ priority }}">
                   {{ priority }}
                 </div>
                 <div class="priority-label">Priority {{ priority }}</div>
@@ -48,11 +40,7 @@
           {% for date, plannings in planning_by_day.items() %}
             <div class="col-3">
               <div class="card h-100 animated-card drop-zone"
-                   data-date="{{ date.isoformat() }}"
-                   ondrop="drop(event)"
-                   ondragover="allowDrop(event)"
-                   ondragenter="dragEnter(event)"
-                   ondragleave="dragLeave(event)">
+                   data-date="{{ date.isoformat() }}">
                 <div class="card-header">
                   <h5 class="card-title">{{ date | datetimeformat("d/M/Y, EEEE") }}</h5>
                 </div>
@@ -62,8 +50,7 @@
                       <li class="list-group-item planning-item"
                           draggable="true"
                           data-planning-id="{{ planning.id }}"
-                          data-current-date="{{ date.isoformat() }}"
-                          ondragstart="dragStart(event)">
+                          data-current-date="{{ date.isoformat() }}">
                         <div class="d-flex justify-content-between align-items-start">
                           <div class="planning-content">
                             <strong class="planning-task">{{ planning.task.title }}</strong>
@@ -85,10 +72,9 @@
                             {% endif %}
                           </span>
                         </div>
-                        {% set priority_colors = ["#FFD700", "#FFC107", "#FFA07A", "#FF4500", "#DC3545"] %}
                         <div class="priority-line mt-2">
-                          <div class="priority-fill" style="width: {{ (planning.priority / 5) * 100 if planning.priority else 20 }}%; background-color: {{ priority_colors[planning.priority - 1] if planning.priority and planning.priority >= 1 and planning.priority <= 5 else '#ccc' }};">
-                          </div>
+                          <div class="priority-fill priority-{{ planning.priority or 0 }}"
+                               data-priority="{{ planning.priority or 0 }}"></div>
                         </div>
                       </li>
                     {% endfor %}
