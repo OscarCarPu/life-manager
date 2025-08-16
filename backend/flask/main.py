@@ -3,7 +3,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from common.database import get_db_context as get_db
-from common.tasks.models import TaskPlanning
+from common.tasks.models import Task, TaskPlanning
 from flask import Flask, jsonify, render_template
 from flask_babel import Babel
 from sqlalchemy.orm import selectinload
@@ -39,7 +39,7 @@ def calendar():
 
         plannings_four_days = (
             db.query(TaskPlanning)
-            .options(selectinload(TaskPlanning.task))
+            .options(selectinload(TaskPlanning.task).selectinload(Task.project))
             .filter(TaskPlanning.planned_date.in_(four_days))
             .order_by(
                 TaskPlanning.planned_date,

@@ -4,71 +4,113 @@
   <div class="calendar-container">
     <h1 class="calendar-title">Calendar</h1>
     <div class="row g-4">
-      {% for date, plannings in planning_by_day.items() %}
-        <div class="col-3">
-          <div class="card h-100 animated-card drop-zone"
-               data-date="{{ date.isoformat() }}"
-               ondrop="drop(event)"
+      <!-- Sidebar con zona de eliminar y prioridades -->
+      <div class="col-2">
+        <div class="sidebar-actions">
+          <!-- Zona de eliminar -->
+          <div class="action-zone delete-zone"
+               data-action="delete"
+               ondrop="dropAction(event)"
                ondragover="allowDrop(event)"
-               ondragenter="dragEnter(event)"
-               ondragleave="dragLeave(event)">
-            <div class="card-header">
-              <h5 class="card-title">{{ date | datetimeformat("d/M/Y, EEEE") }}</h5>
+               ondragenter="dragEnterAction(event)"
+               ondragleave="dragLeaveAction(event)">
+            <div class="action-icon">
+              <i class="fas fa-trash-alt"></i>
             </div>
-            <ul class="list-group list-group-flush" id="plannings-{{ date.isoformat() }}">
-              {% if plannings %}
-                {% for planning in plannings %}
-                  <li class="list-group-item planning-item"
-                      draggable="true"
-                      data-planning-id="{{ planning.id }}"
-                      data-current-date="{{ date.isoformat() }}"
-                      ondragstart="dragStart(event)">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <strong class="task-title">{{ planning.task.title }}</strong>
-                      <span class="planning-time">
-                        {% if planning.start_hour and planning.end_hour %}
-                          {{ planning.start_hour|datetimeformat("H") }}
-                          {% if planning.start_hour.minute %}
-                            :{{ '%02d'|format(planning.start_hour.minute) }}
-                          {% endif %}
-                          - {{ planning.end_hour|datetimeformat("H") }}
-                          {% if planning.end_hour.minute %}
-                            :{{ '%02d'|format(planning.end_hour.minute) }}
-                          {% endif %}
-                        {% elif planning.start_hour %}
-                          {{ planning.start_hour|datetimeformat("H") }}
-                          {% if planning.start_hour.minute %}
-                            :{{ '%02d'|format(planning.start_hour.minute) }}
-                          {% endif %}
-                        {% elif planning.end_hour %}
-                          - {{ planning.end_hour|datetimeformat("H") }}
-                          {% if planning.end_hour.minute %}
-                            :{{ '%02d'|format(planning.end_hour.minute) }}
-                          {% endif %}
-                        {% endif %}
-                      </span>
-                    </div>
-                    {% set priority_colors = ["#FFD700", "#FFC107", "#FFA07A", "#FF4500", "#DC3545"] %}
-                    <div class="priority-line mt-2">
-                      <div class="priority-fill" style="width: {{ (planning.priority / 5) * 100 }}%; background-color: {{ priority_colors[planning.priority - 1] if planning.priority >= 1 and planning.priority <= 5 else '#ccc' }}">
-                      </div>
-                    </div>
-                  </li>
-                {% endfor %}
-              {% else %}
-                <li class="list-group-item text-center text-muted no-plannings">No plannings for this day.</li>
-              {% endif %}
-            </ul>
+            <div class="action-text">Drop to Delete</div>
+          </div>
+
+          <!-- Zona de prioridades -->
+          <div class="priority-section">
+            <h6 class="priority-title">Priority</h6>
+            {% set priority_colors = ["#FFD700", "#FFC107", "#FFA07A", "#FF4500", "#DC3545"] %}
+            {% for priority in range(1, 6) %}
+              <div class="action-zone priority-zone"
+                   data-action="priority"
+                   data-priority="{{ priority }}"
+                   ondrop="dropAction(event)"
+                   ondragover="allowDrop(event)"
+                   ondragenter="dragEnterAction(event)"
+                   ondragleave="dragLeaveAction(event)">
+                <div class="priority-indicator" style="background-color: {{ priority_colors[priority - 1] }};">
+                  {{ priority }}
+                </div>
+                <div class="priority-label">Priority {{ priority }}</div>
+              </div>
+            {% endfor %}
           </div>
         </div>
-      {% endfor %}
+      </div>
+
+      <!-- Calendario existente -->
+      <div class="col-10">
+        <div class="row g-4">
+          {% for date, plannings in planning_by_day.items() %}
+            <div class="col-3">
+              <div class="card h-100 animated-card drop-zone"
+                   data-date="{{ date.isoformat() }}"
+                   ondrop="drop(event)"
+                   ondragover="allowDrop(event)"
+                   ondragenter="dragEnter(event)"
+                   ondragleave="dragLeave(event)">
+                <div class="card-header">
+                  <h5 class="card-title">{{ date | datetimeformat("d/M/Y, EEEE") }}</h5>
+                </div>
+                <ul class="list-group list-group-flush" id="plannings-{{ date.isoformat() }}">
+                  {% if plannings %}
+                    {% for planning in plannings %}
+                      <li class="list-group-item planning-item"
+                          draggable="true"
+                          data-planning-id="{{ planning.id }}"
+                          data-current-date="{{ date.isoformat() }}"
+                          ondragstart="dragStart(event)">
+                        <div class="d-flex justify-content-between align-items-start">
+                          <div class="planning-content">
+                            <strong class="planning-task">{{ planning.task.title }}</strong>
+                            <span class="planning-hour text-muted">
+                              {% if planning.start_hour and planning.end_hour %}
+                                {{ planning.start_hour.strftime('%H:%M') }} - {{ planning.end_hour.strftime('%H:%M') }}
+                              {% elif planning.start_hour %}
+                                {{ planning.start_hour.strftime('%H:%M') }}
+                              {% else %}
+                                All day
+                              {% endif %}
+                            </span>
+                          </div>
+                          <span class="badge bg-secondary">
+                            {% if planning.task.project %}
+                              {{ planning.task.project.name }}
+                            {% else %}
+                              No Project
+                            {% endif %}
+                          </span>
+                        </div>
+                        {% set priority_colors = ["#FFD700", "#FFC107", "#FFA07A", "#FF4500", "#DC3545"] %}
+                        <div class="priority-line mt-2">
+                          <div class="priority-fill" style="width: {{ (planning.priority / 5) * 100 if planning.priority else 20 }}%; background-color: {{ priority_colors[planning.priority - 1] if planning.priority and planning.priority >= 1 and planning.priority <= 5 else '#ccc' }};">
+                          </div>
+                        </div>
+                      </li>
+                    {% endfor %}
+                  {% else %}
+                    <li class="list-group-item text-center text-muted no-plannings">No plannings for this day.</li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
+
 {% block styles %}
   <link rel="stylesheet"
         href="{{ url_for('static', filename='css/calendar.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 {% endblock %}
+
 {% block scripts %}
   <script>
     const API_BASE_URL = "{{ api_base_url }}";

@@ -4,7 +4,7 @@ up:
 	@echo "Starting local development environment (with Supabase)..."
 	cd supabase
 	npx supabase start
-	docker compose --profile dev up -d
+	docker compose up -d --wait
 	@echo "Local development environment is up"
 
 clean:
@@ -16,7 +16,7 @@ clean:
 
 build:
 	@echo "Building images.."
-	docker compose --profile dev build
+	docker compose build
 	@echo "All images built, resetting Supabase"
 	cd supabase
 	npx supabase start
@@ -38,7 +38,7 @@ down:
 reset-dev:
 	@echo "Resetting development environment"
 	docker compose down -v
-	docker compose up -d --build
+	docker compose up -d --build --wait
 	cd supabase
 	npx supabase start
 	npx supabase db reset
