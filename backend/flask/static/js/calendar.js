@@ -22,16 +22,19 @@ const state = {
   originalDate: null,
 };
 
-const parseTextToTime = (text, end = false) => {
+const parseTextToTime = (text, isEndTime = false) => {
   if (!text) return localConfig.HIGH_LIMIT_MINUTES;
-  if (end) {
-    const match = text.match(/-(\d{1,2}):?(\d{2})?$/);
+  let match;
+  if (isEndTime) {
+    match = text.match(/- (\d{1,2}):?(\d{2})?$/);
   } else {
-    const match = text.match(/^(\d{1,2}):?(\d{2})?/);
+    match = text.match(/^(\d{1,2}):?(\d{2})?/);
   }
+
   if (!match) return localConfig.HIGH_LIMIT_MINUTES;
+
   const hour = parseInt(match[1]);
-  const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
+  const minute = match[2] ? parseInt(match[2]) : 0;
   return hour * 60 + minute;
 };
 

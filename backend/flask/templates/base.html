@@ -41,11 +41,7 @@
     <div class="container-fluid">
       {% block main %}{% endblock %}
     </div>
-
-    <div class="alert hidden alert-custom alert-dismissible fade position-fixed" id="alert">
-      <p id="alert-message"></p>
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+    {% include 'notifications/container.html' %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

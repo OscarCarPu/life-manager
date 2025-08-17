@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from common.database import get_db_context as get_db
 from common.tasks.models import Task, TaskPlanning
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_babel import Babel
 from sqlalchemy.orm import selectinload
 
@@ -67,6 +67,19 @@ def calendar():
 def projects():
     projects
     return render_template("projects.html")
+
+
+@app.route("/notification", methods=["POST"])
+def render_notification():
+    """Render a single notification template"""
+    data = request.get_json()
+    message = data.get("message", "")
+    notification_type = data.get("type", "info")
+    notification_id = data.get("id", "")
+
+    return render_template(
+        "notifications/single.html", message=message, type=notification_type, id=notification_id
+    )
 
 
 def get_api_base_url():
