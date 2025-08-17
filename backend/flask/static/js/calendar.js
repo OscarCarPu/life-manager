@@ -21,6 +21,47 @@ const state = {
   originalDate: null,
 };
 
+// Sort plannings in a container
+const sortPlannings = (container) => {
+  const plannings = Array.from(
+    container.querySelectorAll(`.${localConfig.CLASSES.PLANNING_ITEM}`),
+  );
+  plannings.sort((a, b) => {
+    const hourA = a.querySelector(".planning-hour").textContent.trim();
+    const hourB = b.querySelector(".planning-hour").textContent.trim();
+
+    const getStartHour = (timeText) => {
+      if (!timeText) return 1500;
+      const match = timeText.match(/^(\d{1,2}):?(\d{2})?/);
+      if (!match) return 1500;
+      const hour = parseInt(match[1]);
+      const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
+      return hour * 60 + minute;
+    };
+
+    const startA = getStartHour(hourA);
+    const startB = getStartHour(hourB);
+    if (startA !== startB) {
+      return startA - startB;
+    }
+
+    const priorityA =
+      parseInt(
+        a
+          .querySelector(".priority-fill")
+          .getAttribute(localConfig.DATA_ATTRIBUTES.PRIORITY),
+      ) || 0;
+    const priorityB =
+      parseInt(
+        b
+          .querySelector(".priority-fill")
+          .getAttribute(localConfig.DATA_ATTRIBUTES.PRIORITY),
+      ) || 0;
+    return priorityB - priorityA;
+  });
+  plannings.forEach((planning) => container.appendChild(planning));
+};
+
 //handle DOM changes for "no planning"
 function handleNoPlannings(container) {
   const remainingPlannings = container.querySelectorAll(
@@ -224,37 +265,6 @@ function movePlanningInDOM(element, newDate, oldDate) {
   handleNoPlannings(newContainer);
   handleNoPlannings(oldContainer);
 
-  const sortPlannings = (container) => {
-    const plannings = Array.from(
-      container.querySelectorAll(`.${localConfig.CLASSES.PLANNING_ITEM}`),
-    );
-    plannings.sort((a, b) => {
-      const hourA = a.querySelector(".planning-hour").textContent.trim();
-      const hourB = b.querySelector(".planning-hour").textContent.trim();
-
-      const getStartHour = (timeText) => {
-        if (!timeText) return 1500;
-        const match = timeText.match(/^(\d{1,2}):?(\d{2})?/);
-        if (!match) return 1500;
-        const hour = parseInt(match[1]);
-        const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
-        return hour * 60 + minute;
-      };
-
-      const startA = getStartHour(hourA);
-      const startB = getStartHour(hourB);
-      if (startA !== startB) {
-        return startA - startB;
-      }
-
-      const priorityA =
-        parseInt(a.querySelector(".priority-fill").style.width) || 0;
-      const priorityB =
-        parseInt(b.querySelector(".priority-fill").style.width) || 0;
-      return priorityB - priorityA;
-    });
-    plannings.forEach((planning) => container.appendChild(planning));
-  };
   sortPlannings(newContainer);
 }
 
@@ -275,6 +285,97 @@ document.addEventListener("dragend", () => {
   });
 });
 
+// Hide any open context menu
+function hideContextMenu() {
+  const menu = document.getElementById("time-context-menu");
+  if (menu) {
+    menu.style.display = "none";
+    // Clean up event listeners to prevent memory leaks
+    const saveButton = menu.querySelector("#save-time");
+    const cancelButton = menu.querySelector("#cancel-time");
+    saveButton.replaceWith(saveButton.cloneNode(true));
+    cancelButton.replaceWith(cancelButton.cloneNode(true));
+  }
+}
+
+// Show and manage the time selection context menu
+function showTimeContextMenu(event, planningItem) {
+  event.preventDefault();
+  hideContextMenu(); // Hide any other open menu before showing a new one
+
+  const planningId = planningItem.getAttribute(
+    localConfig.DATA_ATTRIBUTES.PLANNING_ID,
+  );
+  const menu = document.getElementById("time-context-menu");
+
+  // Position the menu near the cursor
+  menu.style.left = `${event.clientX + 5}px`;
+  menu.style.top = `${event.clientY + 5}px`;
+  menu.style.display = "block";
+
+  const startTimeInput = menu.querySelector("#start-time");
+  const endTimeInput = menu.querySelector("#end-time");
+  const saveButton = menu.querySelector("#save-time");
+  const cancelButton = menu.querySelector("#cancel-time");
+
+  // Function to handle the save action
+  const saveHandler = async () => {
+    const startTime = startTimeInput.value;
+    const endTime = endTimeInput.value;
+
+    if (startTime || endTime) {
+      try {
+        await makeApiRequest(
+          `${API_BASE_URL}/tasks/task_planning/${planningId}`,
+          "PATCH",
+          {
+            start_hour: startTime || null,
+            end_hour: endTime || null,
+          },
+        );
+
+        const hourSpan = planningItem.querySelector(".planning-hour");
+        if (hourSpan) {
+          if (startTime && endTime) {
+            hourSpan.textContent = `${startTime} - ${endTime}`;
+          } else if (startTime) {
+            hourSpan.textContent = startTime;
+          } else {
+            hourSpan.textContent = ""; // Clear if no time is set
+          }
+        }
+        const container = planningItem.closest(".list-group");
+        if (container) {
+          sortPlannings(container);
+        }
+        showNotification("Time updated successfully", "success");
+      } catch (error) {
+        console.error("Error updating time:", error);
+        showNotification(`Error: ${error.message}`, "danger");
+      }
+    }
+    hideContextMenu();
+  };
+
+  // Add event listeners to the new menu's buttons
+  saveButton.addEventListener("click", saveHandler);
+  cancelButton.addEventListener("click", hideContextMenu);
+}
+
+// Close context menu when clicking outside of it
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("time-context-menu");
+  // If the menu is visible and the click is outside the menu and not on a planning item
+  if (
+    menu &&
+    menu.style.display === "block" &&
+    !menu.contains(e.target) &&
+    !e.target.closest(".planning-item")
+  ) {
+    hideContextMenu();
+  }
+});
+
 // Assign event listeners
 document.querySelectorAll(".drop-zone").forEach((zone) => {
   zone.addEventListener("dragover", allowDrop);
@@ -292,4 +393,7 @@ document.querySelectorAll(".action-zone").forEach((zone) => {
 
 document.querySelectorAll(".planning-item").forEach((item) => {
   item.addEventListener("dragstart", dragStart);
+  item.addEventListener("contextmenu", (e) => {
+    showTimeContextMenu(e, item);
+  });
 });

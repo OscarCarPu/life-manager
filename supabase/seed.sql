@@ -204,8 +204,8 @@ INSERT INTO task_planning (task_id, planned_date, start_hour, end_hour, priority
         WHERE title = 'Complete Module 3'
     ),
     CURRENT_DATE + INTERVAL '1 day',
-    '11:00:00',
-    '15:00:00',
+    NULL,
+    NULL,
     1
 ),
 -- Day + 2
@@ -226,7 +226,7 @@ INSERT INTO task_planning (task_id, planned_date, start_hour, end_hour, priority
     ),
     CURRENT_DATE + INTERVAL '2 day',
     '10:00:00',
-    '12:00:00',
+    NULL,
     1
 ),
 -- Day + 3
