@@ -13,6 +13,7 @@ const localConfig = {
     PRIORITY: "data-priority",
     DATE: "data-date",
   },
+  HIGH_LIMIT_MINUTES: 1500, // Represents a default value for sorting
 };
 
 const state = {
@@ -21,7 +22,19 @@ const state = {
   originalDate: null,
 };
 
-// Sort plannings in a container
+const parseTextToTime = (text, end = false) => {
+  if (!text) return localConfig.HIGH_LIMIT_MINUTES;
+  if (end) {
+    const match = text.match(/-(\d{1,2}):?(\d{2})?$/);
+  } else {
+    const match = text.match(/^(\d{1,2}):?(\d{2})?/);
+  }
+  if (!match) return localConfig.HIGH_LIMIT_MINUTES;
+  const hour = parseInt(match[1]);
+  const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
+  return hour * 60 + minute;
+};
+
 const sortPlannings = (container) => {
   const plannings = Array.from(
     container.querySelectorAll(`.${localConfig.CLASSES.PLANNING_ITEM}`),
@@ -29,20 +42,17 @@ const sortPlannings = (container) => {
   plannings.sort((a, b) => {
     const hourA = a.querySelector(".planning-hour").textContent.trim();
     const hourB = b.querySelector(".planning-hour").textContent.trim();
+    const startA = parseTextToTime(hourA);
+    const startB = parseTextToTime(hourB);
 
-    const getStartHour = (timeText) => {
-      if (!timeText) return 1500;
-      const match = timeText.match(/^(\d{1,2}):?(\d{2})?/);
-      if (!match) return 1500;
-      const hour = parseInt(match[1]);
-      const minute = match[2] ? parseInt(match[2].slice(1)) : 0;
-      return hour * 60 + minute;
-    };
-
-    const startA = getStartHour(hourA);
-    const startB = getStartHour(hourB);
     if (startA !== startB) {
       return startA - startB;
+    }
+
+    const endA = parseTextToTime(hourA, true);
+    const endB = parseTextToTime(hourB, true);
+    if (endA !== endB) {
+      return endA - endB;
     }
 
     const priorityA =
@@ -62,32 +72,26 @@ const sortPlannings = (container) => {
   plannings.forEach((planning) => container.appendChild(planning));
 };
 
-//handle DOM changes for "no planning"
-function handleNoPlannings(container) {
+const updateNoPlanningsState = (container) => {
+  const { CLASSES } = localConfig;
   const remainingPlannings = container.querySelectorAll(
-    `.${localConfig.CLASSES.PLANNING_ITEM}`,
+    `.${CLASSES.PLANNING_ITEM}`,
   ).length;
-
-  let noPlanningsItem = container.querySelector(
-    `.${localConfig.CLASSES.NO_PLANNINGS}`,
-  );
+  let noPlanningsItem = container.querySelector(`.${CLASSES.NO_PLANNINGS}`);
 
   if (remainingPlannings === 0) {
     if (!noPlanningsItem) {
       noPlanningsItem = document.createElement("li");
-      noPlanningsItem.className = `list-group-item text-center text-muted ${localConfig.CLASSES.NO_PLANNINGS}`;
+      noPlanningsItem.className = `list-group-item text-center text-muted ${CLASSES.NO_PLANNINGS}`;
       noPlanningsItem.textContent = "No plannings for this day.";
       container.appendChild(noPlanningsItem);
     }
-  } else {
-    if (noPlanningsItem) {
-      noPlanningsItem.remove();
-    }
+  } else if (noPlanningsItem) {
+    noPlanningsItem.remove();
   }
-}
+};
 
-// Handle API requests
-async function makeApiRequest(url, method, body = null) {
+const makeApiRequest = async (url, method, body = null) => {
   try {
     const options = {
       method: method,
@@ -96,83 +100,75 @@ async function makeApiRequest(url, method, body = null) {
     if (body) {
       options.body = JSON.stringify(body);
     }
-
     const response = await fetch(url, options);
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.detail || `Failed to ${method.toLowerCase()}`);
     }
-
     return response.json();
   } catch (error) {
-    console.error(`Erro with API request:`, error);
+    console.error("Error with API request:", error);
     showNotification(`Error: ${error.message}`, "danger");
     throw error;
   }
-}
+};
 
-// Event handlers
-function dragStart(event) {
+// --- Event Handlers ---
+
+const handleDragStart = (event) => {
+  const { PLANNING_ID, CURRENT_DATE } = localConfig.DATA_ATTRIBUTES;
+  const { DRAGGING } = localConfig.CLASSES;
   state.draggedElement = event.target;
-  state.draggedPlanningId = event.target.getAttribute(
-    localConfig.DATA_ATTRIBUTES.PLANNING_ID,
-  );
-  state.originalDate = event.target.getAttribute(
-    localConfig.DATA_ATTRIBUTES.CURRENT_DATE,
-  );
+  state.draggedPlanningId = event.target.getAttribute(PLANNING_ID);
+  state.originalDate = event.target.getAttribute(CURRENT_DATE);
 
-  event.target.classList.add(localConfig.CLASSES.DRAGGING);
+  event.target.classList.add(DRAGGING);
   event.dataTransfer.effectAllowed = "move";
   event.dataTransfer.setData("text/html", event.target.outerHTML);
-}
+};
 
-function allowDrop(event) {
+const handleAllowDrop = (event) => {
   event.preventDefault();
   event.dataTransfer.dropEffect = "move";
-}
+};
 
-function handleDragOverState(event, add = true) {
+const handleDragOverState = (event, isOver) => {
   event.preventDefault();
   const target = event.currentTarget;
-  const className = localConfig.CLASSES.DRAG_OVER;
+  const { DRAG_OVER, NO_PLANNINGS, DRAG_OVER_TEXT } = localConfig.CLASSES;
 
-  if (add) {
-    target.classList.add(className);
-    const noPlannings = target.querySelector(
-      `.${localConfig.CLASSES.NO_PLANNINGS}`,
-    );
+  if (isOver) {
+    target.classList.add(DRAG_OVER);
+    const noPlannings = target.querySelector(`.${NO_PLANNINGS}`);
     if (noPlannings) {
       noPlannings.textContent = "Drop here to move planning";
-      noPlannings.classList.add(localConfig.CLASSES.DRAG_OVER_TEXT);
+      noPlannings.classList.add(DRAG_OVER_TEXT);
     }
   } else {
-    // Avoid flicker
+    // Avoid flicker on mouseout
     const rect = target.getBoundingClientRect();
-    const isInside =
-      event.clientX >= rect.left &&
-      event.clientX <= rect.right &&
-      event.clientY >= rect.top &&
-      event.clientY <= rect.bottom;
-    if (!isInside) {
-      target.classList.remove(className);
-      const noPlannings = target.querySelector(
-        `.${localConfig.CLASSES.NO_PLANNINGS}`,
-      );
+    if (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    ) {
+      target.classList.remove(DRAG_OVER);
+      const noPlannings = target.querySelector(`.${NO_PLANNINGS}`);
       if (noPlannings) {
         noPlannings.textContent = "No plannings for this day.";
-        noPlannings.classList.remove(localConfig.CLASSES.DRAG_OVER_TEXT);
+        noPlannings.classList.remove(DRAG_OVER_TEXT);
       }
     }
   }
-}
+};
 
-async function drop(event) {
+const handleDrop = async (event) => {
   event.preventDefault();
   const dropZone = event.currentTarget;
   const newDate = dropZone.getAttribute(localConfig.DATA_ATTRIBUTES.DATE);
 
-  // Clean drag-over
+  // Clean up drag-over state
   dropZone.classList.remove(localConfig.CLASSES.DRAG_OVER);
   const noPlannings = dropZone.querySelector(
     `.${localConfig.CLASSES.NO_PLANNINGS}`,
@@ -181,10 +177,7 @@ async function drop(event) {
     noPlannings.textContent = "No plannings for this day.";
     noPlannings.classList.remove(localConfig.CLASSES.DRAG_OVER_TEXT);
   }
-
-  if (newDate === state.originalDate) {
-    return; // No change in date, do nothing
-  }
+  if (newDate === state.originalDate) return;
 
   try {
     await makeApiRequest(
@@ -196,18 +189,18 @@ async function drop(event) {
     showNotification("Planning moved successfully", "success");
   } catch (error) {
     console.error("Error in new date planning:", error);
-    showNotification(`Error: ${error.message}`, "danger");
   } finally {
     state.draggedElement = null;
     state.draggedPlanningId = null;
     state.originalDate = null;
   }
-}
+};
 
-async function dropAction(event) {
+const handleDropAction = async (event) => {
   event.preventDefault();
   const actionZone = event.currentTarget;
-  const action = actionZone.getAttribute(localConfig.DATA_ATTRIBUTES.ACTION);
+  const { ACTION, PRIORITY } = localConfig.DATA_ATTRIBUTES;
+  const action = actionZone.getAttribute(ACTION);
   actionZone.classList.remove(localConfig.CLASSES.DRAG_OVER);
 
   if (!state.draggedElement) return;
@@ -220,12 +213,10 @@ async function dropAction(event) {
       );
       const container = state.draggedElement.parentElement;
       state.draggedElement.remove();
-      handleNoPlannings(container);
+      updateNoPlanningsState(container);
       showNotification("Planning deleted successfully", "success");
     } else if (action === "priority") {
-      const priority = parseInt(
-        actionZone.getAttribute(localConfig.DATA_ATTRIBUTES.PRIORITY),
-      );
+      const priority = parseInt(actionZone.getAttribute(PRIORITY));
       await makeApiRequest(
         `${API_BASE_URL}/tasks/task_planning/${state.draggedPlanningId}`,
         "PATCH",
@@ -234,42 +225,101 @@ async function dropAction(event) {
       const priorityFill = state.draggedElement.querySelector(".priority-fill");
       if (priorityFill) {
         priorityFill.className = `priority-fill priority-${priority}`;
-        priorityFill.setAttribute("data-priority", priority);
+        priorityFill.setAttribute(PRIORITY, priority);
       }
       showNotification("Planning priority updated successfully", "success");
     }
   } catch (error) {
-    console.error("ERror in dropAction:", error);
-    showNotification(`Error: ${error.message}`, "danger");
+    console.error("Error in dropAction:", error);
   } finally {
     state.draggedElement = null;
     state.draggedPlanningId = null;
     state.originalDate = null;
   }
-}
+};
 
-// Move planning in DOM
-function movePlanningInDOM(element, newDate, oldDate) {
+const movePlanningInDOM = (element, newDate, oldDate) => {
   const oldContainer = document.getElementById(`plannings-${oldDate}`);
   const newContainer = document.getElementById(`plannings-${newDate}`);
-
   if (!oldContainer || !newContainer) {
     console.error("Invalid containers for planning move");
     return;
   }
-
   element.setAttribute(localConfig.DATA_ATTRIBUTES.CURRENT_DATE, newDate);
   element.classList.remove(localConfig.CLASSES.DRAGGING);
-
   newContainer.appendChild(element);
-  handleNoPlannings(newContainer);
-  handleNoPlannings(oldContainer);
-
+  updateNoPlanningsState(newContainer);
+  updateNoPlanningsState(oldContainer);
   sortPlannings(newContainer);
-}
+};
 
-// Cleanup
-document.addEventListener("dragend", () => {
+// --- Context Menu and Global Cleanup ---
+
+const hideContextMenu = () => {
+  const menu = document.getElementById("time-context-menu");
+  if (menu) {
+    menu.style.display = "none";
+    // To prevent memory leaks, we clone and replace the buttons
+    const saveButton = menu.querySelector("#save-time");
+    const cancelButton = menu.querySelector("#cancel-time");
+    saveButton.replaceWith(saveButton.cloneNode(true));
+    cancelButton.replaceWith(cancelButton.cloneNode(true));
+  }
+};
+
+const showTimeContextMenu = (event, planningItem) => {
+  event.preventDefault();
+  hideContextMenu();
+  const planningId = planningItem.getAttribute(
+    localConfig.DATA_ATTRIBUTES.PLANNING_ID,
+  );
+  const menu = document.getElementById("time-context-menu");
+  if (!menu) return;
+
+  menu.style.left = `${event.clientX + 5}px`;
+  menu.style.top = `${event.clientY + 5}px`;
+  menu.style.display = "block";
+
+  const startTimeInput = menu.querySelector("#start-time");
+  const endTimeInput = menu.querySelector("#end-time");
+  const saveButton = menu.querySelector("#save-time");
+  const cancelButton = menu.querySelector("#cancel-time");
+
+  const saveHandler = async () => {
+    const startTime = startTimeInput.value;
+    const endTime = endTimeInput.value;
+    if (!startTime && !endTime) return;
+    try {
+      await makeApiRequest(
+        `${API_BASE_URL}/tasks/task_planning/${planningId}`,
+        "PATCH",
+        {
+          start_hour: startTime || null,
+          end_hour: endTime || null,
+        },
+      );
+      const hourSpan = planningItem.querySelector(".planning-hour");
+      if (hourSpan) {
+        hourSpan.textContent =
+          startTime && endTime ? `${startTime} - ${endTime}` : startTime || "";
+      }
+      const container = planningItem.closest(".list-group");
+      if (container) {
+        sortPlannings(container);
+      }
+      showNotification("Time updated successfully", "success");
+    } catch (error) {
+      console.error("Error updating time:", error);
+    } finally {
+      hideContextMenu();
+    }
+  };
+
+  saveButton.addEventListener("click", saveHandler);
+  cancelButton.addEventListener("click", hideContextMenu);
+};
+
+const handleDragEnd = () => {
   if (state.draggedElement) {
     state.draggedElement.classList.remove(localConfig.CLASSES.DRAGGING);
   }
@@ -283,89 +333,10 @@ document.addEventListener("dragend", () => {
       noPlannings.classList.remove(localConfig.CLASSES.DRAG_OVER_TEXT);
     }
   });
-});
+};
 
-// Hide any open context menu
-function hideContextMenu() {
+const handleGlobalClick = (e) => {
   const menu = document.getElementById("time-context-menu");
-  if (menu) {
-    menu.style.display = "none";
-    // Clean up event listeners to prevent memory leaks
-    const saveButton = menu.querySelector("#save-time");
-    const cancelButton = menu.querySelector("#cancel-time");
-    saveButton.replaceWith(saveButton.cloneNode(true));
-    cancelButton.replaceWith(cancelButton.cloneNode(true));
-  }
-}
-
-// Show and manage the time selection context menu
-function showTimeContextMenu(event, planningItem) {
-  event.preventDefault();
-  hideContextMenu(); // Hide any other open menu before showing a new one
-
-  const planningId = planningItem.getAttribute(
-    localConfig.DATA_ATTRIBUTES.PLANNING_ID,
-  );
-  const menu = document.getElementById("time-context-menu");
-
-  // Position the menu near the cursor
-  menu.style.left = `${event.clientX + 5}px`;
-  menu.style.top = `${event.clientY + 5}px`;
-  menu.style.display = "block";
-
-  const startTimeInput = menu.querySelector("#start-time");
-  const endTimeInput = menu.querySelector("#end-time");
-  const saveButton = menu.querySelector("#save-time");
-  const cancelButton = menu.querySelector("#cancel-time");
-
-  // Function to handle the save action
-  const saveHandler = async () => {
-    const startTime = startTimeInput.value;
-    const endTime = endTimeInput.value;
-
-    if (startTime || endTime) {
-      try {
-        await makeApiRequest(
-          `${API_BASE_URL}/tasks/task_planning/${planningId}`,
-          "PATCH",
-          {
-            start_hour: startTime || null,
-            end_hour: endTime || null,
-          },
-        );
-
-        const hourSpan = planningItem.querySelector(".planning-hour");
-        if (hourSpan) {
-          if (startTime && endTime) {
-            hourSpan.textContent = `${startTime} - ${endTime}`;
-          } else if (startTime) {
-            hourSpan.textContent = startTime;
-          } else {
-            hourSpan.textContent = ""; // Clear if no time is set
-          }
-        }
-        const container = planningItem.closest(".list-group");
-        if (container) {
-          sortPlannings(container);
-        }
-        showNotification("Time updated successfully", "success");
-      } catch (error) {
-        console.error("Error updating time:", error);
-        showNotification(`Error: ${error.message}`, "danger");
-      }
-    }
-    hideContextMenu();
-  };
-
-  // Add event listeners to the new menu's buttons
-  saveButton.addEventListener("click", saveHandler);
-  cancelButton.addEventListener("click", hideContextMenu);
-}
-
-// Close context menu when clicking outside of it
-document.addEventListener("click", (e) => {
-  const menu = document.getElementById("time-context-menu");
-  // If the menu is visible and the click is outside the menu and not on a planning item
   if (
     menu &&
     menu.style.display === "block" &&
@@ -374,26 +345,36 @@ document.addEventListener("click", (e) => {
   ) {
     hideContextMenu();
   }
-});
+};
 
-// Assign event listeners
-document.querySelectorAll(".drop-zone").forEach((zone) => {
-  zone.addEventListener("dragover", allowDrop);
-  zone.addEventListener("dragenter", (e) => handleDragOverState(e, true));
-  zone.addEventListener("dragleave", (e) => handleDragOverState(e, false));
-  zone.addEventListener("drop", drop);
-});
-
-document.querySelectorAll(".action-zone").forEach((zone) => {
-  zone.addEventListener("dragover", allowDrop);
-  zone.addEventListener("dragenter", (e) => handleDragOverState(e, true));
-  zone.addEventListener("dragleave", (e) => handleDragOverState(e, false));
-  zone.addEventListener("drop", dropAction);
-});
-
-document.querySelectorAll(".planning-item").forEach((item) => {
-  item.addEventListener("dragstart", dragStart);
-  item.addEventListener("contextmenu", (e) => {
-    showTimeContextMenu(e, item);
+/**
+ * Attaches all necessary event listeners to the DOM.
+ */
+const setupEventListeners = () => {
+  document.querySelectorAll(".drop-zone").forEach((zone) => {
+    zone.addEventListener("dragover", handleAllowDrop);
+    zone.addEventListener("dragenter", (e) => handleDragOverState(e, true));
+    zone.addEventListener("dragleave", (e) => handleDragOverState(e, false));
+    zone.addEventListener("drop", handleDrop);
   });
+
+  document.querySelectorAll(".action-zone").forEach((zone) => {
+    zone.addEventListener("dragover", handleAllowDrop);
+    zone.addEventListener("dragenter", (e) => handleDragOverState(e, true));
+    zone.addEventListener("dragleave", (e) => handleDragOverState(e, false));
+    zone.addEventListener("drop", handleDropAction);
+  });
+
+  document.querySelectorAll(".planning-item").forEach((item) => {
+    item.addEventListener("dragstart", handleDragStart);
+    item.addEventListener("contextmenu", (e) => showTimeContextMenu(e, item));
+  });
+
+  document.addEventListener("dragend", handleDragEnd);
+  document.addEventListener("click", handleGlobalClick);
+};
+
+// Start the calendar functionality
+document.addEventListener("DOMContentLoaded", () => {
+  setupEventListeners();
 });
