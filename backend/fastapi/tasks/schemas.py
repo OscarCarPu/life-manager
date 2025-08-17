@@ -11,6 +11,7 @@ from common.tasks.enums import ProjectState, TaskState
 from pydantic import BaseModel, validator
 
 
+# region Category
 class CategoryBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -36,6 +37,10 @@ class Category(CategoryBase):
         from_attributes = True
 
 
+# endregion
+
+
+# region Project
 class ProjectBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -65,6 +70,10 @@ class Project(ProjectBase):
         from_attributes = True
 
 
+# endregion
+
+
+# region Task
 class TaskBase(BaseModel):
     title: str
     due_date: Optional[date] = None
@@ -91,6 +100,10 @@ class Task(TaskBase):
         from_attributes = True
 
 
+# endregion
+
+
+# region TaskPlanning
 class TaskPlanningBase(BaseModel):
     task_id: int
     planned_date: date
@@ -123,6 +136,10 @@ class TaskPlanning(TaskPlanningBase):
         from_attributes = True
 
 
+# endregion
+
+
+# region Note
 class NoteBase(BaseModel):
     content: str
     task_id: Optional[int] = None
@@ -144,3 +161,16 @@ class Note(NoteBase):
 
     class Config:
         from_attributes = True
+
+
+# endregion
+
+
+# region General
+class TaskGeneralInfo(Task):
+    project: Optional[ProjectBase] = None
+    last_notes: list[NoteBase] = []
+    next_plannings: list[TaskPlanningBase] = []
+
+
+# endregion
