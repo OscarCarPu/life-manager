@@ -1,3 +1,4 @@
+import logging
 import os
 from collections import defaultdict
 from datetime import date, timedelta
@@ -17,6 +18,9 @@ if os.getenv("STAGE") == "dev":
     app.config["DEBUG"] = True
     app.jinja_env.auto_reload = True
     app.jinja_env.cache = {}
+    # Configure logging for development
+    logging.basicConfig(level=logging.DEBUG)
+    app.logger.setLevel(logging.DEBUG)
 
 babel = Babel(app)
 

@@ -12,6 +12,7 @@ const localConfig = {
     ACTION: "data-action",
     PRIORITY: "data-priority",
     DATE: "data-date",
+    TASK_ID: "data-task-id",
   },
   HIGH_LIMIT_MINUTES: 1500, // Represents a default value for sorting
 };
@@ -36,6 +37,43 @@ const parseTextToTime = (text, isEndTime = false) => {
   const hour = parseInt(match[1]);
   const minute = match[2] ? parseInt(match[2]) : 0;
   return hour * 60 + minute;
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return "No date";
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid date";
+
+  // Format as dd/mm/yyyy, day of week
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+
+  return `${day}/${month}/${year}, ${weekday}`;
+};
+
+const formatStatus = (status) => {
+  if (!status) return "Unknown";
+  return status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ");
+};
+
+const getStatusCssClass = (status, isProject = false) => {
+  if (!status) return "bg-secondary";
+
+  const statusMap = {
+    // Task states
+    pending: "bg-warning",
+    completed: "bg-success",
+    in_progress: "bg-info",
+    archived: "bg-secondary",
+    // Project states
+    not_started: "bg-secondary",
+  };
+
+  const normalizedStatus = status.toLowerCase().replace("_", "_");
+  return statusMap[normalizedStatus] || "bg-secondary";
 };
 
 const sortPlannings = (container) => {
@@ -256,7 +294,7 @@ const movePlanningInDOM = (element, newDate, oldDate) => {
   sortPlannings(newContainer);
 };
 
-// --- Context Menu and Global Cleanup ---
+// --- Context Menu ---
 
 const hideContextMenu = () => {
   const menu = document.getElementById("time-context-menu");
@@ -322,6 +360,110 @@ const showTimeContextMenu = (event, planningItem) => {
   cancelButton.addEventListener("click", hideContextMenu);
 };
 
+// --- Task Details ---
+
+const showTaskDetails = async (event, planningItem) => {
+  event.preventDefault();
+  const taskId = planningItem.getAttribute(localConfig.DATA_ATTRIBUTES.TASK_ID);
+  if (!taskId) return;
+
+  try {
+    const task = await makeApiRequest(
+      `${API_BASE_URL}/tasks/tasks/${taskId}/general-info`,
+      "GET",
+    );
+
+    // Populate basic info
+    document.getElementById("taskTitle").textContent =
+      task.title || "Untitled Task";
+    document.getElementById("taskDueDate").textContent = formatDate(
+      task.due_date,
+    );
+    document.getElementById("taskDescription").textContent =
+      task.description || "No description available";
+
+    // Set status with appropriate styling
+    const statusElement = document.getElementById("taskStatus");
+    const status = task.state || "unknown";
+    statusElement.textContent = formatStatus(status);
+    statusElement.className = `badge ${getStatusCssClass(status)}`;
+
+    // Handle project info
+    const projectSection = document.getElementById("projectSection");
+    if (task.project) {
+      document.getElementById("projectName").textContent = task.project.name;
+      const projectStatusElement = document.getElementById("projectStatus");
+      const projectStatus = task.project.state || "unknown";
+      projectStatusElement.textContent = formatStatus(projectStatus);
+      projectStatusElement.className = `badge ${getStatusCssClass(projectStatus, true)}`;
+      projectSection.style.display = "block";
+    } else {
+      projectSection.style.display = "none";
+    }
+
+    // Handle notes
+    const notesContainer = document.getElementById("taskNotes");
+    const notesSection = document.getElementById("notesSection");
+    if (task.last_notes && task.last_notes.length > 0) {
+      notesContainer.innerHTML = task.last_notes
+        .map(
+          (note) =>
+            `<div class="note-item">${note.content || "Empty note"}</div>`,
+        )
+        .join("");
+      notesSection.style.display = "block";
+    } else {
+      notesSection.style.display = "none";
+    }
+
+    // Handle plannings with simplified priority display
+    const planningsContainer = document.getElementById("taskPlannings");
+    const planningsSection = document.getElementById("planningsSection");
+    if (task.next_plannings && task.next_plannings.length > 0) {
+      planningsContainer.innerHTML = task.next_plannings
+        .map((planning) => {
+          const formattedDate = formatDate(planning.planned_date);
+          const timeInfo =
+            planning.start_hour && planning.end_hour
+              ? `${planning.start_hour.split(":").slice(0, 2).join(":")} - ${planning.end_hour.split(":").slice(0, 2).join(":")}`
+              : planning.start_hour
+                ? `${planning.start_hour.split(":").slice(0, 2).join(":")}`
+                : "No time set";
+          const priority = planning.priority || 0;
+          const priorityClass = priority > 0 ? `priority-${priority}` : "";
+
+          return `
+          <div class="planning-item ${priorityClass}">
+            <div class="planning-date">${formattedDate}</div>
+            <div class="planning-time">${timeInfo}</div>
+            ${
+              priority > 0
+                ? `
+              <div class="priority-line mt-2">
+                <div class="priority-fill priority-${priority}"></div>
+              </div>
+            `
+                : ""
+            }
+          </div>
+        `;
+        })
+        .join("");
+      planningsSection.style.display = "block";
+    } else {
+      planningsSection.style.display = "none";
+    }
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById("taskModal"));
+    modal.show();
+  } catch (error) {
+    console.error("Error loading task details:", error);
+    showNotification("Failed to load task details", "danger");
+  }
+};
+// --- Cleanup ---
+
 const handleDragEnd = () => {
   if (state.draggedElement) {
     state.draggedElement.classList.remove(localConfig.CLASSES.DRAGGING);
@@ -371,6 +513,7 @@ const setupEventListeners = () => {
   document.querySelectorAll(".planning-item").forEach((item) => {
     item.addEventListener("dragstart", handleDragStart);
     item.addEventListener("contextmenu", (e) => showTimeContextMenu(e, item));
+    item.addEventListener("click", (e) => showTaskDetails(e, item));
   });
 
   document.addEventListener("dragend", handleDragEnd);

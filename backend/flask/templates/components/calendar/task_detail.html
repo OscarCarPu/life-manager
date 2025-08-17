@@ -1,0 +1,71 @@
+<div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="taskModalTitle">
+          <span id="taskTitle"></span>
+        </h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <!-- Main Info -->
+          <div class="col-md-8">
+            <div class="task-details">
+              <div class="detail-section mb-3">
+                <h6 class="section-title">Details</h6>
+
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <div class="detail-item">
+                      <small class="detail-label">Due Date</small>
+                      <div id="taskDueDate" class="detail-value"></div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <div class="detail-item">
+                      <small class="detail-label">Status</small>
+                      <div><span id="taskStatus" class="badge"></span></div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="mt-3" id="taskDescriptionContainer">
+                  <small class="detail-label">Description</small>
+                  <p id="taskDescription" class="detail-description"></p>
+                </div>
+              </div>
+
+              <!-- Notes Section -->
+              <div class="detail-section" id="notesSection">
+                <h6 class="section-title">Recent Notes</h6>
+                <div id="taskNotes" class="notes-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="col-md-4">
+            <!-- Project Info -->
+            <div class="sidebar-section" id="projectSection">
+              <div class="project-info">
+                <h6 class="section-title">Project</h6>
+                <div id="projectName" class="project-name"></div>
+                <span id="projectStatus" class="badge"></span>
+              </div>
+            </div>
+
+            <!-- Upcoming Plannings -->
+            <div class="sidebar-section" id="planningsSection">
+              <h6 class="section-title">Upcoming</h6>
+              <div id="taskPlannings" class="plannings-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

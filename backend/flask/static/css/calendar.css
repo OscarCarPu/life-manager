@@ -1,3 +1,24 @@
+/* Status Badge Colors */
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+.badge.bg-success {
+  background-color: #28a745 !important;
+  color: #fff !important;
+}
+
+.badge.bg-info {
+  background-color: #17a2b8 !important;
+  color: #fff !important;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: #fff !important;
+}
+
 /* General Styles */
 .calendar-container {
   padding: 1rem;
@@ -132,32 +153,6 @@
   font-weight: 600;
 }
 
-/* Animation for action zones */
-.action-zone {
-  position: relative;
-  overflow: hidden;
-}
-
-.action-zone::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(0, 123, 255, 0.1);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.3s ease,
-    height 0.3s ease;
-}
-
-.action-zone.drag-over::before {
-  width: 200%;
-  height: 200%;
-}
-
 /* Card and List items */
 .animated-card {
   border-radius: 1rem;
@@ -284,4 +279,237 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Task Modal Improvements */
+/* Task Modal Styles */
+#taskModal .modal-dialog {
+  max-width: 800px;
+}
+
+#taskModal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom: none;
+  border-radius: 0.375rem 0.375rem 0 0;
+}
+
+#taskModal .modal-title {
+  font-weight: 600;
+}
+
+#taskModal .modal-body {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+}
+
+#taskModal .task-details {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#taskModal .sidebar-section {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#taskModal .section-title {
+  color: #495057;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+}
+
+#taskModal .detail-section {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+#taskModal .detail-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+#taskModal .detail-item {
+  margin-bottom: 0.5rem;
+}
+
+#taskModal .detail-label {
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.3px;
+}
+
+#taskModal .detail-value {
+  color: #212529;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+#taskModal .detail-description {
+  color: #495057;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+/* Project Info */
+#taskModal .project-info {
+  text-align: center;
+}
+
+#taskModal .project-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+}
+
+/* Notes */
+#taskModal .notes-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#taskModal .note-item {
+  background: #f8f9fa;
+  border-left: 3px solid #28a745;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+#taskModal .note-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Plannings */
+#taskModal .plannings-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+#taskModal .planning-item {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+#taskModal .planning-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Dynamic border-left color based on priority */
+#taskModal .planning-item:has(.priority-fill.priority-1) {
+  border-left: 3px solid #ffd700;
+}
+#taskModal .planning-item:has(.priority-fill.priority-2) {
+  border-left: 3px solid #ffc107;
+}
+#taskModal .planning-item:has(.priority-fill.priority-3) {
+  border-left: 3px solid #ffa07a;
+}
+#taskModal .planning-item:has(.priority-fill.priority-4) {
+  border-left: 3px solid #ff4500;
+}
+#taskModal .planning-item:has(.priority-fill.priority-5) {
+  border-left: 3px solid #dc3545;
+}
+
+/* Fallback for browsers that don't support :has() */
+#taskModal .planning-item.priority-1 {
+  border-left: 3px solid #ffd700;
+}
+#taskModal .planning-item.priority-2 {
+  border-left: 3px solid #ffc107;
+}
+#taskModal .planning-item.priority-3 {
+  border-left: 3px solid #ffa07a;
+}
+#taskModal .planning-item.priority-4 {
+  border-left: 3px solid #ff4500;
+}
+#taskModal .planning-item.priority-5 {
+  border-left: 3px solid #dc3545;
+}
+
+#taskModal .planning-date {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+#taskModal .planning-time {
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+
+/* Empty states */
+#taskModal .empty-state {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 0.25rem;
+}
+
+/* Priority line for task modal plannings */
+#taskModal .priority-line {
+  height: 4px;
+  background-color: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#taskModal .priority-fill {
+  height: 100%;
+  background-color: #e9ecef;
+  transition: width 0.3s ease;
+  border-radius: inherit;
+}
+
+#taskModal .priority-fill.priority-0 {
+  width: 0%;
+  background-color: #e9ecef;
+}
+#taskModal .priority-fill.priority-1 {
+  width: 7%;
+  background-color: #ffd700;
+}
+#taskModal .priority-fill.priority-2 {
+  width: 25%;
+  background-color: #ffc107;
+}
+#taskModal .priority-fill.priority-3 {
+  width: 50%;
+  background-color: #ffa07a;
+}
+#taskModal .priority-fill.priority-4 {
+  width: 80%;
+  background-color: #ff4500;
+}
+#taskModal .priority-fill.priority-5 {
+  width: 100%;
+  background-color: #dc3545;
 }

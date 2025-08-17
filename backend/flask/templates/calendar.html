@@ -38,7 +38,7 @@
       <div class="col-10">
         <div class="row g-4">
           {% for date, plannings in planning_by_day.items() %}
-            <div class="col-3">
+            <div class="col-6 col-xxl-3">
               <div class="card h-100 animated-card drop-zone"
                    data-date="{{ date.isoformat() }}">
                 <div class="card-header">
@@ -50,6 +50,7 @@
                       <li class="list-group-item planning-item"
                           draggable="true"
                           data-planning-id="{{ planning.id }}"
+                          data-task-id="{{ planning.task.id }}"
                           data-current-date="{{ date.isoformat() }}">
                         <div class="d-flex justify-content-between align-items-start">
                           <div class="planning-content">
@@ -104,6 +105,8 @@
       </div>
     </div>
   </div>
+  <!-- Task detail modal -->
+  {% include "components/calendar/task_detail.html" %}
 {% endblock %}
 
 {% block styles %}

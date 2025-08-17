@@ -167,7 +167,7 @@ class Note(NoteBase):
 
 
 # region General
-class TaskGeneralInfo(Task):
+class TaskGeneralInfo(TaskBase):
     project: Optional[ProjectBase] = None
     last_notes: list[NoteBase] = []
     next_plannings: list[TaskPlanningBase] = []
