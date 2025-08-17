@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS task_planning (
     start_hour TIME,
     end_hour TIME,
     priority INTEGER CHECK (priority >= 1 AND priority <= 5),
+    done BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (task_id, planned_date)
