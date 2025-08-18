@@ -4,8 +4,8 @@ from collections import defaultdict
 from datetime import date, timedelta
 
 from common.database import get_db_context as get_db
-from common.tasks.models import Task, TaskPlanning
-from flask import Flask, jsonify, render_template, request
+from common.tasks.models import Project, Task, TaskPlanning
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 from flask_babel import Babel
 from sqlalchemy.orm import selectinload
 
@@ -32,7 +32,53 @@ def healthcheck():
 
 @app.route("/")
 def index():
-    return render_template("main.html")
+    # redirect to the projects listing which uses the unified `project.html` template
+    return redirect(url_for("projects"))
+
+
+@app.route("/projects")
+def projects():
+    with get_db() as db:
+        projects = (
+            db.query(Project)
+            .options(selectinload(Project.tasks))
+            .order_by(Project.updated_at.desc())
+            .all()
+        )
+    return render_template("project.html", projects=projects)
+
+
+@app.route("/projects/<int:project_id>")
+def project_detail(project_id):
+    with get_db() as db:
+        project = (
+            db.query(Project)
+            .options(
+                selectinload(Project.tasks),
+                selectinload(Project.notes),
+                selectinload(Project.category),
+            )
+            .filter(Project.id == project_id)
+            .one_or_none()
+        )
+        if not project:
+            return jsonify({"error": "Project not found"}), 404
+
+        category_path = []
+        if project.category:
+            current = project.category
+            while current:
+                category_path.append(current)
+                current = current.parent_category
+            category_path.reverse()
+
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.DEBUG)
+        logger.debug(
+            f"Category path for project {project_id}: {[cat.name for cat in category_path]}"
+        )
+
+        return render_template("project_detail.html", project=project, category_path=category_path)
 
 
 @app.route("/calendar")
@@ -65,12 +111,6 @@ def calendar():
     return render_template(
         "calendar.html", planning_by_day=plannings_by_day, api_base_url=api_base_url
     )
-
-
-@app.route("/projects")
-def projects():
-    projects
-    return render_template("projects.html")
 
 
 @app.route("/notification", methods=["POST"])

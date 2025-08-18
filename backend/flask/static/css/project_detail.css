@@ -1,0 +1,20 @@
+.notes-section {
+  margin-top: 20px;
+}
+
+.note-card {
+  margin-bottom: 15px;
+  border: 1px solid #eee;
+  border-left: 3px solid #007bff;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.note-content {
+  font-size: 1rem;
+}
+
+.note-meta {
+  font-size: 0.8rem;
+  color: #6c757d;
+}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Project Details{% endblock %}
+
+{% block main %}
+  <div class="container mt-4">
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="card-title mb-0">{{ project.name }}</h2>
+              <a href="{{ url_for('projects') }}" class="btn btn-sm btn-outline-secondary">Back to Projects</a>
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+              <span class="state-badge {{ project.state }}">{{ project.state.replace('_', ' ') | title }}</span>
+              {% if category_path %}
+                <small class="text-muted ms-2">
+                  {% for category in category_path %}
+                    {{ category.name }}
+                    {% if not loop.last %}
+                      &gt;
+                    {% endif %}
+                  {% endfor %}
+                </small>
+              {% endif %}
+              <div class="ms-auto text-muted small">
+                {% if project.expected_start_date and project.expected_end_date %}
+                  {{ project.expected_start_date }} - {{ project.expected_end_date }}
+                {% elif project.expected_start_date %}
+                  Start: {{ project.expected_start_date }}
+                {% elif project.expected_end_date %}
+                  End: {{ project.expected_end_date }}
+                {% endif %}
+              </div>
+            </div>
+
+            {% if project.description %}
+              <p class="lead">{{ project.description }}</p>
+            {% endif %}
+
+            <h5 class="mt-4">Tasks</h5>
+            <ul class="list-group list-group-flush">
+              {% if project.tasks %}
+                {% for task in project.tasks %}
+                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                      <strong>{{ task.title }}</strong>
+                      {% if task.due_date %}
+                        <div class="text-muted small">Due: {{ task.due_date }}</div>
+                      {% endif %}
+                      {% if task.description %}
+                        <div class="text-muted small mt-1">{{ task.description }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="text-end">
+                      <span class="state-badge {{ task.state }}">{{ task.state.replace('_', ' ') | title }}</span>
+                    </div>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="list-group-item text-center text-muted">No tasks for this project.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Notes</h5>
+            {% if project.notes %}
+              <div class="list-group list-group-flush">
+                {% for note in project.notes %}
+                  <div class="list-group-item">
+                    <p class="mb-1">{{ note.content }}</p>
+                    <small class="text-muted">Created at: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted">No notes for this project yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/project_detail.css') }}" />
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/project_detail.js') }}"></script>
+{% endblock %}

@@ -16,7 +16,6 @@ Modelo para categorizar proyectos de forma jerárquica.
 - `id`: Integer, clave primaria
 - `name`: String(100), nombre único de la categoría
 - `description`: Text, descripción opcional
-- `color`: String(7), color en formato hexadecimal (default: `#3182CE`)
 - `parent_category_id`: Integer, referencia a categoría padre (opcional)
 - `created_at`: DateTime, fecha de creación
 - `updated_at`: DateTime, fecha de última actualización
@@ -35,7 +34,6 @@ Modelo para gestionar proyectos.
 - `name`: String(100), nombre único del proyecto
 - `description`: Text, descripción opcional
 - `category_id`: Integer, referencia a categoría (opcional)
-- `color`: String(7), color en formato hexadecimal (default: `#F6E05E`)
 - `expected_start_date`: Date, fecha de inicio esperada (opcional)
 - `expected_end_date`: Date, fecha de fin esperada (opcional)
 - `state`: String(50), estado del proyecto (default: `not_started`)
@@ -89,6 +87,7 @@ Modelo para planificar tareas en fechas específicas.
 - `start_hour`: Time, hora de inicio (opcional)
 - `end_hour`: Time, hora de fin (opcional)
 - `priority`: Integer, prioridad (1-5, opcional)
+- `done`: Boolean, realizado ese dia
 - `created_at`: DateTime, fecha de creación
 - `updated_at`: DateTime, fecha de última actualización
 
@@ -134,10 +133,6 @@ Modelo para almacenar notas asociadas a proyectos o tareas.
 - `ARCHIVED`: "archived"
 
 ## Constantes
-
-**Colores por defecto:**
-- `DEFAULT_CATEGORY_COLOR`: "#3182CE" (azul)
-- `DEFAULT_PROJECT_COLOR`: "#F6E05E" (amarillo)
 
 **Prioridades:**
 - `MIN_PRIORITY`: 1

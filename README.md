@@ -30,7 +30,7 @@ Cada módulo estará aislado del resto, permitiendo un código más limpio y fá
 
 ### Sistema de Gestión de Tareas
 - **Categorías**: Organización jerárquica de proyectos
-- **Proyectos**: Gestión de proyectos con estados, fechas y colores
+- **Proyectos**: Gestión de proyectos con estados y fechas
 - **Tareas**: Creación y seguimiento de tareas individuales
 - **Planificación**: Programación de tareas en fechas específicas con prioridades
 - **Notas**: Sistema de notas vinculadas a proyectos o tareas

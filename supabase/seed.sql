@@ -1,20 +1,19 @@
 -- seed.sql - Extended demo data
 -- Categories
-INSERT INTO category (name, description, color) VALUES
-('Finance', 'Financial management and accounting tasks.', '#48bb78'),
-('Marketing', 'Digital and traditional marketing initiatives.', '#ed8936'),
-('Health & Wellness', 'Personal health, fitness, and well-being.', '#9f7aea'),
+INSERT INTO category (name, description) VALUES
+('Finance', 'Financial management and accounting tasks.'),
+('Marketing', 'Digital and traditional marketing initiatives.'),
+('Health & Wellness', 'Personal health, fitness, and well-being.'),
 (
     'Home & Personal',
-    'Tasks related to home maintenance and personal errands.',
-    '#5a67d8'
+    'Tasks related to home maintenance and personal errands.'
 ),
-('Learning', 'Educational and skill development activities.', '#d53f8c');
+('Learning', 'Educational and skill development activities.');
 ---
 -- Subcategories
-INSERT INTO category (name, description, color, parent_category_id) VALUES
+INSERT INTO category (name, description, parent_category_id) VALUES
 (
-    'Budgeting', 'Monthly and annual budget planning.', '#4299e1', (
+    'Budgeting', 'Monthly and annual budget planning.', (
         SELECT id FROM category
         WHERE name = 'Finance'
     )
@@ -22,7 +21,6 @@ INSERT INTO category (name, description, color, parent_category_id) VALUES
 (
     'Social Media',
     'Content creation and scheduling for social media platforms.',
-    '#f6ad55',
     (
         SELECT id FROM category
         WHERE name = 'Marketing'
@@ -31,7 +29,6 @@ INSERT INTO category (name, description, color, parent_category_id) VALUES
 (
     'Time Management',
     'Techniques and planning for effective use of time.',
-    '#667eea',
     (
         SELECT id FROM category
         WHERE name = 'Learning'
@@ -48,6 +45,17 @@ INSERT INTO project (
     expected_end_date
 ) VALUES
 (
+    'Annual Home Renovation',
+    'Manage the complete renovation of the kitchen and bathroom.',
+    (
+        SELECT id FROM category
+        WHERE name = 'Home & Personal'
+    ),
+    'not_started',
+    CURRENT_DATE,
+    CURRENT_DATE + INTERVAL '6 months'
+),
+(
     'Q4 Marketing Campaign',
     'Develop and execute a new marketing campaign for the fourth quarter.',
     (
@@ -55,38 +63,63 @@ INSERT INTO project (
         WHERE name = 'Marketing'
     ),
     'in_progress',
-    CURRENT_DATE + INTERVAL '1 month',
-    CURRENT_DATE + INTERVAL '4 month'
+    CURRENT_DATE - INTERVAL '1 month',
+    CURRENT_DATE + INTERVAL '3 months'
+),
+(
+    'Website Redesign',
+    'Redesign and launch the new company website.',
+    (
+        SELECT id FROM category
+        WHERE name = 'Marketing'
+    ),
+    'completed',
+    CURRENT_DATE - INTERVAL '6 months',
+    CURRENT_DATE - INTERVAL '1 month'
+),
+(
+    '2023 Tax Filing',
+    'Completed tax filing for the year 2023.',
+    (
+        SELECT id FROM category
+        WHERE name = 'Finance'
+    ),
+    'archived',
+    CURRENT_DATE - INTERVAL '8 months',
+    CURRENT_DATE - INTERVAL '7 months'
 ),
 (
     '10k Race Training Plan',
-    'Train for a local 10k run with a goal time of under 50 minutes.',
+    'A comprehensive training plan to prepare for a 10k race.',
     (
         SELECT id FROM category
         WHERE name = 'Health & Wellness'
     ),
     'in_progress',
-    CURRENT_DATE - INTERVAL '1 month',
-    CURRENT_DATE + INTERVAL '1 month'
-),
-(
-    'Annual Home Renovation',
-    'Manage the complete renovation of the kitchen and bathroom.',
-    (
-        SELECT id FROM category
-        WHERE name = 'Home & Personal'
-    ), 'not_started', CURRENT_DATE, CURRENT_DATE + INTERVAL '6 months'
+    CURRENT_DATE - INTERVAL '1 week',
+    CURRENT_DATE + INTERVAL '2 months'
 ),
 (
     'Agile Project Management Course',
-    'Complete an online course on agile project management and earn certification.',
+    'Complete an online course on Agile project management.',
     (
         SELECT id FROM category
         WHERE name = 'Learning'
     ),
     'in_progress',
     CURRENT_DATE - INTERVAL '2 weeks',
-    CURRENT_DATE + INTERVAL '2 weeks'
+    CURRENT_DATE + INTERVAL '1 month'
+),
+(
+    'Budget music festival',
+    'Plan and organize a budget-friendly music festival in the local park.',
+    (
+        SELECT id FROM category
+        WHERE name = 'Budgeting'
+    ),
+    'not_started',
+    CURRENT_DATE,
+    CURRENT_DATE + INTERVAL '2 months'
 );
 ---
 -- Tasks for the new projects
@@ -170,6 +203,49 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     CURRENT_DATE
 );
 ---
+-- More tasks for existing projects
+INSERT INTO task (title, description, project_id, state, due_date) VALUES
+(
+    'Select kitchen countertops',
+    'Visit showrooms and select granite or quartz countertops.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '2 weeks'
+),
+(
+    'Order bathroom tiles',
+    'Finalize tile selection and place the order for bathroom flooring and walls.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '3 weeks'
+),
+(
+    'Draft wireframes',
+    'Create low-fidelity wireframes for all main pages of the new website.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Website Redesign'
+    ), 'completed', CURRENT_DATE - INTERVAL '5 months'
+),
+(
+    'Develop front-end',
+    'Code the front-end of the website based on the approved design.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Website Redesign'
+    ), 'completed', CURRENT_DATE - INTERVAL '3 months'
+),
+(
+    'Review peer assignments',
+    'Provide feedback on two peer assignments for the Agile course.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Agile Project Management Course'
+    ), 'pending', CURRENT_DATE + INTERVAL '4 days'
+);
+---
 -- Task Planning with varied priorities and times
 INSERT INTO task_planning (
     task_id, planned_date, start_hour, end_hour, priority, done
@@ -215,17 +291,6 @@ INSERT INTO task_planning (
     2,
     FALSE
 ),
-(
-    (
-        SELECT id FROM task
-        WHERE title = 'Complete Module 3'
-    ),
-    CURRENT_DATE + INTERVAL '1 day',
-    '10:00:00',
-    NULL,
-    1,
-    FALSE
-),
 -- Day + 3
 (
     (
@@ -266,6 +331,13 @@ INSERT INTO task_planning (
 INSERT INTO note (content, project_id, task_id) VALUES
 (
     'The campaign will focus heavily on Instagram and TikTok, with a budget allocation of 60% and 40% respectively.', -- noqa: LT05
+    (
+        SELECT id FROM project
+        WHERE name = 'Q4 Marketing Campaign'
+    ), NULL
+),
+(
+    'The actor for the public service announcement has been confirmed and will be available for filming next week.', -- noqa: LT05
     (
         SELECT id FROM project
         WHERE name = 'Q4 Marketing Campaign'
@@ -330,5 +402,38 @@ INSERT INTO note (content, project_id, task_id) VALUES
     'Morning cardio will be a 30-minute elliptical session at the gym.', NULL, (
         SELECT id FROM task
         WHERE title = 'Morning cardio'
+    )
+);
+---
+-- More notes for projects and tasks
+INSERT INTO note (content, project_id, task_id) VALUES
+(
+    'Budget for renovation is $25,000. Need to track all expenses carefully.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), NULL
+),
+(
+    'The new website increased user engagement by 25% in the first month.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Website Redesign'
+    ), NULL
+),
+(
+    'Focus on providing constructive and actionable feedback for the peer reviews.',
+    NULL,
+    (
+        SELECT id FROM task
+        WHERE title = 'Review peer assignments'
+    )
+),
+(
+    'Leaning towards a light-colored quartz for a modern look. Get samples from Home Depot and Lowes.', -- noqa: LT05
+    NULL,
+    (
+        SELECT id FROM task
+        WHERE title = 'Select kitchen countertops'
     )
 );

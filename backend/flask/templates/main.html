@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Main Page{% endblock %}
-{% block main
-  %}
+{% block main %}
   <h1>Welcome to Life Manager</h1>
-  <p>Button to test correct styling:</p>
-  <a href="#" class="btn btn-primary">Test Button</a>
-  <a href="#" class="btn btn-secondary">Secondary Button</a>
-  <a href="#" class="btn btn-success">Success Button</a>
+  <p>Project list</p>
+  <ul>
+    {% for project in projects %}
+      <li>
+        <a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

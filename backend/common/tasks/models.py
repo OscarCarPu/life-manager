@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Column,
     Date,
@@ -13,7 +14,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
 
-from .constants import DEFAULT_CATEGORY_COLOR, DEFAULT_PROJECT_COLOR
 from .enums import ProjectState, TaskState
 
 Base = declarative_base()
@@ -25,7 +25,6 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text)
-    color = Column(String(7), default=DEFAULT_CATEGORY_COLOR)
     parent_category_id = Column(Integer, ForeignKey("category.id", ondelete="RESTRICT"))
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
@@ -47,14 +46,13 @@ class Project(Base):
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text)
     category_id = Column(Integer, ForeignKey("category.id", ondelete="SET NULL"))
-    color = Column(String(7), default=DEFAULT_PROJECT_COLOR)
     expected_start_date = Column(Date)
     expected_end_date = Column(Date)
     state = Column(String(50), default=ProjectState.NOT_STARTED.value)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    category = relationship("Category", back_populates="projects")
+    category = relationship("Category", back_populates="projects", foreign_keys=[category_id])
     tasks = relationship("Task", back_populates="project", cascade="all, delete-orphan")
 
     # One-to-many relationship with Note
@@ -95,6 +93,7 @@ class TaskPlanning(Base):
     start_hour = Column(Time)
     end_hour = Column(Time)
     priority = Column(Integer)
+    done = Column(Boolean, default=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 

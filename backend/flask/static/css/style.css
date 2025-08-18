@@ -41,3 +41,32 @@
     opacity 0.4s ease-out,
     transform 0.4s ease-out;
 }
+
+/* State Badge Styles */
+.state-badge {
+  color: #1a202c;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+.state-badge.not_started {
+  background-color: #a0aec0 !important;
+}
+.state-badge.in_progress {
+  background-color: #4299e1 !important;
+}
+.state-badge.completed {
+  background-color: #48bb78 !important;
+}
+.state-badge.archived {
+  background-color: #f6ad55 !important;
+}
+.state-badge.pending {
+  background-color: #a0aec0 !important;
+}

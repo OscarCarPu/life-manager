@@ -16,7 +16,7 @@ Esta carpeta contiene los archivos SQL que definen la estructura de la base de d
 
 ### Sistema de Tareas
 - `category`: Categorías jerárquicas para organizar proyectos
-- `project`: Proyectos con estados, fechas y colores
+- `project`: Proyectos con estados y fechas
 - `task`: Tareas individuales con estados y fechas límite
 - `task_planning`: Planificación de tareas en fechas específicas
 - `note`: Notas asociadas a proyectos o tareas

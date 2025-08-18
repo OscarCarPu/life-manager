@@ -2,8 +2,6 @@ from datetime import date, datetime, time
 from typing import Optional
 
 from common.tasks.constants import (
-    DEFAULT_CATEGORY_COLOR,
-    DEFAULT_PROJECT_COLOR,
     MAX_PRIORITY,
     MIN_PRIORITY,
 )
@@ -15,7 +13,6 @@ from pydantic import BaseModel, validator
 class CategoryBase(BaseModel):
     name: str
     description: Optional[str] = None
-    color: Optional[str] = DEFAULT_CATEGORY_COLOR
     parent_category_id: Optional[int] = None
 
 
@@ -25,7 +22,6 @@ class CategoryCreate(CategoryBase):
 
 class CategoryUpdate(CategoryBase):
     name: Optional[str] = None
-    color: Optional[str] = None
 
 
 class Category(CategoryBase):
@@ -45,7 +41,6 @@ class ProjectBase(BaseModel):
     name: str
     description: Optional[str] = None
     category_id: Optional[int] = None
-    color: Optional[str] = DEFAULT_PROJECT_COLOR
     expected_start_date: Optional[date] = None
     expected_end_date: Optional[date] = None
     state: Optional[ProjectState] = ProjectState.NOT_STARTED
@@ -57,7 +52,6 @@ class ProjectCreate(ProjectBase):
 
 class ProjectUpdate(ProjectBase):
     name: Optional[str] = None
-    color: Optional[str] = None
     state: Optional[ProjectState] = None
 
 
@@ -110,6 +104,7 @@ class TaskPlanningBase(BaseModel):
     start_hour: Optional[time] = None
     end_hour: Optional[time] = None
     priority: Optional[int] = None
+    done: bool = False
 
     @validator("priority")
     def validate_priority(cls, v):

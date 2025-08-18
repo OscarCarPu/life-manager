@@ -60,20 +60,9 @@ const formatStatus = (status) => {
 };
 
 const getStatusCssClass = (status, isProject = false) => {
-  if (!status) return "bg-secondary";
-
-  const statusMap = {
-    // Task states
-    pending: "bg-warning",
-    completed: "bg-success",
-    in_progress: "bg-info",
-    archived: "bg-secondary",
-    // Project states
-    not_started: "bg-secondary",
-  };
-
-  const normalizedStatus = status.toLowerCase().replace("_", "_");
-  return statusMap[normalizedStatus] || "bg-secondary";
+  if (!status) return "state-badge";
+  const normalizedStatus = status.toLowerCase();
+  return `state-badge ${normalizedStatus}`;
 };
 
 const sortPlannings = (container) => {
@@ -386,7 +375,7 @@ const showTaskDetails = async (event, planningItem) => {
     const statusElement = document.getElementById("taskStatus");
     const status = task.state || "unknown";
     statusElement.textContent = formatStatus(status);
-    statusElement.className = `badge ${getStatusCssClass(status)}`;
+    statusElement.className = getStatusCssClass(status);
 
     // Handle project info
     const projectSection = document.getElementById("projectSection");
@@ -395,7 +384,7 @@ const showTaskDetails = async (event, planningItem) => {
       const projectStatusElement = document.getElementById("projectStatus");
       const projectStatus = task.project.state || "unknown";
       projectStatusElement.textContent = formatStatus(projectStatus);
-      projectStatusElement.className = `badge ${getStatusCssClass(projectStatus, true)}`;
+      projectStatusElement.className = getStatusCssClass(projectStatus, true);
       projectSection.style.display = "block";
     } else {
       projectSection.style.display = "none";
