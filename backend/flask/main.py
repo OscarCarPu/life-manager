@@ -134,4 +134,7 @@ def render_notification():
 
 def get_api_base_url():
     """Get the API base URL based on environment"""
-    return os.getenv("API_BASE_URL", "http://localhost:8001")
+    url = os.getenv("API_BASE_URL", "http://localhost:8000")
+    if not url.startswith(("http://", "https://")):
+        url = f"http://{url}"
+    return url
