@@ -45,7 +45,8 @@ def projects():
             .order_by(Project.updated_at.desc())
             .all()
         )
-    return render_template("project.html", projects=projects)
+    api_base_url = get_api_base_url()
+    return render_template("project.html", projects=projects, api_base_url=api_base_url)
 
 
 @app.route("/projects/<int:project_id>")

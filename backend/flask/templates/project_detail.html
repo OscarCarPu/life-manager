@@ -9,12 +9,15 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h2 class="card-title mb-0">{{ project.name }}</h2>
-              <a href="{{ url_for('projects') }}" class="btn btn-sm btn-outline-secondary">Back to Projects</a>
+              <h2 class="card-title mb-0" id="project-detail-name" data-project-id="{{ project.id }}">{{ project.name }}</h2>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary" id="btn-edit-project" data-project-id="{{ project.id }}"><i class="fa fa-edit"></i> Edit</button>
+                <a href="{{ url_for('projects') }}" class="btn btn-sm btn-outline-secondary">Back</a>
+              </div>
             </div>
 
             <div class="d-flex align-items-center mb-3">
-              <span class="state-badge {{ project.state }}">{{ project.state.replace('_', ' ') | title }}</span>
+              <span class="state-badge {{ project.state }}" id="project-detail-state">{{ project.state.replace('_', ' ') | title }}</span>
               {% if category_path %}
                 <small class="text-muted ms-2">
                   {% for category in category_path %}
@@ -25,7 +28,7 @@
                   {% endfor %}
                 </small>
               {% endif %}
-              <div class="ms-auto text-muted small">
+              <div class="ms-auto text-muted small" id="project-detail-dates">
                 {% if project.expected_start_date and project.expected_end_date %}
                   {{ project.expected_start_date }} - {{ project.expected_end_date }}
                 {% elif project.expected_start_date %}
@@ -37,25 +40,35 @@
             </div>
 
             {% if project.description %}
-              <p class="lead">{{ project.description }}</p>
+              <p class="lead" id="project-detail-description">{{ project.description }}</p>
+            {% else %}
+              <p class="lead text-muted" id="project-detail-description"></p>
             {% endif %}
 
-            <h5 class="mt-4">Tasks</h5>
-            <ul class="list-group list-group-flush">
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+              <h5 class="mb-0">Tasks</h5>
+              <button class="btn btn-sm btn-primary" id="btn-add-task" data-project-id="{{ project.id }}"><i class="fa fa-plus"></i> Add Task</button>
+            </div>
+            <ul class="list-group list-group-flush" id="project-tasks-list">
               {% if project.tasks %}
                 {% for task in project.tasks %}
-                  <li class="list-group-item d-flex justify-content-between align-items-start task-item" data-task-id="{{ task.id }}">
-                    <div>
-                      <strong>{{ task.title }}</strong>
+                  <li class="list-group-item d-flex justify-content-between align-items-start task-item" data-task-id="{{ task.id }}" data-project-id="{{ project.id }}">
+                    <div class="task-click" style="cursor:pointer;">
+                      <strong class="task-title">{{ task.title }}</strong>
                       {% if task.due_date %}
                         <div class="text-muted small">Due: {{ task.due_date }}</div>
                       {% endif %}
                       {% if task.description %}
-                        <div class="text-muted small mt-1">{{ task.description }}</div>
+                        <div class="text-muted small mt-1 task-desc">{{ task.description }}</div>
                       {% endif %}
                     </div>
                     <div class="text-end">
-                      <span class="state-badge {{ task.state }}">{{ task.state.replace('_', ' ') | title }}</span>
+                      <span class="state-badge {{ task.state }} task-state">{{ task.state.replace('_', ' ') | title }}</span>
+                      <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger mt-2 btn-delete-task" data-task-id="{{ task.id }}">
+                          <i class="fa fa-trash"></i> Delete
+                        </button>
+                      </div>
                     </div>
                   </li>
                 {% endfor %}
@@ -89,6 +102,8 @@
   </div>
 
   {% include 'components/project/task_planning_modal.html' %}
+  {% include 'components/project/project_modal.html' %}
+  {% include 'components/task/task_modal.html' %}
 {% endblock %}
 
 {% block styles %}
@@ -97,4 +112,5 @@
 
 {% block scripts %}
   <script src="{{ url_for('static', filename='js/project_detail.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/project.js') }}"></script>
 {% endblock %}

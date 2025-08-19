@@ -175,7 +175,7 @@ const showTaskDetails = async (event, planningItem) => {
       projectStatusElement.textContent = formatStatus(projectStatus);
       projectStatusElement.className = getStatusCssClass(projectStatus, true);
       projectSection.style.display = "block";
-    } else {
+    } else if (projectSection) {
       projectSection.style.display = "none";
     }
 
@@ -190,7 +190,7 @@ const showTaskDetails = async (event, planningItem) => {
         )
         .join("");
       notesSection.style.display = "block";
-    } else {
+    } else if (notesSection) {
       notesSection.style.display = "none";
     }
 
@@ -228,8 +228,17 @@ const showTaskDetails = async (event, planningItem) => {
         })
         .join("");
       planningsSection.style.display = "block";
-    } else {
+    } else if (planningsSection) {
       planningsSection.style.display = "none";
+    }
+
+    // Store current task id on the detail modal for editing
+    const taskModalElement = document.getElementById("taskModal");
+    if (taskModalElement) {
+      taskModalElement.dataset.currentTaskId = taskId;
+      taskModalElement.dataset.projectId = task.project
+        ? task.project.id
+        : task.project_id || "";
     }
 
     // Show modal
@@ -240,3 +249,89 @@ const showTaskDetails = async (event, planningItem) => {
     showNotification("Failed to load task details", "danger");
   }
 };
+
+// Utility to stack Bootstrap 5 modals safely
+function openStackedModal(currentModalEl, newModalEl) {
+  if (!newModalEl) return;
+  // If Bootstrap already supports stacking via appended backdrop, just show
+  // We manually increase z-index if another modal is open
+  const openModals = document.querySelectorAll(".modal.show");
+  const baseZ = 1050; // bootstrap default for modal
+  newModalEl.style.zIndex = baseZ + openModals.length * 20;
+  // Adjust existing backdrops
+  const backdrops = document.querySelectorAll(".modal-backdrop");
+  backdrops.forEach((bd, idx) => {
+    bd.style.zIndex = 1040 + idx * 20;
+  });
+  const newModal = new bootstrap.Modal(newModalEl);
+  newModal.show();
+  // Focus first input if present
+  const firstInput = newModalEl.querySelector("input, textarea, select");
+  if (firstInput) setTimeout(() => firstInput.focus(), 300);
+}
+
+// Add listener to open edit modal from task detail modal
+document.addEventListener("DOMContentLoaded", () => {
+  const editFromDetailBtn = document.getElementById(
+    "open-edit-task-from-detail",
+  );
+  if (!editFromDetailBtn) return;
+  editFromDetailBtn.addEventListener("click", async () => {
+    const taskModalElement = document.getElementById("taskModal");
+    if (!taskModalElement) return;
+    const taskId = taskModalElement.dataset.currentTaskId;
+    if (!taskId) {
+      showNotification("Task not loaded", "warning");
+      return;
+    }
+    try {
+      const data = await makeApiRequest(
+        `${API_BASE_URL}/tasks/tasks/${taskId}`,
+        "GET",
+      );
+      const taskEditModalEl = document.getElementById("taskEditModal");
+      if (!taskEditModalEl) {
+        showNotification("Edit modal not available", "danger");
+        return;
+      }
+      // Fill form
+      const idInput = document.getElementById("task-id");
+      const projInput = document.getElementById("task-project-id");
+      const titleInput = document.getElementById("task-title");
+      const descInput = document.getElementById("task-description");
+      const dueInput = document.getElementById("task-due-date");
+      const stateSelect = document.getElementById("task-state");
+      const label = document.getElementById("taskEditModalLabel");
+      if (idInput) idInput.value = data.id || "";
+      if (projInput)
+        projInput.value =
+          data.project_id || taskModalElement.dataset.projectId || "";
+      if (titleInput) titleInput.value = data.title || "";
+      if (descInput) descInput.value = data.description || "";
+      if (dueInput) dueInput.value = data.due_date || "";
+      if (stateSelect && data.state) stateSelect.value = data.state;
+      if (label) label.textContent = "Edit Task";
+
+      // Strategy: show edit modal stacked above detail
+      openStackedModal(taskModalElement, taskEditModalEl);
+
+      // Fallback: if stacking fails (user still sees only backdrop), close detail then reopen edit
+      setTimeout(() => {
+        const visibleEdit = taskEditModalEl.classList.contains("show");
+        if (!visibleEdit) return; // already fine
+        const detailVisible = taskModalElement.classList.contains("show");
+        if (detailVisible) {
+          // Check if edit modal is obscured
+          const editRect = taskEditModalEl.getBoundingClientRect();
+          if (editRect.width === 0 || editRect.height === 0) {
+            const detailInstance =
+              bootstrap.Modal.getInstance(taskModalElement);
+            if (detailInstance) detailInstance.hide();
+          }
+        }
+      }, 600);
+    } catch (e) {
+      // error already notified
+    }
+  });
+});
