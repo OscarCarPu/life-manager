@@ -39,32 +39,6 @@ const parseTextToTime = (text, isEndTime = false) => {
   return hour * 60 + minute;
 };
 
-const formatDate = (dateString) => {
-  if (!dateString) return "No date";
-
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "Invalid date";
-
-  // Format as dd/mm/yyyy, day of week
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-  const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
-
-  return `${day}/${month}/${year}, ${weekday}`;
-};
-
-const formatStatus = (status) => {
-  if (!status) return "Unknown";
-  return status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ");
-};
-
-const getStatusCssClass = (status, isProject = false) => {
-  if (!status) return "state-badge";
-  const normalizedStatus = status.toLowerCase();
-  return `state-badge ${normalizedStatus}`;
-};
-
 const sortPlannings = (container) => {
   const plannings = Array.from(
     container.querySelectorAll(`.${localConfig.CLASSES.PLANNING_ITEM}`),
@@ -124,15 +98,17 @@ const updateNoPlanningsState = (container) => {
 // --- Event Handlers ---
 
 const handleDragStart = (event) => {
+  const item = event.currentTarget; // more robust than event.target
   const { PLANNING_ID, CURRENT_DATE } = localConfig.DATA_ATTRIBUTES;
   const { DRAGGING } = localConfig.CLASSES;
-  state.draggedElement = event.target;
-  state.draggedPlanningId = event.target.getAttribute(PLANNING_ID);
-  state.originalDate = event.target.getAttribute(CURRENT_DATE);
+  state.draggedElement = item;
+  state.draggedPlanningId = item.getAttribute(PLANNING_ID);
+  state.originalDate = item.getAttribute(CURRENT_DATE);
 
-  event.target.classList.add(DRAGGING);
+  item.classList.add(DRAGGING);
+  // Provide minimal data for Firefox compatibility
   event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/html", event.target.outerHTML);
+  event.dataTransfer.setData("text/plain", state.draggedPlanningId || "");
 };
 
 const handleAllowDrop = (event) => {
@@ -327,9 +303,7 @@ const showTimeContextMenu = (event, planningItem) => {
   cancelButton.addEventListener("click", hideContextMenu);
 };
 
-// --- Task Details ---
-
-// --- Cleanup ---
+// --- Global Handlers ---
 
 const handleDragEnd = () => {
   if (state.draggedElement) {
@@ -359,9 +333,6 @@ const handleGlobalClick = (e) => {
   }
 };
 
-/**
- * Attaches all necessary event listeners to the DOM.
- */
 const setupEventListeners = () => {
   document.querySelectorAll(".drop-zone").forEach((zone) => {
     zone.addEventListener("dragover", handleAllowDrop);
@@ -377,17 +348,18 @@ const setupEventListeners = () => {
     zone.addEventListener("drop", handleDropAction);
   });
 
-  document.querySelectorAll(".planning-item").forEach((item) => {
-    item.addEventListener("dragstart", handleDragStart);
-    item.addEventListener("contextmenu", (e) => showTimeContextMenu(e, item));
-    item.addEventListener("click", (e) => showTaskDetails(e, item));
-  });
+  document
+    .querySelectorAll(`.${localConfig.CLASSES.PLANNING_ITEM}`)
+    .forEach((item) => {
+      item.addEventListener("dragstart", handleDragStart);
+      item.addEventListener("contextmenu", (e) => showTimeContextMenu(e, item));
+      item.addEventListener("click", (e) => showTaskDetails(e, item));
+    });
 
   document.addEventListener("dragend", handleDragEnd);
   document.addEventListener("click", handleGlobalClick);
 };
 
-// Start the calendar functionality
 document.addEventListener("DOMContentLoaded", () => {
   setupEventListeners();
 });
