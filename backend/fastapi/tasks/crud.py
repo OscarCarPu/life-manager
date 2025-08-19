@@ -290,20 +290,9 @@ def create_task_planning(task_planning: schemas.TaskPlanningCreate, db: Session 
     if not task:
         raise HTTPException(status_code=400, detail="Task not found")
 
-    # Check if task planning for this date already exists
-    existing_planning = (
-        db.query(models.TaskPlanning)
-        .filter(
-            models.TaskPlanning.task_id == task_planning.task_id,
-            models.TaskPlanning.planned_date == task_planning.planned_date,
-        )
-        .first()
-    )
-    if existing_planning:
-        raise HTTPException(status_code=400, detail="Task planning for this date already exists")
-
-    # Create task planning data, excluding None values
+    # Create task planning data, excluding None values to let model defaults apply
     task_planning_data = task_planning.dict(exclude_unset=True)
+
     try:
         db_task_planning = models.TaskPlanning(**task_planning_data)
     except ValueError as ve:
@@ -331,22 +320,6 @@ def update_task_planning(
         task = db.query(models.Task).filter(models.Task.id == task_planning_data.task_id).first()
         if not task:
             raise HTTPException(status_code=400, detail="Task not found")
-
-    # Check if task planning for this date already exists (excluding current planning)
-    if task_planning_data.planned_date and task_planning_data.task_id:
-        existing_planning = (
-            db.query(models.TaskPlanning)
-            .filter(
-                models.TaskPlanning.task_id == task_planning_data.task_id,
-                models.TaskPlanning.planned_date == task_planning_data.planned_date,
-                models.TaskPlanning.id != task_planning_id,
-            )
-            .first()
-        )
-        if existing_planning:
-            raise HTTPException(
-                status_code=400, detail="Task planning for this date already exists"
-            )
 
     update_data = task_planning_data.dict(exclude_unset=True)
     for key, value in update_data.items():
@@ -378,29 +351,6 @@ def patch_task_planning(
         task = db.query(models.Task).filter(models.Task.id == task_planning_data.task_id).first()
         if not task:
             raise HTTPException(status_code=400, detail="Task not found")
-
-    # Check if task planning for this date already exists (excluding current planning)
-    if task_planning_data.planned_date:
-        # Determine the task_id to check against
-        check_task_id = (
-            task_planning_data.task_id
-            if task_planning_data.task_id is not None
-            else db_task_planning.task_id
-        )
-
-        existing_planning = (
-            db.query(models.TaskPlanning)
-            .filter(
-                models.TaskPlanning.task_id == check_task_id,
-                models.TaskPlanning.planned_date == task_planning_data.planned_date,
-                models.TaskPlanning.id != task_planning_id,
-            )
-            .first()
-        )
-        if existing_planning:
-            raise HTTPException(
-                status_code=400, detail="Task planning for this date already exists"
-            )
 
     # Only update fields that are provided (exclude_unset=True)
     update_data = task_planning_data.dict(exclude_unset=True)

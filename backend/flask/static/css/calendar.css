@@ -110,22 +110,6 @@
   color: #495057;
 }
 
-.priority-indicator.priority-1 {
-  background-color: #ffd700;
-}
-.priority-indicator.priority-2 {
-  background-color: #ffc107;
-}
-.priority-indicator.priority-3 {
-  background-color: #ffa07a;
-}
-.priority-indicator.priority-4 {
-  background-color: #ff4500;
-}
-.priority-indicator.priority-5 {
-  background-color: #dc3545;
-}
-
 /* Enhanced drag states */
 .action-zone.drag-over .action-text,
 .action-zone.drag-over .priority-label {

@@ -9,7 +9,6 @@ from sqlalchemy import (
     String,
     Text,
     Time,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
@@ -96,8 +95,6 @@ class TaskPlanning(Base):
     done = Column(Boolean, default=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-
-    __table_args__ = (UniqueConstraint("task_id", "planned_date", name="_task_planned_date_uc"),)
 
     # Assuming the Task model has a `plannings` attribute
     task = relationship("Task", back_populates="plannings")

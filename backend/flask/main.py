@@ -77,8 +77,13 @@ def project_detail(project_id):
         logger.debug(
             f"Category path for project {project_id}: {[cat.name for cat in category_path]}"
         )
-
-        return render_template("project_detail.html", project=project, category_path=category_path)
+    api_base_url = get_api_base_url()
+    return render_template(
+        "project_detail.html",
+        project=project,
+        category_path=category_path,
+        api_base_url=api_base_url,
+    )
 
 
 @app.route("/calendar")

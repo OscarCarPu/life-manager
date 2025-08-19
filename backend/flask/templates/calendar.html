@@ -116,8 +116,5 @@
 {% endblock %}
 
 {% block scripts %}
-  <script>
-    const API_BASE_URL = "{{ api_base_url }}";
-  </script>
   <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
 {% endblock %}

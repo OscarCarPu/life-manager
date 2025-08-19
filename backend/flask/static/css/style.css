@@ -1,3 +1,12 @@
+/* Variables for priority colors */
+:root {
+  --priority-1-color: #ffd700;
+  --priority-2-color: #ffc107;
+  --priority-3-color: #ffa07a;
+  --priority-4-color: #ff4500;
+  --priority-5-color: #dc3545;
+}
+
 .hidden {
   display: none !important;
 }
@@ -69,4 +78,21 @@
 }
 .state-badge.pending {
   background-color: #a0aec0 !important;
+}
+
+/* Priority Colors */
+.priority-1 {
+  background-color: var(--priority-1-color);
+}
+.priority-2 {
+  background-color: var(--priority-2-color);
+}
+.priority-3 {
+  background-color: var(--priority-3-color);
+}
+.priority-4 {
+  background-color: var(--priority-4-color);
+}
+.priority-5 {
+  background-color: var(--priority-5-color);
 }

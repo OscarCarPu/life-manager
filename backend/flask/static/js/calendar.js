@@ -121,28 +121,6 @@ const updateNoPlanningsState = (container) => {
   }
 };
 
-const makeApiRequest = async (url, method, body = null) => {
-  try {
-    const options = {
-      method: method,
-      headers: { "Content-Type": "application/json" },
-    };
-    if (body) {
-      options.body = JSON.stringify(body);
-    }
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || `Failed to ${method.toLowerCase()}`);
-    }
-    return response.json();
-  } catch (error) {
-    console.error("Error with API request:", error);
-    showNotification(`Error: ${error.message}`, "danger");
-    throw error;
-  }
-};
-
 // --- Event Handlers ---
 
 const handleDragStart = (event) => {

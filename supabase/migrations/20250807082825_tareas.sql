@@ -46,8 +46,7 @@ CREATE TABLE IF NOT EXISTS task_planning (
     end_hour TIME,
     priority INTEGER CHECK (priority >= 1 AND priority <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (task_id, planned_date)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla notas

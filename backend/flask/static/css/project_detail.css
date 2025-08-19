@@ -18,3 +18,87 @@
   font-size: 0.8rem;
   color: #6c757d;
 }
+
+.planning-popup {
+  position: fixed;
+  z-index: 1050;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  width: 350px;
+  display: none; /* Initially hidden */
+}
+
+.task-item {
+  cursor: pointer;
+}
+
+.task-item:hover {
+  background-color: #f8f9fa;
+}
+
+.priority-btn {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.priority-btn:hover {
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+.priority-btn.selected.priority-1,
+.priority-btn.selected.priority-1:hover {
+  background-color: var(--priority-1-color);
+  color: #fff;
+  border-color: var(--priority-1-color);
+}
+
+.priority-btn.selected.priority-2,
+.priority-btn.selected.priority-2:hover {
+  background-color: var(--priority-2-color);
+  color: #fff;
+  border-color: var(--priority-2-color);
+}
+
+.priority-btn.selected.priority-3,
+.priority-btn.selected.priority-3:hover {
+  background-color: var(--priority-3-color);
+  color: #fff;
+  border-color: var(--priority-3-color);
+}
+
+.priority-btn.selected.priority-4,
+.priority-btn.selected.priority-4:hover {
+  background-color: var(--priority-4-color);
+  color: #fff;
+  border-color: var(--priority-4-color);
+}
+
+.priority-btn.selected.priority-5,
+.priority-btn.selected.priority-5:hover {
+  background-color: var(--priority-5-color);
+  color: #fff;
+  border-color: var(--priority-5-color);
+}
+
+#planning-days {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+#planning-days .btn {
+  flex-grow: 1;
+}
+
+#planning-days .btn.selected {
+  background-color: #0d6efd;
+  color: #fff;
+}
