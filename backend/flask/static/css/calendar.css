@@ -63,6 +63,29 @@
   font-weight: 500;
 }
 
+/* Complete Zone */
+.complete-zone {
+  background-color: #f0fff4;
+  border-color: #c6f6d5;
+}
+
+.complete-zone.drag-over {
+  background-color: #c6f6d5;
+  border-color: #38a169;
+  transform: scale(1.02);
+}
+
+.complete-zone .action-icon {
+  font-size: 1.5rem;
+  color: #38a169;
+  margin-right: 0.75rem;
+}
+
+.complete-zone .action-text {
+  color: #2f855a;
+  font-weight: 500;
+}
+
 /* Priority Zones */
 .priority-section {
   margin-top: 1.5rem;
@@ -134,6 +157,18 @@
 
 .planning-item:hover {
   background-color: #f8f9fa;
+}
+
+/* Completed planning */
+.planning-item.planning-done {
+  background-color: #e6fffa !important;
+  border-left: 4px solid #38a169;
+  opacity: 0.85;
+}
+
+.planning-item.planning-done .planning-task {
+  text-decoration: line-through;
+  color: #2f855a;
 }
 
 /* Priority Styles */

@@ -13,6 +13,7 @@ const localConfig = {
     PRIORITY: "data-priority",
     DATE: "data-date",
     TASK_ID: "data-task-id",
+    DONE: "data-done",
   },
   HIGH_LIMIT_MINUTES: 1500, // Represents a default value for sorting
 };
@@ -183,7 +184,7 @@ const handleDrop = async (event) => {
 const handleDropAction = async (event) => {
   event.preventDefault();
   const actionZone = event.currentTarget;
-  const { ACTION, PRIORITY } = localConfig.DATA_ATTRIBUTES;
+  const { ACTION, PRIORITY, DONE } = localConfig.DATA_ATTRIBUTES;
   const action = actionZone.getAttribute(ACTION);
   actionZone.classList.remove(localConfig.CLASSES.DRAG_OVER);
 
@@ -212,6 +213,15 @@ const handleDropAction = async (event) => {
         priorityFill.setAttribute(PRIORITY, priority);
       }
       showNotification("Planning priority updated successfully", "success");
+    } else if (action === "complete") {
+      await makeApiRequest(
+        `${API_BASE_URL}/tasks/task_planning/${state.draggedPlanningId}`,
+        "PATCH",
+        { done: true },
+      );
+      state.draggedElement.classList.add("planning-done");
+      state.draggedElement.setAttribute(DONE, "true");
+      showNotification("Planning marked as completed", "success");
     }
   } catch (error) {
     console.error("Error in dropAction:", error);
