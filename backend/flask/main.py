@@ -139,4 +139,4 @@ def get_api_base_url():
         return "http://localhost:8001"
     else:
         # return address on /api
-        return "zestful-linet-oscarcarpu-a3f74780.koyeb.app/api"
+        return "www.ocp-apps.es/api"
