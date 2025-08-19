@@ -134,9 +134,4 @@ def render_notification():
 
 def get_api_base_url():
     """Get the API base URL based on environment"""
-    stage = os.getenv("STAGE", "dev")
-    if stage == "dev":
-        return "http://localhost:8001"
-    else:
-        # return address on /api
-        return "www.ocp-apps.es/api"
+    return os.getenv("API_BASE_URL", "http://localhost:8001")
