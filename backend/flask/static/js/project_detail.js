@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Core Functions ---
 
   const showPopup = (event) => {
+    event.preventDefault();
     const taskItem = event.currentTarget;
     const taskId = taskItem.dataset.taskId;
     taskIdInput.value = taskId;
@@ -176,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Event Listeners ---
 
-  taskItems.forEach((item) => item.addEventListener("click", showPopup));
+  taskItems.forEach((item) => item.addEventListener("contextmenu", showPopup));
   cancelButton.addEventListener("click", hidePopup);
   saveButton.addEventListener("click", handleSave);
   prioritiesContainer
@@ -193,4 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
       hidePopup();
     }
   });
+
+  // Open popu on right click for task detail
+  taskItems.forEach((item) =>
+    item.addEventListener("click", (e) => showTaskDetails(e, item)),
+  );
 });
