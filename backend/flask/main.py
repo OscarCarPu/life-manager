@@ -138,4 +138,5 @@ def get_api_base_url():
     if stage == "dev":
         return "http://localhost:8001"
     else:
-        return "https://api.yourdomain.com"
+        # return address on /api
+        return "zestful-linet-oscarcarpu-a3f74780.koyeb.app/api"
