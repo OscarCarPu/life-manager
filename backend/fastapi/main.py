@@ -1,9 +1,13 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from tasks.router import router as tasks_router
 
-app = FastAPI()
+# Allow setting a deployment path prefix (e.g. /api) so swagger fetches /api/openapi.json
+ROOT_PATH = os.getenv("FASTAPI_ROOT_PATH", "")  # set FASTAPI_ROOT_PATH=/api in Koyeb
+app = FastAPI(root_path=ROOT_PATH)
 
 # CORS
 
