@@ -12,7 +12,7 @@
               <h2 class="card-title mb-0" id="project-detail-name" data-project-id="{{ project.id }}">{{ project.name }}</h2>
               <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-outline-primary" id="btn-edit-project" data-project-id="{{ project.id }}"><i class="fa fa-edit"></i> Edit</button>
-                <a href="{{ url_for('projects') }}" class="btn btn-sm btn-outline-secondary">Back</a>
+                <a href="{{ url_for('tasks.projects') }}" class="btn btn-sm btn-outline-secondary">Back</a>
               </div>
             </div>
 

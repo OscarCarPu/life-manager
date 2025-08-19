@@ -1,4 +1,4 @@
-.PHONY: up build clean logs down reset-dev
+.PHONY: up build clean logs down reset-dev up-logs
 
 up:
 	@echo "Starting local development environment (with Supabase)..."
@@ -6,6 +6,14 @@ up:
 	npx supabase start
 	docker compose -f docker-compose-dev.yaml up -d --wait
 	@echo "Local development environment is up"
+
+up-logs:
+	@echo "Starting local development environment with logs (with Supabase)..."
+	cd supabase
+	npx supabase start
+	docker compose -f docker-compose-dev.yaml up --wait -d
+	@echo "Local development environment is up"
+	docker compose -f docker-compose-dev.yaml logs -f
 
 clean:
 	@echo "Cleaning services"
