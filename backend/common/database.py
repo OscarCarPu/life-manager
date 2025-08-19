@@ -7,6 +7,8 @@ from sqlalchemy.orm import sessionmaker
 
 SQLALCHEMY_DATABASE_URL = os.getenv("SUPABASE_PSQL_URL")
 
+if not SQLALCHEMY_DATABASE_URL:
+    raise RuntimeError("SUPABASE_PSQL_URL environment variable is not set")
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
