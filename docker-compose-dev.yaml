@@ -3,14 +3,13 @@ services:
     build:
       context: ./backend
       dockerfile: fastapi/Dockerfile
-    # Use an explicit image name (can be pushed to registry before deploy)
-    image: life-manager-fastapi:latest
+    volumes:
+      - ./backend/fastapi:/app
+      - ./backend/common:/app/common
     env_file:
       - ./.env
       - ./backend/fastapi/.env
-    ports:
-      - "8001:8001"
-    restart: unless-stopped
+    network_mode: host
     healthcheck:
       test: ["CMD", "python", "healthcheck.py"]
       interval: 30s
@@ -22,24 +21,16 @@ services:
     build:
       context: ./backend
       dockerfile: flask/Dockerfile
-    image: life-manager-flask:latest
+    volumes:
+      - ./backend/flask:/app
+      - ./backend/common:/app/common
     env_file:
       - ./.env
       - ./backend/flask/.env
-    ports:
-      - "8000:8000"
-    restart: unless-stopped
-    depends_on:
-      fastapi:
-        condition: service_healthy
+    network_mode: host
     healthcheck:
       test: ["CMD", "python", "healthcheck.py"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-networks:
-  default:
-    name: life-manager-net
-    driver: bridge

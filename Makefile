@@ -4,19 +4,19 @@ up:
 	@echo "Starting local development environment (with Supabase)..."
 	cd supabase
 	npx supabase start
-	docker compose up -d --wait
+	docker compose -f docker-compose-dev.yaml up -d --wait
 	@echo "Local development environment is up"
 
 clean:
 	@echo "Cleaning services"
-	docker compose down -v
+	docker compose -f docker-compose-dev.yaml down -v
 	cd supabase
 	npx supabase stop
 	@echo "Volumes cleaned"
 
 build:
 	@echo "Building images.."
-	docker compose build
+	docker compose -f docker-compose-dev.yaml build
 	@echo "All images built, resetting Supabase"
 	cd supabase
 	npx supabase start
@@ -26,21 +26,21 @@ build:
 
 logs:
 	@echo "Showing logs for all services"
-	docker compose logs -f
+	docker compose -f docker-compose-dev.yaml logs -f
 
 down:
 	@echo "Stopping all services"
-	docker compose down
+	docker compose -f docker-compose-dev.yaml down
 	cd supabase
 	npx supabase stop
 	@echo "All services stopped"
 
 reset-dev:
 	@echo "Resetting development environment"
-	docker compose down -v
-	docker compose up -d --build --wait
+	docker compose -f docker-compose-dev.yaml down -v
+	docker compose -f docker-compose-dev.yaml up -d --build --wait
 	cd supabase
 	npx supabase start
 	npx supabase db reset
 	@echo "Development environment reset complete"
-	docker compose logs -f
+	docker compose -f docker-compose-dev.yaml logs -f
