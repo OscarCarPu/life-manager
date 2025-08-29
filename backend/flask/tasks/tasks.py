@@ -8,6 +8,10 @@ from sqlalchemy.orm import selectinload
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks", template_folder="templates")
 
+TASK_STATE_ORDER = {"in_progress": 0, "pending": 1, "completed": 2, "archived": 3}
+
+PROJECT_STATE_ORDER = {"in_progress": 0, "not_started": 1, "completed": 2, "archived": 3}
+
 
 @tasks_bp.route("/projects")
 def projects():
@@ -17,6 +21,9 @@ def projects():
             .options(selectinload(Project.tasks))
             .order_by(Project.updated_at.desc())
             .all()
+        )
+        projects = sorted(
+            projects, key=lambda p: (PROJECT_STATE_ORDER.get(p.state, 4), -p.updated_at.timestamp())
         )
     return render_template("tasks/project.html", projects=projects)
 
@@ -36,6 +43,11 @@ def project_detail(project_id):
         )
         if not project:
             return jsonify({"error": "Project not found"}), 404
+
+        project.tasks = sorted(
+            project.tasks,
+            key=lambda t: (TASK_STATE_ORDER.get(t.state, 4), -t.updated_at.timestamp()),
+        )
 
         category_path = []
         if project.category:
