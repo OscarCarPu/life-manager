@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% if project %}{{ project.name }} - Project{% else %}Projects{% endif %}{% endblock %}
+{% block title %}Projects{% endblock %}
 
 {% block main %}
   <div class="projects-container mt-4">
@@ -52,13 +52,13 @@
       <div class="text-center text-muted mt-5">No projects to show.</div>
     {% endif %}
   </div>
-  {% include 'components/project/project_modal.html' %}
+  {% include 'tasks/components/project_modal.html' %}
 {% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/project.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks/project.css') }}" />
 {% endblock %}
 
 {% block scripts %}
-  <script src="{{ url_for('static', filename='js/project.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/tasks/project.js') }}"></script>
 {% endblock %}

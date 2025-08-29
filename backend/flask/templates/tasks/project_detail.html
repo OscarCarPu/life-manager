@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ project.name }} - Project Details{% endblock %}
+{% block title %}{{ project.name }}{% endblock %}
 
 {% block main %}
   <div class="container mt-4">
@@ -101,16 +101,16 @@
     </div>
   </div>
 
-  {% include 'components/project/task_planning_modal.html' %}
-  {% include 'components/project/project_modal.html' %}
-  {% include 'components/task/task_modal.html' %}
+  {% include 'tasks/components/task_planning_modal.html' %}
+  {% include 'tasks/components/project_modal.html' %}
+  {% include 'tasks/components/task_modal.html' %}
 {% endblock %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/project_detail.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks/project_detail.css') }}" />
 {% endblock %}
 
 {% block scripts %}
-  <script src="{{ url_for('static', filename='js/project_detail.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/project.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/tasks/project_detail.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/tasks/project.js') }}"></script>
 {% endblock %}

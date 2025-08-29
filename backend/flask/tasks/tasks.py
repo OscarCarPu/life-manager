@@ -18,7 +18,7 @@ def projects():
             .order_by(Project.updated_at.desc())
             .all()
         )
-    return render_template("project.html", projects=projects)
+    return render_template("tasks/project.html", projects=projects)
 
 
 @tasks_bp.route("/projects/<int:project_id>")
@@ -46,7 +46,7 @@ def project_detail(project_id):
             category_path.reverse()
 
     return render_template(
-        "project_detail.html",
+        "tasks/project_detail.html",
         project=project,
         category_path=category_path,
     )
@@ -78,4 +78,4 @@ def calendar():
         for planning in plannings_four_days:
             plannings_by_day[planning.planned_date].append(planning)
 
-    return render_template("calendar.html", planning_by_day=plannings_by_day)
+    return render_template("tasks/calendar.html", planning_by_day=plannings_by_day)

@@ -1,4 +1,3 @@
-<!-- Task Create/Edit Modal -->
 <div class="modal fade" id="taskEditModal" tabindex="-1" aria-labelledby="taskEditModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -7,32 +6,31 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="taskForm">
-          <input type="hidden" id="task-id" />
-          <input type="hidden" id="task-project-id" />
-          <div class="mb-3">
-            <label for="task-title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="task-title" required />
-          </div>
-          <div class="mb-3">
-            <label for="task-description" class="form-label">Description</label>
-            <textarea class="form-control" id="task-description" rows="3"></textarea>
-          </div>
-          <div class="mb-3">
+        <input type="hidden" id="task-id" />
+        <input type="hidden" id="task-project-id" />
+        <div class="mb-3">
+          <label for="task-title" class="form-label">Title</label>
+          <input type="text" class="form-control" id="task-title" required />
+        </div>
+        <div class="mb-3">
+          <label for="task-description" class="form-label">Description</label>
+          <textarea class="form-control" id="task-description" rows="3"></textarea>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
             <label for="task-due-date" class="form-label">Due Date</label>
             <input type="date" class="form-control" id="task-due-date" />
           </div>
-          <div class="mb-3">
+          <div class="col-md-6 mb-3">
             <label for="task-state" class="form-label">State</label>
-            <select id="task-state" class="form-select">
+            <select class="form-select" id="task-state">
               <option value="pending">Pending</option>
               <option value="in_progress">In Progress</option>
               <option value="completed">Completed</option>
-              <option value="on_hold">On Hold</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="archived">Archived</option>
             </select>
           </div>
-        </form>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

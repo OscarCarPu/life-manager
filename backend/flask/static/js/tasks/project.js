@@ -1,8 +1,6 @@
-// Project and Task modal logic
-// Relies on global API_BASE_URL, showNotification, makeApiRequest
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Project Modal Elements
+  window.ProjectTaskHandlersLoaded = true;
+
   const projectModalEl = document.getElementById("projectModal");
   const projectModal = projectModalEl
     ? new bootstrap.Modal(projectModalEl)
@@ -21,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectStateSelect = document.getElementById("project-state");
   const projectModalLabel = document.getElementById("projectModalLabel");
 
-  // Project detail elements (if on detail page)
   const projectDetailName = document.getElementById("project-detail-name");
   const projectDetailDescription = document.getElementById(
     "project-detail-description",
@@ -29,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectDetailState = document.getElementById("project-detail-state");
   const projectDetailDates = document.getElementById("project-detail-dates");
 
-  // Task Modal Elements
   const taskModalEl = document.getElementById("taskEditModal");
   const taskModal = taskModalEl ? new bootstrap.Modal(taskModalEl) : null;
   const btnAddTask = document.getElementById("btn-add-task");
@@ -45,13 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const tasksList = document.getElementById("project-tasks-list");
 
-  // Attach delete listeners (delegated)
   if (tasksList) {
     tasksList.addEventListener("click", async (e) => {
       const delBtn = e.target.closest && e.target.closest(".btn-delete-task");
       if (!delBtn) return;
       e.preventDefault();
-      e.stopPropagation(); // prevent opening task detail
+      e.stopPropagation();
       const taskId = delBtn.getAttribute("data-task-id");
       if (!taskId) return;
       try {
@@ -61,20 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         if (li) li.remove();
         showNotification("Task deleted", "success");
-        // If list becomes empty show placeholder
         if (!tasksList.querySelector(".task-item")) {
           const placeholder = document.createElement("li");
           placeholder.className = "list-group-item text-center text-muted";
           placeholder.textContent = "No tasks for this project.";
           tasksList.appendChild(placeholder);
         }
-      } catch (err) {
-        // error already notified
-      }
+      } catch (err) {}
     });
   }
 
-  // Utility
   const clearProjectForm = () => {
     if (!projectIdInput) return;
     projectIdInput.value = "";
@@ -113,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (data.project_id) taskProjectIdInput.value = data.project_id;
   };
 
-  // Open create project modal
   btnOpenProjectModal &&
     btnOpenProjectModal.addEventListener("click", () => {
       clearProjectForm();
@@ -121,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
       projectModal && projectModal.show();
     });
 
-  // Open edit project modal
   btnEditProject &&
     btnEditProject.addEventListener("click", async (e) => {
       const pid = e.currentTarget.getAttribute("data-project-id");
@@ -135,12 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
         fillProjectForm(data);
         projectModalLabel.textContent = "Edit Project";
         projectModal && projectModal.show();
-      } catch (err) {
-        // error handled by makeApiRequest
-      }
+      } catch (err) {}
     });
 
-  // Save (create/update) project - always full reload to keep server-rendered HTML consistent
   saveProjectBtn &&
     saveProjectBtn.addEventListener("click", async () => {
       if (!projectNameInput.value.trim()) {
@@ -167,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {}
     });
 
-  // Task handlers
   btnAddTask &&
     btnAddTask.addEventListener("click", () => {
       clearTaskForm();
@@ -177,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
       taskModal && taskModal.show();
     });
 
-  // Save task - always full reload
   saveTaskBtn &&
     saveTaskBtn.addEventListener("click", async () => {
       if (!taskTitleInput.value.trim()) {

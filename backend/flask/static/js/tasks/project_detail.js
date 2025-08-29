@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Configuration and State
   const config = {
     selectors: {
       planningPopup: "#task-planning-menu",
@@ -13,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       startTimeInput: "#planning-start-time",
       endTimeInput: "#planning-end-time",
     },
-    classes: {
-      active: "selected",
-    },
+    classes: { active: "selected" },
     dayNames: [
       "Domingo",
       "Lunes",
@@ -27,15 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
   };
 
-  const state = {
-    selectedDate: null,
-    selectedPriority: null,
-  };
+  const state = { selectedDate: null, selectedPriority: null };
 
-  // DOM Elements
   const planningPopup = document.querySelector(config.selectors.planningPopup);
   if (!planningPopup) return;
-
   const taskItems = document.querySelectorAll(config.selectors.taskItems);
   const daysContainer = document.querySelector(config.selectors.daysContainer);
   const taskIdInput = document.querySelector(config.selectors.taskIdInput);
@@ -49,48 +41,38 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const endTimeInput = document.querySelector(config.selectors.endTimeInput);
 
-  // --- Core Functions ---
-
   const showPopup = (event) => {
     event.preventDefault();
     const taskItem = event.currentTarget;
     const taskId = taskItem.dataset.taskId;
     taskIdInput.value = taskId;
-
     populateNextFourDays();
     resetPopup();
-
     const rect = taskItem.getBoundingClientRect();
     planningPopup.style.display = "block";
     planningPopup.style.top = `${rect.bottom + window.scrollY}px`;
     planningPopup.style.left = `${rect.left + window.scrollX}px`;
   };
-
   const hidePopup = () => {
     planningPopup.style.display = "none";
   };
-
   const resetPopup = () => {
     state.selectedDate = null;
     state.selectedPriority = null;
     startTimeInput.value = "";
     endTimeInput.value = "";
-
     const activeDay = daysContainer.querySelector(`.${config.classes.active}`);
     if (activeDay) activeDay.classList.remove(config.classes.active);
-
     const activePriority = prioritiesContainer.querySelector(
       `.${config.classes.active}`,
     );
     if (activePriority) activePriority.classList.remove(config.classes.active);
   };
-
   const handleSave = async () => {
     if (!state.selectedDate) {
       showNotification("Please select a day.", "warning");
       return;
     }
-
     const payload = {
       task_id: taskIdInput.value,
       planned_date: state.selectedDate,
@@ -98,14 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
       start_time: startTimeInput.value || null,
       end_time: endTimeInput.value || null,
     };
-
     try {
       const response = await makeApiRequest(
         `${API_BASE_URL}/tasks/task_planning/`,
         "POST",
         payload,
       );
-
       if (response) {
         showNotification("Planning saved successfully!", "success");
         hidePopup();
@@ -115,24 +95,18 @@ document.addEventListener("DOMContentLoaded", () => {
       showNotification(`Error: ${error.message}`, "danger");
     }
   };
-
   const populateNextFourDays = () => {
     daysContainer.innerHTML = "";
     const today = new Date();
-
     for (let i = 0; i < 4; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-
       const button = document.createElement("button");
       button.type = "button";
       button.classList.add("btn", "btn-outline-secondary", "btn-sm");
       button.dataset.date = date.toISOString().split("T")[0];
-
       let dayLabel = config.dayNames[date.getDay()].substring(0, 3);
-
       button.textContent = `${dayLabel} ${date.getDate()}`;
-
       button.addEventListener("click", (e) => {
         const currentActive = daysContainer.querySelector(
           `.${config.classes.active}`,
@@ -143,48 +117,32 @@ document.addEventListener("DOMContentLoaded", () => {
         e.currentTarget.classList.add(config.classes.active);
         state.selectedDate = e.currentTarget.dataset.date;
       });
-
       daysContainer.appendChild(button);
     }
   };
-
-  // --- Event Handlers ---
-
   const handlePrioritySelection = (e) => {
     const selectedBtn = e.currentTarget;
     const priority = selectedBtn.dataset.priority;
-
-    // If the clicked button is already selected, deselect it
     if (selectedBtn.classList.contains(config.classes.active)) {
       selectedBtn.classList.remove(config.classes.active);
       state.selectedPriority = null;
     } else {
-      // Remove active class from all priority buttons
       const priorityButtons = prioritiesContainer.querySelectorAll(
         config.selectors.priorityButtons,
       );
       priorityButtons.forEach((btn) =>
         btn.classList.remove(config.classes.active),
       );
-
-      // Add active class to the clicked button
       selectedBtn.classList.add(config.classes.active);
-
-      // Update state
       state.selectedPriority = priority;
     }
   };
-
-  // --- Event Listeners ---
-
   taskItems.forEach((item) => item.addEventListener("contextmenu", showPopup));
   cancelButton.addEventListener("click", hidePopup);
   saveButton.addEventListener("click", handleSave);
   prioritiesContainer
     .querySelectorAll(config.selectors.priorityButtons)
     .forEach((btn) => btn.addEventListener("click", handlePrioritySelection));
-
-  // Close popup if clicked outside
   document.addEventListener("click", (e) => {
     if (
       planningPopup.style.display === "block" &&
@@ -194,8 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
       hidePopup();
     }
   });
-
-  // Open popu on right click for task detail
   taskItems.forEach((item) =>
     item.addEventListener("click", (e) => showTaskDetails(e, item)),
   );
