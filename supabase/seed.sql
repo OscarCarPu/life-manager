@@ -222,6 +222,62 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     ), 'pending', CURRENT_DATE + INTERVAL '3 weeks'
 ),
 (
+    'Demolish existing kitchen cabinets',
+    'Safely remove and dispose of old kitchen cabinets and countertops.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '4 weeks'
+),
+(
+    'Install new kitchen flooring',
+    'Lay down the new tiles or hardwood for the kitchen floor.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '5 weeks'
+),
+(
+    'Assemble and install new kitchen cabinets',
+    'Assemble and securely mount the new kitchen cabinets.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '6 weeks'
+),
+(
+    'Install kitchen backsplash',
+    'Install the tile backsplash above the countertops.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '7 weeks'
+),
+(
+    'Paint kitchen walls',
+    'Paint the kitchen walls with the chosen color.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '8 weeks'
+),
+(
+    'Install new lighting fixtures in kitchen',
+    'Install new ceiling lights and under-cabinet lighting.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '9 weeks'
+),
+(
+    'Final plumbing and electrical connections for kitchen',
+    'Connect the sink, dishwasher, and new electrical outlets.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', CURRENT_DATE + INTERVAL '10 weeks'
+),
+(
     'Draft wireframes',
     'Create low-fidelity wireframes for all main pages of the new website.',
     (

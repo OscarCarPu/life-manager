@@ -6,13 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
       daysContainer: "#planning-days",
       taskIdInput: "#planning-task-id",
       saveButton: "#save-planning",
-      cancelButton: "#cancel-planning",
+      cancelButton: ".cancel-planning",
       priorityButtons: ".priority-btn",
       prioritiesContainer: "#planning-priorities",
       startTimeInput: "#planning-start-time",
       endTimeInput: "#planning-end-time",
     },
-    classes: { active: "selected" },
+    classes: { active: "selected", visible: "visible" },
     dayNames: [
       "Domingo",
       "Lunes",
@@ -32,7 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const daysContainer = document.querySelector(config.selectors.daysContainer);
   const taskIdInput = document.querySelector(config.selectors.taskIdInput);
   const saveButton = document.querySelector(config.selectors.saveButton);
-  const cancelButton = document.querySelector(config.selectors.cancelButton);
+  const cancelButtons = document.querySelectorAll(
+    config.selectors.cancelButton,
+  );
   const prioritiesContainer = document.querySelector(
     config.selectors.prioritiesContainer,
   );
@@ -49,12 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
     populateNextFourDays();
     resetPopup();
     const rect = taskItem.getBoundingClientRect();
-    planningPopup.style.display = "block";
-    planningPopup.style.top = `${rect.bottom + window.scrollY}px`;
-    planningPopup.style.left = `${rect.left + window.scrollX}px`;
+    planningPopup.classList.add(config.classes.visible);
+    planningPopup.style.top = `${rect.bottom}px`;
+    planningPopup.style.left = `${rect.left}px`;
   };
   const hidePopup = () => {
-    planningPopup.style.display = "none";
+    planningPopup.classList.remove(config.classes.visible);
   };
   const resetPopup = () => {
     state.selectedDate = null;
@@ -138,14 +140,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
   taskItems.forEach((item) => item.addEventListener("contextmenu", showPopup));
-  cancelButton.addEventListener("click", hidePopup);
+  cancelButtons.forEach((btn) => btn.addEventListener("click", hidePopup));
   saveButton.addEventListener("click", handleSave);
   prioritiesContainer
     .querySelectorAll(config.selectors.priorityButtons)
     .forEach((btn) => btn.addEventListener("click", handlePrioritySelection));
   document.addEventListener("click", (e) => {
     if (
-      planningPopup.style.display === "block" &&
+      planningPopup.classList.contains(config.classes.visible) &&
       !planningPopup.contains(e.target) &&
       !e.target.closest(config.selectors.taskItems)
     ) {
