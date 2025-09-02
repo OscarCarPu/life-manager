@@ -7,6 +7,12 @@
     <div class="row g-4">
       <div class="col-2">
         <div class="sidebar-actions">
+          <div class="action-zone complete-zone" data-action="complete-task">
+            <div class="action-icon">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="action-text">Drop to Complete task</div>
+          </div>
           <div class="action-zone complete-zone" data-action="complete">
             <div class="action-icon">
               <i class="fas fa-check-circle"></i>
@@ -47,15 +53,19 @@
                 <ul class="list-group list-group-flush" id="plannings-{{ date.isoformat() }}">
                   {% if plannings %}
                     {% for planning in plannings %}
-                      <li class="list-group-item planning-item {% if planning.done %}planning-done{% endif %}"
+                      <li class="list-group-item planning-item {% if planning.done or planning.task.status == 'DONE' %}planning-done{% endif %}"
                           draggable="true"
                           data-planning-id="{{ planning.id }}"
                           data-task-id="{{ planning.task.id }}"
                           data-current-date="{{ date.isoformat() }}"
-                          data-done="{{ 'true' if planning.done else 'false' }}">
+                          data-done="{{ 'true' if planning.done else 'false' }}"
+                          data-task-done="{{ 'true' if planning.task.state == 'completed' else 'false' }}">
                         <div class="d-flex justify-content-between align-items-start">
                           <div class="planning-content">
                             <strong class="planning-task">{{ planning.task.title }}</strong>
+                            {% if planning.task.state == 'completed' %}
+                              <i class="fas fa-check-circle planning-done-icon"></i>
+                            {% endif %}
                             <span class="planning-hour text-muted">
                               {% if planning.start_hour and planning.end_hour %}
                                 {{ planning.start_hour.strftime('%H:%M') }} - {{ planning.end_hour.strftime('%H:%M') }}

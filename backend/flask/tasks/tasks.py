@@ -4,7 +4,8 @@ from datetime import date, timedelta
 from common.database import get_db_context as get_db
 from common.tasks.models import Project, Task, TaskPlanning
 from flask import Blueprint, jsonify, render_template
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.sql import case
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks", template_folder="templates")
 
@@ -72,9 +73,12 @@ def calendar():
 
         plannings_four_days = (
             db.query(TaskPlanning)
-            .options(selectinload(TaskPlanning.task).selectinload(Task.project))
+            .join(Task)
+            .options(joinedload(TaskPlanning.task).selectinload(Task.project))
             .filter(TaskPlanning.planned_date.in_(four_days))
             .order_by(
+                case((Task.state == "completed", 1), else_=0),
+                TaskPlanning.done.asc(),
                 TaskPlanning.planned_date,
                 TaskPlanning.start_hour,
                 TaskPlanning.end_hour,
@@ -89,5 +93,12 @@ def calendar():
 
         for planning in plannings_four_days:
             plannings_by_day[planning.planned_date].append(planning)
+
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger.info("Rendering calendar view")
+    logger.info(plannings_by_day)
 
     return render_template("tasks/calendar.html", planning_by_day=plannings_by_day)

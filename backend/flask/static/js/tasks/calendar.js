@@ -46,13 +46,31 @@ function extractPriorityFromClasses(el) {
 function applyPlanningVisualState(itemEl) {
   if (!itemEl) return;
 
-  // 1) DONE state: prefer data-done if present; otherwise preserve current class
-  const doneAttr = itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE);
-  const shouldBeDone =
-    doneAttr === null
-      ? itemEl.classList.contains(APP_CONFIG.CLASSES.DONE)
-      : doneAttr === "true";
-  itemEl.classList.toggle(APP_CONFIG.CLASSES.DONE, shouldBeDone);
+  // 1) DONE state: task-done and planning-done are separate
+  const isTaskDone =
+    itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE) === "true";
+  const isPlanningDone =
+    itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
+
+  // If planning is done, apply the 'task-done' class.
+  itemEl.classList.toggle("task-done", isPlanningDone);
+
+  // If the task is done, show the checkmark icon.
+  let checkmark = itemEl.querySelector(".planning-done-icon");
+  if (isTaskDone) {
+    if (!checkmark) {
+      checkmark = document.createElement("i");
+      checkmark.className = "fas fa-check planning-done-icon";
+      const titleEl = itemEl.querySelector(".planning-title");
+      if (titleEl) {
+        titleEl.insertBefore(checkmark, titleEl.firstChild);
+      }
+    }
+  } else {
+    if (checkmark) {
+      checkmark.remove();
+    }
+  }
 
   // 2) Priority on the inner .priority-fill as: "priority-fill priority-<n>"
   let fill = itemEl.querySelector(".priority-fill");
@@ -107,6 +125,24 @@ function orderAndApplyClasses(listEl) {
 
   // Sort items according to time and priority
   items.sort((a, b) => {
+    // Group by done status first (done items go to the bottom)
+    const aIsTaskDone =
+      a.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE) === "true";
+    const bIsTaskDone =
+      b.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE) === "true";
+    const aIsPlanningDone =
+      a.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
+    const bIsPlanningDone =
+      b.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
+
+    const aIsDone = aIsTaskDone || aIsPlanningDone;
+    const bIsDone = bIsTaskDone || bIsPlanningDone;
+
+    if (aIsDone !== bIsDone) {
+      return aIsDone ? 1 : -1; // non-done items first
+    }
+
+    // Then by time and priority
     const aTime = parsePlanningTimeRange(
       a.querySelector(".planning-hour")?.textContent || "",
     );
@@ -274,66 +310,102 @@ async function onDropToAction(ev) {
   const action = zone.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.ACTION);
 
   try {
-    if (action === "delete") {
-      await makeApiRequest(
-        `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
-        "DELETE",
-      );
-      const parentList = dndState.draggedElement.parentElement;
-      dndState.draggedElement.remove();
-      updateNoPlanningsState(parentList);
-      showNotification("Planning deleted successfully", "success");
-    } else if (action === "priority") {
-      const newPriority = parseInt(
-        zone.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.PRIORITY),
-        10,
-      );
-      await makeApiRequest(
-        `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
-        "PATCH",
-        { priority: newPriority },
-      );
-      const parentList = dndState.draggedElement.closest(".list-group");
-      const bar = dndState.draggedElement.querySelector(".priority-fill");
-      if (bar) {
-        bar.setAttribute(
-          APP_CONFIG.DATA_ATTRIBUTES.PRIORITY,
-          String(newPriority),
+    switch (action) {
+      case "delete": {
+        await makeApiRequest(
+          `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+          "DELETE",
         );
+        const parentList = dndState.draggedElement.parentElement;
+        dndState.draggedElement.remove();
+        updateNoPlanningsState(parentList);
+        showNotification("Planning deleted successfully", "success");
+        break;
       }
-      applyPlanningVisualState(dndState.draggedElement);
-      if (parentList) orderAndApplyClasses(parentList);
-      showNotification("Planning priority updated successfully", "success");
-    } else if (action === "complete") {
-      // Toggle complete based on current state
-      const currentlyDone =
-        dndState.draggedElement.getAttribute(
-          APP_CONFIG.DATA_ATTRIBUTES.DONE,
-        ) === "true" ||
-        dndState.draggedElement.classList.contains(APP_CONFIG.CLASSES.DONE);
+      case "priority": {
+        const newPriority = parseInt(
+          zone.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.PRIORITY),
+          10,
+        );
+        await makeApiRequest(
+          `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+          "PATCH",
+          { priority: newPriority },
+        );
+        const parentList = dndState.draggedElement.closest(".list-group");
+        const bar = dndState.draggedElement.querySelector(".priority-fill");
+        if (bar) {
+          bar.setAttribute(
+            APP_CONFIG.DATA_ATTRIBUTES.PRIORITY,
+            String(newPriority),
+          );
+        }
+        applyPlanningVisualState(dndState.draggedElement);
+        if (parentList) orderAndApplyClasses(parentList);
+        showNotification("Planning priority updated successfully", "success");
+        break;
+      }
+      case "complete": {
+        const currentlyDone =
+          dndState.draggedElement.getAttribute(
+            APP_CONFIG.DATA_ATTRIBUTES.DONE,
+          ) === "true" ||
+          dndState.draggedElement.classList.contains(APP_CONFIG.CLASSES.DONE);
 
-      const newDone = !currentlyDone;
-      await makeApiRequest(
-        `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
-        "PATCH",
-        { done: newDone },
-      );
-      dndState.draggedElement.setAttribute(
-        APP_CONFIG.DATA_ATTRIBUTES.DONE,
-        newDone ? "true" : "false",
-      );
-      applyPlanningVisualState(dndState.draggedElement);
-      const parentList = dndState.draggedElement.closest(".list-group");
-      if (parentList) orderAndApplyClasses(parentList);
-      showNotification(
-        newDone
-          ? "Planning marked as completed"
-          : "Planning unmarked as completed",
-        "success",
-      );
+        const newDone = !currentlyDone;
+        await makeApiRequest(
+          `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+          "PATCH",
+          { done: newDone },
+        );
+        dndState.draggedElement.setAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.DONE,
+          newDone ? "true" : "false",
+        );
+        const parentList = dndState.draggedElement.closest(".list-group");
+        orderAndApplyClasses(parentList);
+        showNotification(
+          newDone
+            ? "Planning marked as completed"
+            : "Planning unmarked as completed",
+          "success",
+        );
+        break;
+      }
+      case "complete-task": {
+        const taskId = dndState.draggedElement.getAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_ID,
+        );
+        const currentlyDone =
+          dndState.draggedElement.getAttribute(
+            APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE,
+          ) === "true";
+        if (!taskId) {
+          showNotification("Task ID not found for this planning.", "error");
+          return;
+        }
+        await makeApiRequest(
+          `${API_BASE_URL}/tasks/tasks/${taskId}/toggle-status`,
+          "PATCH",
+        );
+        dndState.draggedElement.setAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE,
+          currentlyDone ? "false" : "true",
+        );
+        const parentList = dndState.draggedElement.closest(".list-group");
+        orderAndApplyClasses(parentList);
+        showNotification(
+          currentlyDone ? "Task marked as not done" : "Task marked as done",
+          "success",
+        );
+        break;
+      }
+      default:
+        console.warn("Unknown action:", action);
     }
   } catch (err) {
     console.error("Error applying action:", err);
+    showNotification(`Error: ${err.message}`, "error");
   } finally {
     resetDragState();
   }
