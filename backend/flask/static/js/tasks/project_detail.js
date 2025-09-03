@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     try {
       const response = await makeApiRequest(
-        `${API_BASE_URL}/tasks/task_planning/`,
+        `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/`,
         "POST",
         payload,
       );

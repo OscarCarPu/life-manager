@@ -50,7 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const taskId = delBtn.getAttribute("data-task-id");
       if (!taskId) return;
       try {
-        await makeApiRequest(`${API_BASE_URL}/tasks/tasks/${taskId}`, "DELETE");
+        await makeApiRequest(
+          `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}`,
+          "DELETE",
+        );
         const li = tasksList.querySelector(
           `.task-item[data-task-id='${taskId}']`,
         );
@@ -117,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!pid) return;
       try {
         const data = await makeApiRequest(
-          `${API_BASE_URL}/tasks/projects/${pid}`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/projects/${pid}`,
           "GET",
         );
         clearProjectForm();
@@ -143,8 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const pid = projectIdInput.value;
       const method = pid ? "PUT" : "POST";
       const url = pid
-        ? `${API_BASE_URL}/tasks/projects/${pid}`
-        : `${API_BASE_URL}/tasks/projects/`;
+        ? `${APP_CONFIG.API_BASE_URL}/tasks/projects/${pid}`
+        : `${APP_CONFIG.API_BASE_URL}/tasks/projects/`;
       try {
         await makeApiRequest(url, method, payload);
         showNotification("Project saved", "success");
@@ -180,8 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const tid = taskIdInput.value;
       const method = tid ? "PUT" : "POST";
       const url = tid
-        ? `${API_BASE_URL}/tasks/tasks/${tid}`
-        : `${API_BASE_URL}/tasks/tasks/`;
+        ? `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${tid}`
+        : `${APP_CONFIG.API_BASE_URL}/tasks/tasks/`;
       try {
         await makeApiRequest(url, method, payload);
         showNotification("Task saved", "success");

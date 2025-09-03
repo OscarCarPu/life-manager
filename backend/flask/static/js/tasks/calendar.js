@@ -280,7 +280,7 @@ async function onDropToDay(ev) {
 
   try {
     await makeApiRequest(
-      `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+      `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
       "PATCH",
       apiData,
     );
@@ -314,7 +314,7 @@ async function onDropToAction(ev) {
     switch (action) {
       case "delete": {
         await makeApiRequest(
-          `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
           "DELETE",
         );
         const parentList = dndState.draggedElement.parentElement;
@@ -329,7 +329,7 @@ async function onDropToAction(ev) {
           10,
         );
         await makeApiRequest(
-          `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
           "PATCH",
           { priority: newPriority },
         );
@@ -355,7 +355,7 @@ async function onDropToAction(ev) {
 
         const newDone = !currentlyDone;
         await makeApiRequest(
-          `${API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/${dndState.draggedPlanningId}`,
           "PATCH",
           { done: newDone },
         );
@@ -386,7 +386,7 @@ async function onDropToAction(ev) {
           return;
         }
         await makeApiRequest(
-          `${API_BASE_URL}/tasks/tasks/${taskId}/toggle-status`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}/toggle-status`,
           "PATCH",
         );
         dndState.draggedElement.setAttribute(
@@ -489,7 +489,7 @@ function showTimeContextMenu(ev, itemEl) {
     }
     try {
       await makeApiRequest(
-        `${API_BASE_URL}/tasks/task_planning/${planningId}`,
+        `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/${planningId}`,
         "PATCH",
         {
           start_hour: startValue || null,

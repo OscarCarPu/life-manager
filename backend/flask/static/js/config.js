@@ -1,4 +1,5 @@
 const APP_CONFIG = {
+  API_BASE_URL: "/api",
   CLASSES: {
     DRAGGING: "dragging",
     DRAG_OVER: "drag-over",

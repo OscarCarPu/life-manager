@@ -5,7 +5,7 @@ const showTaskDetails = async (event, planningItem) => {
 
   try {
     const task = await makeApiRequest(
-      `${API_BASE_URL}/tasks/tasks/${taskId}/general-info`,
+      `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}/general-info`,
       "GET",
     );
 
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       try {
         const data = await makeApiRequest(
-          `${API_BASE_URL}/tasks/tasks/${taskId}`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}`,
           "GET",
         );
         const taskEditModalEl = document.getElementById("taskEditModal");
@@ -232,8 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const tid = taskIdInput.value;
       const method = tid ? "PUT" : "POST";
       const url = tid
-        ? `${API_BASE_URL}/tasks/tasks/${tid}`
-        : `${API_BASE_URL}/tasks/tasks/`;
+        ? `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${tid}`
+        : `${APP_CONFIG.API_BASE_URL}/tasks/tasks/`;
       try {
         await makeApiRequest(url, method, payload);
         showNotification("Task saved", "success");
