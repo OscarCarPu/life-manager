@@ -53,17 +53,17 @@ function applyPlanningVisualState(itemEl) {
     itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
 
   // If planning is done, apply the 'task-done' class.
-  itemEl.classList.toggle("task-done", isPlanningDone);
+  itemEl.classList.toggle("planning-done", isPlanningDone);
 
   // If the task is done, show the checkmark icon.
   let checkmark = itemEl.querySelector(".planning-done-icon");
   if (isTaskDone) {
     if (!checkmark) {
       checkmark = document.createElement("i");
-      checkmark.className = "fas fa-check planning-done-icon";
-      const titleEl = itemEl.querySelector(".planning-title");
+      checkmark.className = "fas fa-check-circle planning-done-icon";
+      const titleEl = itemEl.querySelector(".planning-task");
       if (titleEl) {
-        titleEl.insertBefore(checkmark, titleEl.firstChild);
+        titleEl.parentNode.insertBefore(checkmark, titleEl.nextSibling);
       }
     }
   } else {
@@ -135,11 +135,12 @@ function orderAndApplyClasses(listEl) {
     const bIsPlanningDone =
       b.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
 
-    const aIsDone = aIsTaskDone || aIsPlanningDone;
-    const bIsDone = bIsTaskDone || bIsPlanningDone;
+    if (aIsPlanningDone !== bIsPlanningDone) {
+      return aIsPlanningDone ? 1 : -1; // planning done goes down
+    }
 
-    if (aIsDone !== bIsDone) {
-      return aIsDone ? 1 : -1; // non-done items first
+    if (aIsTaskDone !== bIsTaskDone) {
+      return aIsTaskDone ? 1 : -1; // task done goes down
     }
 
     // Then by time and priority

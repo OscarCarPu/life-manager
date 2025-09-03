@@ -138,6 +138,10 @@
   color: #2f855a;
 }
 
+.planning-done-icon {
+  margin-left: 5px;
+}
+
 .planning-item.planning-done .priority-fill {
   background-color: #38a169 !important;
   width: 100% !important;
