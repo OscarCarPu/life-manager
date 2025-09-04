@@ -96,3 +96,98 @@
 .priority-5 {
   background-color: var(--priority-5-color);
 }
+
+/* Task Planning Popup Styles - Global */
+.planning-popup {
+  position: fixed;
+  z-index: 1050;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  width: 350px;
+  display: none; /* Initially hidden */
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
+}
+
+.planning-popup.visible {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
+.planning-popup .priority-btn {
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.planning-popup .priority-btn:hover {
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+.planning-popup .priority-btn.selected {
+  color: #fff;
+}
+
+.planning-popup .priority-btn.selected.priority-1 {
+  background-color: var(--priority-1-color);
+  border-color: var(--priority-1-color);
+}
+
+.planning-popup .priority-btn.selected.priority-2 {
+  background-color: var(--priority-2-color);
+  border-color: var(--priority-2-color);
+}
+
+.planning-popup .priority-btn.selected.priority-3 {
+  background-color: var(--priority-3-color);
+  border-color: var(--priority-3-color);
+}
+
+.planning-popup .priority-btn.selected.priority-4 {
+  background-color: var(--priority-4-color);
+  border-color: var(--priority-4-color);
+}
+
+.planning-popup .priority-btn.selected.priority-5 {
+  background-color: var(--priority-5-color);
+  border-color: var(--priority-5-color);
+}
+
+.planning-popup .btn-group .btn:hover {
+  margin-top: 0px !important;
+  border-bottom-width: 0px !important;
+}
+
+.planning-popup #planning-days {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.planning-popup #planning-days .btn {
+  flex-grow: 1;
+}
+
+.planning-popup #planning-days .btn.selected {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.planning-popup .btn-group {
+  flex-wrap: wrap;
+}
+
+.planning-popup .btn-group .btn {
+  margin: 2px;
+}

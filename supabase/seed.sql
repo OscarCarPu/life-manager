@@ -493,3 +493,42 @@ INSERT INTO note (content, project_id, task_id) VALUES
         WHERE title = 'Select kitchen countertops'
     )
 );
+
+-- Additional tasks without due_date for testing
+INSERT INTO task (title, description, project_id, state, due_date) VALUES
+(
+    'Organizar escritorio de trabajo',
+    'Limpiar y reorganizar el escritorio para mejorar la productividad.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Annual Home Renovation'
+    ), 'pending', NULL
+),
+(
+    'Revisar documentos fiscales',
+    'Revisar y organizar todos los documentos necesarios para la próxima declaración de impuestos.',
+    NULL, 'pending', NULL
+),
+(
+    'Comprar suministros de oficina',
+    'Hacer una lista y comprar bolígrafos, papel, y otros suministros necesarios.',
+    NULL, 'in_progress', NULL
+),
+(
+    'Llamar al dentista',
+    'Programar una cita para la limpieza dental rutinaria.',
+    NULL, 'pending', NULL
+),
+(
+    'Investigar cursos online',
+    'Buscar cursos de desarrollo profesional en plataformas como Coursera o Udemy.',
+    (
+        SELECT id FROM project
+        WHERE name = 'Personal Development Initiative'
+    ), 'pending', NULL
+),
+(
+    'Backup de fotos familiares',
+    'Hacer respaldo de todas las fotos familiares en un disco duro externo.',
+    NULL, 'pending', NULL
+);

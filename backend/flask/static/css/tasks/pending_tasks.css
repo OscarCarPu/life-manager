@@ -1,0 +1,261 @@
+/* Pending Tasks Calendar Styles */
+.calendar-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-header {
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 15px;
+}
+
+.calendar-grid {
+  display: grid;
+  gap: 1px;
+  background-color: #e9ecef;
+  border: 1px solid #e9ecef;
+}
+
+.month-grid {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.week-grid {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.weekday-header {
+  background-color: #f8f9fa;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #495057;
+}
+
+.calendar-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: #e9ecef;
+}
+
+.calendar-day {
+  background-color: white;
+  min-height: 100px;
+  padding: 8px;
+  position: relative;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.calendar-day:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.calendar-day.other-month {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.calendar-day.today {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.calendar-day.drop-zone {
+  background-color: #e8f5e8;
+  border-color: #28a745;
+  border-style: dashed;
+}
+
+.day-number {
+  font-weight: 600;
+  margin-bottom: 5px;
+  flex-shrink: 0;
+}
+
+.day-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.calendar-task {
+  background-color: #007bff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.75em;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.calendar-task:hover {
+  background-color: #0056b3;
+}
+
+.calendar-task.dragging {
+  opacity: 0.5;
+}
+
+/* Tasks Section (Below Calendar) */
+.tasks-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.tasks-container-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.task-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: move;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 280px;
+  max-width: 350px;
+  flex: 0 0 auto;
+}
+
+.task-item:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.task-item.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+.task-content {
+  flex: 1;
+}
+
+.task-title {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #212529;
+}
+
+.task-project {
+  font-size: 0.85em;
+  margin-bottom: 4px;
+}
+
+.task-state .badge {
+  font-size: 0.7em;
+}
+
+.task-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* State badges */
+.state-badge {
+  font-size: 0.75em;
+  padding: 0.25em 0.5em;
+}
+
+.state-badge.pending {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.state-badge.in_progress {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.state-badge.completed {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.state-badge.archived {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+/* Drag and drop styles */
+.drop-zone-active {
+  background-color: #e8f5e8 !important;
+  border: 2px dashed #28a745 !important;
+}
+
+.drop-zone-hover {
+  background-color: #d4edda !important;
+}
+
+/* Tasks section drop zone */
+.tasks-container-horizontal.drop-zone-hover {
+  background-color: #d4edda !important;
+  border: 2px dashed #28a745 !important;
+  border-radius: 8px;
+}
+
+.tasks-section.drop-zone-hover {
+  background-color: #e8f5e8 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calendar-day {
+    min-height: 80px;
+    padding: 4px;
+  }
+
+  .calendar-task {
+    font-size: 0.7em;
+    padding: 1px 4px;
+  }
+
+  .tasks-container-horizontal {
+    flex-direction: column;
+    max-height: none;
+  }
+
+  .task-item {
+    min-width: auto;
+    max-width: none;
+    flex: 1;
+  }
+}
+
+/* Week view specific styles */
+.week-view .calendar-day {
+  min-height: 120px;
+}

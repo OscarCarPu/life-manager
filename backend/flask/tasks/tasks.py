@@ -102,3 +102,42 @@ def calendar():
     logger.info(plannings_by_day)
 
     return render_template("tasks/calendar.html", planning_by_day=plannings_by_day)
+
+
+@tasks_bp.route("/pending-tasks")
+def pending_tasks():
+    with get_db() as db:
+        # Get all pending tasks with their due dates
+        pending_tasks = (
+            db.query(Task)
+            .options(selectinload(Task.project))
+            .filter(Task.state.in_(["pending", "in_progress"]))
+            .order_by(Task.due_date.asc(), Task.updated_at.desc())
+            .all()
+        )
+
+        # Separate tasks with and without due dates
+        tasks_with_due_date = [task for task in pending_tasks if task.due_date]
+        tasks_without_due_date = [task for task in pending_tasks if not task.due_date]
+
+        # Group tasks by due date (convert date to string for JSON serialization)
+        tasks_by_date = defaultdict(list)
+        for task in tasks_with_due_date:
+            date_str = task.due_date.isoformat() if task.due_date else None
+            if date_str:
+                task_dict = {
+                    "id": task.id,
+                    "title": task.title,
+                    "state": task.state,
+                    "due_date": date_str,
+                    "project": (
+                        {"id": task.project.id, "name": task.project.name} if task.project else None
+                    ),
+                }
+                tasks_by_date[date_str].append(task_dict)
+
+    return render_template(
+        "tasks/pending_tasks.html",
+        tasks_by_date=dict(tasks_by_date),
+        tasks_without_due_date=tasks_without_due_date,
+    )

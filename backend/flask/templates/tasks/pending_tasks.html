@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Tareas Pendientes{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tasks/pending_tasks.css') }}" />
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid mt-3">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Tareas Pendientes</h2>
+        <div class="calendar-controls">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="view-toggle">Semana</button>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm ms-2" id="today-btn">Hoy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Section (Full Width) -->
+  <div class="row">
+    <div class="col-12">
+      <div class="calendar-container">
+        <div id="calendar-header" class="calendar-header mb-3">
+          <div class="d-flex justify-content-center align-items-center">
+            <button type="button" class="btn btn-outline-secondary btn-sm me-2" id="prev-period">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <h4 id="current-period" class="mb-0 mx-3"></h4>
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="next-period">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Month View -->
+        <div id="month-view" class="calendar-view">
+          <div class="calendar-grid month-grid">
+            <div class="weekday-header">Dom</div>
+            <div class="weekday-header">Lun</div>
+            <div class="weekday-header">Mar</div>
+            <div class="weekday-header">Mié</div>
+            <div class="weekday-header">Jue</div>
+            <div class="weekday-header">Vie</div>
+            <div class="weekday-header">Sáb</div>
+          </div>
+          <div id="month-calendar-body" class="calendar-body">
+            <!-- Calendar days will be generated here -->
+          </div>
+        </div>
+
+        <!-- Week View -->
+        <div id="week-view" class="calendar-view" style="display: none;">
+          <div class="calendar-grid week-grid">
+            <div class="weekday-header">Lun</div>
+            <div class="weekday-header">Mar</div>
+            <div class="weekday-header">Mié</div>
+            <div class="weekday-header">Jue</div>
+            <div class="weekday-header">Vie</div>
+            <div class="weekday-header">Sáb</div>
+            <div class="weekday-header">Dom</div>
+          </div>
+          <div id="week-calendar-body" class="calendar-body">
+            <!-- Calendar week will be generated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks without due date (Below Calendar) -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="tasks-section">
+        <h5 class="mb-3">Tareas sin fecha de vencimiento</h5>
+        <div id="tasks-without-date" class="tasks-container-horizontal">
+          {% for task in tasks_without_due_date %}
+          <div class="task-item" data-task-id="{{ task.id }}" draggable="true">
+            <div class="task-content">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-project text-muted small">
+                {% if task.project %}{{ task.project.name }}{% endif %}
+              </div>
+              <div class="task-state">
+                <span class="badge {{ 'state-badge ' + task.state }}">{{ task.state | title }}</span>
+              </div>
+            </div>
+            <div class="task-actions">
+              <button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); showTaskPlanningPopup(event, this.closest('.task-item'))">
+                <i class="fas fa-calendar-plus"></i>
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pass data to JavaScript -->
+<script>
+  window.tasksData = {{ tasks_by_date | tojson }};
+</script>
+
+<!-- Include the task planning modal -->
+{% include 'tasks/components/task_planning_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tasks/pending_tasks.js') }}"></script>
+{% endblock %}
