@@ -6,38 +6,40 @@
     <div class="d-flex align-items-center mb-4">
       <h1 class="calendar-title mb-0 me-auto">Calendar</h1>
     </div>
-    <div class="row g-4">
-      <div class="col-2">
-        <div class="sidebar-actions">
-          <div class="action-zone complete-zone" data-action="complete-task">
-            <div class="action-icon">
-              <i class="fas fa-check-circle"></i>
+    <div class="row g-4 mb-3">
+      <div class="col-6">
+        <div class="h-100 d-flex flex-column justify-content-center align-items-center p-1 rounded"
+             style="background: #f8f9fa;">
+          <div class="d-flex flex-wrap align-items-center justify-content-center gap-1 mb-1">
+            <div class="action-zone complete-zone me-1 mb-1" data-action="complete-task">
+              <div class="action-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="action-text">Complete task</div>
             </div>
-            <div class="action-text">Complete task</div>
-          </div>
-          <div class="action-zone in-progress-zone" data-action="in-progress">
-            <div class="action-icon">
-              <i class="fas fa-spinner"></i>
+            <div class="action-zone in-progress-zone me-1 mb-1" data-action="in-progress">
+              <div class="action-icon">
+                <i class="fas fa-spinner"></i>
+              </div>
+              <div class="action-text">Mark in progress</div>
             </div>
-            <div class="action-text">Mark in progress</div>
-          </div>
-          <div class="action-zone complete-zone" data-action="complete">
-            <div class="action-icon">
-              <i class="fas fa-check"></i>
+            <div class="action-zone complete-zone me-1 mb-1" data-action="complete">
+              <div class="action-icon">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="action-text">Planning done</div>
             </div>
-            <div class="action-text">Planning done</div>
-          </div>
-          <div class="action-zone delete-zone"
-               data-action="delete">
-            <div class="action-icon">
-              <i class="fas fa-trash-alt"></i>
+            <div class="action-zone delete-zone me-1 mb-1"
+                 data-action="delete">
+              <div class="action-icon">
+                <i class="fas fa-trash-alt"></i>
+              </div>
+              <div class="action-text">Delete</div>
             </div>
-            <div class="action-text">Delete</div>
           </div>
-          <div class="priority-section">
-            <h6 class="priority-title">Priority</h6>
+          <div class="d-flex flex-wrap align-items-center justify-content-center gap-1">
             {% for priority in range(1, 6) %}
-              <div class="action-zone priority-zone"
+              <div class="action-zone priority-zone me-1 mb-1"
                    data-action="priority"
                    data-priority="{{ priority }}">
                 <div class="priority-indicator priority-{{ priority }}">
@@ -49,7 +51,15 @@
           </div>
         </div>
       </div>
-      <div class="col-10">
+      <div class="col-6">
+        <div class="h-100 d-flex flex-column justify-content-center align-items-center rounded"
+             style="background: #f8f9fa;">
+          <span class="text-muted text-center w-100">Futura recomendación de tareas</span>
+        </div>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-12">
         <div class="row g-4">
           {% for date, plannings in planning_by_day.items() %}
             <div class="col-6 col-xxl-3">
