@@ -3,19 +3,21 @@
 {% block title %}Calendar{% endblock %}
 {% block main %}
   <div class="calendar-container">
-    <h1 class="calendar-title">Calendar</h1>
+    <div class="d-flex align-items-center mb-4">
+      <h1 class="calendar-title mb-0 me-auto">Calendar</h1>
+    </div>
     <div class="row g-4">
       <div class="col-2">
         <div class="sidebar-actions">
           <div class="action-zone complete-zone" data-action="complete-task">
             <div class="action-icon">
-              <i class="fas fa-check"></i>
+              <i class="fas fa-check-circle"></i>
             </div>
             <div class="action-text">Drop to Complete task</div>
           </div>
           <div class="action-zone complete-zone" data-action="complete">
             <div class="action-icon">
-              <i class="fas fa-check-circle"></i>
+              <i class="fas fa-check"></i>
             </div>
             <div class="action-text">Drop to Complete</div>
           </div>

@@ -7,32 +7,40 @@
       </div>
       <div class="modal-body">
         <div id="task-detail-content">
-          <div class="mb-3">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <h3 id="taskTitle" class="mb-0">Loading...</h3>
-              <span id="taskStatus" class="badge bg-secondary"></span>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h3 id="taskTitle" class="mb-0">Loading...</h3>
+                  <span id="taskStatus" class="badge bg-secondary"></span>
+                </div>
+                <div class="text-muted small" id="taskDueDate"></div>
+              </div>
+              <div class="mb-3">
+                <p id="taskDescription" class="mb-0 text-muted">No description.</p>
+              </div>
+              <div id="notesSection" style="display:none;" class="mb-3">
+                <h5 class="mb-2">Recent Notes</h5>
+                <div id="taskNotes" class="d-flex flex-column gap-1"></div>
+              </div>
             </div>
-            <div class="text-muted small" id="taskDueDate"></div>
-          </div>
-          <div class="mb-3">
-            <p id="taskDescription" class="mb-0 text-muted">No description.</p>
-          </div>
-          <div id="projectSection" style="display:none;" class="mb-3">
-            <h5 class="mb-2">Project</h5>
-            <div class="d-flex align-items-center gap-2">
-              <strong id="projectName"></strong>
-              <span id="projectStatus" class="badge bg-secondary"></span>
+            <div class="col-md-6">
+              <div id="projectSection" style="display:none;" class="mb-3">
+                <h5 class="mb-2">Project</h5>
+                <div class="d-flex align-items-center gap-2">
+                  <strong id="projectName"></strong>
+                  <span id="projectStatus" class="badge bg-secondary"></span>
+                </div>
+              </div>
+              <div id="planningsSection" style="display:none;" class="mb-3">
+                <h5 class="mb-2">Upcoming Plannings</h5>
+                <div id="taskPlannings" class="d-flex flex-column gap-2"></div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="button" id="open-edit-task-from-detail" class="btn btn-sm btn-outline-primary">Edit Task</button>
             </div>
           </div>
-          <div id="notesSection" style="display:none;" class="mb-3">
-            <h5 class="mb-2">Recent Notes</h5>
-            <div id="taskNotes" class="d-flex flex-column gap-1"></div>
-          </div>
-          <div id="planningsSection" style="display:none;" class="mb-3">
-            <h5 class="mb-2">Upcoming Plannings</h5>
-            <div id="taskPlannings" class="d-flex flex-column gap-2"></div>
-          </div>
-          <button type="button" id="open-edit-task-from-detail" class="btn btn-sm btn-outline-primary">Edit Task</button>
         </div>
       </div>
       <div class="modal-footer">
