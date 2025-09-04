@@ -13,20 +13,26 @@
             <div class="action-icon">
               <i class="fas fa-check-circle"></i>
             </div>
-            <div class="action-text">Drop to Complete task</div>
+            <div class="action-text">Complete task</div>
+          </div>
+          <div class="action-zone in-progress-zone" data-action="in-progress">
+            <div class="action-icon">
+              <i class="fas fa-spinner"></i>
+            </div>
+            <div class="action-text">Mark in progress</div>
           </div>
           <div class="action-zone complete-zone" data-action="complete">
             <div class="action-icon">
               <i class="fas fa-check"></i>
             </div>
-            <div class="action-text">Drop to Complete</div>
+            <div class="action-text">Planning done</div>
           </div>
           <div class="action-zone delete-zone"
                data-action="delete">
             <div class="action-icon">
               <i class="fas fa-trash-alt"></i>
             </div>
-            <div class="action-text">Drop to Delete</div>
+            <div class="action-text">Delete</div>
           </div>
           <div class="priority-section">
             <h6 class="priority-title">Priority</h6>
@@ -61,10 +67,14 @@
                           data-task-id="{{ planning.task.id }}"
                           data-current-date="{{ date.isoformat() }}"
                           data-done="{{ 'true' if planning.done else 'false' }}"
-                          data-task-done="{{ 'true' if planning.task.state == 'completed' else 'false' }}">
+                          data-task-state="{{ planning.task.state }}">
                         <div class="d-flex justify-content-between align-items-start">
                           <div class="planning-content">
-                            <strong class="planning-task">{{ planning.task.title }}</strong>{% if planning.task.state == 'completed' %}<i class="fas fa-check-circle planning-done-icon"></i>
+                            <strong class="planning-task">{{ planning.task.title }}</strong>
+                            {% if planning.task.state == 'completed' %}
+                              <i class="fas fa-check-circle planning-icon"></i>
+                            {% elif planning.task.state == 'in_progress' %}
+                              <i class="fas fa-spinner planning-icon"></i>
                             {% endif %}
                             <span class="planning-hour text-muted">
                               {% if planning.start_hour and planning.end_hour %}

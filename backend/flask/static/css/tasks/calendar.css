@@ -70,6 +70,25 @@
   color: #2f855a;
   font-weight: 500;
 }
+
+.in-progress-zone {
+  background-color: #ebf8ff;
+  border-color: #bee3f8;
+}
+.in-progress-zone.drag-over {
+  background-color: #bee3f8;
+  border-color: #3182ce;
+  transform: scale(1.02);
+}
+.in-progress-zone .action-icon {
+  font-size: 1.5rem;
+  color: #3182ce;
+  margin-right: 0.75rem;
+}
+.in-progress-zone .action-text {
+  color: #2b6cb0;
+  font-weight: 500;
+}
 .priority-section {
   margin-top: 1.5rem;
 }
@@ -138,7 +157,7 @@
   color: #2f855a;
 }
 
-.planning-done-icon {
+.planning-icon {
   margin-left: 5px;
 }
 

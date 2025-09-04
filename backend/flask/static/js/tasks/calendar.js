@@ -46,29 +46,32 @@ function extractPriorityFromClasses(el) {
 function applyPlanningVisualState(itemEl) {
   if (!itemEl) return;
 
-  // 1) DONE state: task-done and planning-done are separate
-  const isTaskDone =
-    itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE) === "true";
+  // 1) DONE state: task-state and planning-done are separate
+  const taskState = itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE);
   const isPlanningDone =
     itemEl.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
 
   // If planning is done, apply the 'task-done' class.
   itemEl.classList.toggle("planning-done", isPlanningDone);
 
-  // If the task is done, show the checkmark icon.
-  let checkmark = itemEl.querySelector(".planning-done-icon");
-  if (isTaskDone) {
-    if (!checkmark) {
-      checkmark = document.createElement("i");
-      checkmark.className = "fas fa-check-circle planning-done-icon";
-      const titleEl = itemEl.querySelector(".planning-task");
-      if (titleEl) {
-        titleEl.parentNode.insertBefore(checkmark, titleEl.nextSibling);
-      }
-    }
-  } else {
-    if (checkmark) {
-      checkmark.remove();
+  // Remove any existing planning icon
+  const existingIcon = itemEl.querySelector(".planning-icon");
+  if (existingIcon) existingIcon.remove();
+
+  // Determine icon based on task state
+  let iconClass = "";
+  if (taskState === "completed") {
+    iconClass = "fas fa-check-circle";
+  } else if (taskState === "in_progress") {
+    iconClass = "fas fa-spinner";
+  }
+
+  if (iconClass) {
+    const icon = document.createElement("i");
+    icon.className = `${iconClass} planning-icon`;
+    const titleEl = itemEl.querySelector(".planning-task");
+    if (titleEl) {
+      titleEl.insertAdjacentElement("afterend", icon);
     }
   }
 
@@ -127,9 +130,9 @@ function orderAndApplyClasses(listEl) {
   items.sort((a, b) => {
     // Group by done status first (done items go to the bottom)
     const aIsTaskDone =
-      a.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE) === "true";
+      a.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE) === "completed";
     const bIsTaskDone =
-      b.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE) === "true";
+      b.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE) === "completed";
     const aIsPlanningDone =
       a.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DONE) === "true";
     const bIsPlanningDone =
@@ -377,26 +380,68 @@ async function onDropToAction(ev) {
         const taskId = dndState.draggedElement.getAttribute(
           APP_CONFIG.DATA_ATTRIBUTES.TASK_ID,
         );
-        const currentlyDone =
-          dndState.draggedElement.getAttribute(
-            APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE,
-          ) === "true";
+        const taskState = dndState.draggedElement.getAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
+        );
         if (!taskId) {
           showNotification("Task ID not found for this planning.", "error");
           return;
         }
+        // Toggle between completed and pending
+        let newState = "completed";
+        if (taskState === "completed") {
+          newState = "pending";
+        }
         await makeApiRequest(
-          `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}/toggle-status`,
+          `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}`,
           "PATCH",
+          { state: newState },
         );
         dndState.draggedElement.setAttribute(
-          APP_CONFIG.DATA_ATTRIBUTES.TASK_DONE,
-          currentlyDone ? "false" : "true",
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
+          newState,
         );
         const parentList = dndState.draggedElement.closest(".list-group");
         orderAndApplyClasses(parentList);
         showNotification(
-          currentlyDone ? "Task marked as not done" : "Task marked as done",
+          newState === "completed"
+            ? "Task marked as done"
+            : "Task marked as not done",
+          "success",
+        );
+        break;
+      }
+      case "in-progress": {
+        const taskId = dndState.draggedElement.getAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_ID,
+        );
+        const taskState = dndState.draggedElement.getAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
+        );
+        if (!taskId) {
+          showNotification("Task ID not found for this planning.", "error");
+          return;
+        }
+        // Toggle between in_progress and pending
+        let newState = "in_progress";
+        if (taskState === "in_progress") {
+          newState = "pending";
+        }
+        await makeApiRequest(
+          `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${taskId}`,
+          "PATCH",
+          { state: newState },
+        );
+        dndState.draggedElement.setAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
+          newState,
+        );
+        const parentList = dndState.draggedElement.closest(".list-group");
+        orderAndApplyClasses(parentList);
+        showNotification(
+          newState === "in_progress"
+            ? "Task marked as in progress"
+            : "Task marked as pending",
           "success",
         );
         break;

@@ -16,7 +16,7 @@ const APP_CONFIG = {
     DATE: "data-date",
     TASK_ID: "data-task-id",
     DONE: "data-done",
-    TASK_DONE: "data-task-done",
+    TASK_STATE: "data-task-state",
   },
   MAX_MINUTES: 1500, // For calendar sorting
   NOTIFICATION_TIMEOUT: 3000,

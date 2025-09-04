@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import common.tasks.models as models
 from common.database import get_db
-from common.tasks.enums import TaskState
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -53,19 +52,3 @@ def get_task_general_info(task_id: int, db: Session = Depends(get_db)):
         ],
     )
     return task_info
-
-
-@router.patch("/tasks/{task_id}/toggle-status")
-def toggle_task_status(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(models.Task).filter(models.Task.id == task_id).first()
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    if task.state == TaskState.COMPLETED:
-        task.state = TaskState.IN_PROGRESS
-    else:
-        task.state = TaskState.COMPLETED
-
-    db.commit()
-    db.refresh(task)
-    return {"message": f"Task {task_id} status toggled to {task.state}"}

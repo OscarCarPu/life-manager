@@ -10,7 +10,7 @@ from . import schemas
 router = APIRouter()
 
 
-# Category CRUD operations
+# region Category
 @router.get("/categories/", response_model=List[schemas.Category])
 def list_categories(db: Session = Depends(get_db)):
     return db.query(models.Category).all()
@@ -106,7 +106,8 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
     return {"message": "Category deleted successfully"}
 
 
-# Project CRUD operations
+# endregion
+# region Project
 @router.get("/projects/", response_model=List[schemas.Project])
 def list_projects(db: Session = Depends(get_db)):
     return db.query(models.Project).all()
@@ -197,7 +198,7 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
     return {"message": "Project deleted successfully"}
 
 
-# Task CRUD operations
+# region Tasks
 @router.get("/tasks/", response_model=List[schemas.Task])
 def list_tasks(db: Session = Depends(get_db)):
     return db.query(models.Task).all()
@@ -257,6 +258,32 @@ def update_task(task_id: int, task_data: schemas.TaskUpdate, db: Session = Depen
     return db_task
 
 
+@router.patch("/tasks/{task_id}", response_model=schemas.Task)
+def patch_task(task_id: int, task_data: schemas.TaskUpdate, db: Session = Depends(get_db)):
+    db_task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not db_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Validate project exists if provided
+    if task_data.project_id:
+        project = db.query(models.Project).filter(models.Project.id == task_data.project_id).first()
+        if not project:
+            raise HTTPException(status_code=400, detail="Project not found")
+
+    # Only update fields that are provided (exclude_unset=True)
+    update_data = task_data.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_task, key, value)
+
+    try:
+        db.commit()
+        db.refresh(db_task)
+    except ValueError as ve:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(ve))
+    return db_task
+
+
 @router.delete("/tasks/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -267,7 +294,10 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     return {"message": "Task deleted successfully"}
 
 
-# TaskPlanning CRUD operations
+# endregion
+
+
+# region TaskPlanning
 @router.get("/task_planning/", response_model=List[schemas.TaskPlanning])
 def list_task_plannings(db: Session = Depends(get_db)):
     return db.query(models.TaskPlanning).all()
@@ -378,6 +408,11 @@ def delete_task_planning(task_planning_id: int, db: Session = Depends(get_db)):
     return {"message": "TaskPlanning deleted successfully"}
 
 
+# endregion
+
+# region Notes
+
+
 @router.get("/notes/", response_model=List[schemas.Note])
 def list_notes(db: Session = Depends(get_db)):
     return db.query(models.Note).all()
@@ -453,3 +488,6 @@ def delete_note(note_id: int, db: Session = Depends(get_db)):
     db.delete(note)
     db.commit()
     return {"message": "Note deleted successfully"}
+
+
+# endregion
