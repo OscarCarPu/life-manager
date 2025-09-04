@@ -252,7 +252,11 @@ class PendingTasksCalendar {
   }
 
   formatDate(date) {
-    return date.toISOString().split("T")[0];
+    // Use local timezone to avoid date shifting
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
 
   isToday(date) {
@@ -263,7 +267,9 @@ class PendingTasksCalendar {
   getStartOfWeek(date) {
     const result = new Date(date);
     const day = result.getDay();
-    const diff = result.getDate() - day; // Get Sunday
+    // Convert Sunday (0) to 7 to make Monday (1) the first day
+    const mondayDay = day === 0 ? 7 : day;
+    const diff = result.getDate() - (mondayDay - 1); // Get Monday
     result.setDate(diff);
     return result;
   }
@@ -397,13 +403,13 @@ class PendingTasksCalendar {
       },
       classes: { active: "selected", visible: "visible" },
       dayNames: [
-        "Domingo",
         "Lunes",
         "Martes",
         "Miércoles",
         "Jueves",
         "Viernes",
         "Sábado",
+        "Domingo",
       ],
     };
 
@@ -534,7 +540,9 @@ class PendingTasksCalendar {
       button.type = "button";
       button.classList.add("btn", "btn-outline-secondary", "btn-sm");
       button.dataset.date = date.toISOString().split("T")[0];
-      let dayLabel = config.dayNames[date.getDay()].substring(0, 3);
+      // Convert getDay() to match our Monday-first dayNames array
+      const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
+      let dayLabel = config.dayNames[dayIndex].substring(0, 3);
       button.textContent = `${dayLabel} ${date.getDate()}`;
       button.addEventListener("click", (e) => {
         const currentActive = daysContainer.querySelector(
