@@ -73,6 +73,13 @@ def login():
         if password_hash and check_password_hash(password_hash, password):
             user = User()
             login_user(user)
+            api_url = os.getenv("API_BASE_URL", "http://localhost:8001")
+            if not api_url.startswith("http"):
+                api_url = f"http://{api_url}"
+            try:
+                requests.get(f"{api_url}/healthcheck", timeout=1)
+            except Exception:
+                pass
             return redirect(url_for("index"))
         return f"{password_hash} {password}", 401
     return render_template("login.html")
