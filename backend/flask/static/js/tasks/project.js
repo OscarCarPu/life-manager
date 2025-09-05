@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
           `.task-item[data-task-id='${taskId}']`,
         );
         if (li) li.remove();
-        showNotification("Task deleted", "success");
+        showNotification("Tarea eliminada", "success");
         if (!tasksList.querySelector(".task-item")) {
           const placeholder = document.createElement("li");
           placeholder.className = "list-group-item text-center text-muted";
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
   saveProjectBtn &&
     saveProjectBtn.addEventListener("click", async () => {
       if (!projectNameInput.value.trim()) {
-        showNotification("Name is required", "warning");
+        showNotification("El nombre es obligatorio", "warning");
         return;
       }
       const payload = {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : `${APP_CONFIG.API_BASE_URL}/tasks/projects/`;
       try {
         await makeApiRequest(url, method, payload);
-        showNotification("Project saved", "success");
+        showNotification("Proyecto guardado", "success");
         projectModal && projectModal.hide();
         window.location.reload();
       } catch (err) {}
@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   saveTaskBtn &&
     saveTaskBtn.addEventListener("click", async () => {
       if (!taskTitleInput.value.trim()) {
-        showNotification("Title is required", "warning");
+        showNotification("El título es obligatorio", "warning");
         return;
       }
       const payload = {
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : `${APP_CONFIG.API_BASE_URL}/tasks/tasks/`;
       try {
         await makeApiRequest(url, method, payload);
-        showNotification("Task saved", "success");
+        showNotification("Tarea guardada", "success");
         taskModal && taskModal.hide();
         window.location.reload();
       } catch (err) {}

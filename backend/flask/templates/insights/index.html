@@ -16,7 +16,7 @@
       <h5>Agregar Nueva Perspectiva</h5>
     </div>
     <div class="card-body">
-      <form method="POST" action="{{ url_for('insights.add_insight') }}">
+            <form id="add-insight-form">
         <div class="row">
           <div class="col-md-3">
             <label for="date" class="form-label">Fecha</label>
@@ -36,20 +36,20 @@
         </div>
         <div class="row mt-3">
           <div class="col-md-3">
-            <label for="focus_score" class="form-label">Puntuación de Enfoque (0-10)</label>
-            <input type="number" class="form-control" id="focus_score" name="focus_score" min="0" max="10">
+            <label for="focus_score" class="form-label">Puntuación de Enfoque (1-10)</label>
+            <input type="number" class="form-control" id="focus_score" name="focus_score" min="1" max="10">
           </div>
           <div class="col-md-3">
-            <label for="productivity_score" class="form-label">Puntuación de Productividad (0-10)</label>
-            <input type="number" class="form-control" id="productivity_score" name="productivity_score" min="0" max="10">
+            <label for="productivity_score" class="form-label">Puntuación de Productividad (1-10)</label>
+            <input type="number" class="form-control" id="productivity_score" name="productivity_score" min="1" max="10">
           </div>
           <div class="col-md-3">
-            <label for="sentiment_score" class="form-label">Puntuación de Sentimiento (0-10)</label>
-            <input type="number" class="form-control" id="sentiment_score" name="sentiment_score" min="0" max="10">
+            <label for="sentiment_score" class="form-label">Puntuación de Sentimiento (1-10)</label>
+            <input type="number" class="form-control" id="sentiment_score" name="sentiment_score" min="1" max="10">
           </div>
           <div class="col-md-3">
-            <label for="general_score" class="form-label">Puntuación General (0-10)</label>
-            <input type="number" class="form-control" id="general_score" name="general_score" min="0" max="10">
+            <label for="general_score" class="form-label">Puntuación General (1-10)</label>
+            <input type="number" class="form-control" id="general_score" name="general_score" min="1" max="10">
           </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Agregar Perspectiva</button>

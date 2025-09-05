@@ -122,3 +122,41 @@ function showText(date, type) {
     new bootstrap.Modal(document.getElementById("textModal")).show();
   }
 }
+
+// Handle form submission
+document
+  .getElementById("add-insight-form")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const payload = {
+      date: formData.get("date"),
+      type: formData.get("type"),
+      text: formData.get("text"),
+      focus_score: formData.get("focus_score")
+        ? parseInt(formData.get("focus_score"))
+        : null,
+      productivity_score: formData.get("productivity_score")
+        ? parseInt(formData.get("productivity_score"))
+        : null,
+      sentiment_score: formData.get("sentiment_score")
+        ? parseInt(formData.get("sentiment_score"))
+        : null,
+      general_score: formData.get("general_score")
+        ? parseInt(formData.get("general_score"))
+        : null,
+    };
+
+    try {
+      await makeApiRequest(
+        `${APP_CONFIG.API_BASE_URL}/insights/daily-insights/`,
+        "POST",
+        payload,
+      );
+      showNotification("Perspectiva agregada exitosamente", "success");
+      window.location.reload();
+    } catch (error) {
+      // Error is already handled by makeApiRequest
+    }
+  });

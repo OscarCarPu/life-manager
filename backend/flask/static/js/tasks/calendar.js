@@ -293,7 +293,7 @@ async function onDropToDay(ev) {
       dndState.originalDate,
       isDone,
     );
-    showNotification("Planning moved successfully", "success");
+    showNotification("Planificación movida exitosamente", "success");
   } catch (err) {
     console.error("Error moving planning to new date:", err);
   } finally {
@@ -323,7 +323,7 @@ async function onDropToAction(ev) {
         const parentList = dndState.draggedElement.parentElement;
         dndState.draggedElement.remove();
         updateNoPlanningsState(parentList);
-        showNotification("Planning deleted successfully", "success");
+        showNotification("Planificación eliminada exitosamente", "success");
         break;
       }
       case "priority": {
@@ -346,7 +346,10 @@ async function onDropToAction(ev) {
         }
         applyPlanningVisualState(dndState.draggedElement);
         if (parentList) orderAndApplyClasses(parentList);
-        showNotification("Planning priority updated successfully", "success");
+        showNotification(
+          "Prioridad de planificación actualizada exitosamente",
+          "success",
+        );
         break;
       }
       case "complete": {
@@ -370,8 +373,8 @@ async function onDropToAction(ev) {
         orderAndApplyClasses(parentList);
         showNotification(
           newDone
-            ? "Planning marked as completed"
-            : "Planning unmarked as completed",
+            ? "Planificación marcada como completada"
+            : "Planificación desmarcada como completada",
           "success",
         );
         break;
@@ -384,7 +387,10 @@ async function onDropToAction(ev) {
           APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
         );
         if (!taskId) {
-          showNotification("Task ID not found for this planning.", "error");
+          showNotification(
+            "ID de tarea no encontrado para esta planificación.",
+            "error",
+          );
           return;
         }
         // Toggle between completed and pending
@@ -405,8 +411,8 @@ async function onDropToAction(ev) {
         orderAndApplyClasses(parentList);
         showNotification(
           newState === "completed"
-            ? "Task marked as done"
-            : "Task marked as not done",
+            ? "Tarea marcada como hecha"
+            : "Tarea marcada como no hecha",
           "success",
         );
         break;
@@ -419,7 +425,10 @@ async function onDropToAction(ev) {
           APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
         );
         if (!taskId) {
-          showNotification("Task ID not found for this planning.", "error");
+          showNotification(
+            "ID de tarea no encontrado para esta planificación.",
+            "error",
+          );
           return;
         }
         // Toggle between in_progress and pending
@@ -440,8 +449,8 @@ async function onDropToAction(ev) {
         orderAndApplyClasses(parentList);
         showNotification(
           newState === "in_progress"
-            ? "Task marked as in progress"
-            : "Task marked as pending",
+            ? "Tarea marcada como en progreso"
+            : "Tarea marcada como pendiente",
           "success",
         );
         break;
@@ -553,7 +562,7 @@ function showTimeContextMenu(ev, itemEl) {
       const list = itemEl.closest(".list-group");
       if (list) sortPlannings(list);
 
-      showNotification("Time updated successfully", "success");
+      showNotification("Hora actualizada exitosamente", "success");
     } catch (err) {
       console.error("Error updating time:", err);
     } finally {

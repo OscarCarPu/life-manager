@@ -100,7 +100,7 @@ const showTaskDetails = async (event, planningItem) => {
     modal.show();
   } catch (error) {
     console.error("Error loading task details:", error);
-    showNotification("Failed to load task details", "danger");
+    showNotification("Error al cargar los detalles de la tarea", "danger");
   }
 };
 
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!taskModalElement) return;
       const taskId = taskModalElement.dataset.currentTaskId;
       if (!taskId) {
-        showNotification("Task not loaded", "warning");
+        showNotification("Tarea no cargada", "warning");
         return;
       }
       try {
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         const taskEditModalEl = document.getElementById("taskEditModal");
         if (!taskEditModalEl) {
-          showNotification("Edit modal not available", "danger");
+          showNotification("Modal de edición no disponible", "danger");
           return;
         }
         const idInput = document.getElementById("task-id");
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveTaskBtn.dataset.listenerAttached = "1";
     saveTaskBtn.addEventListener("click", async () => {
       if (!taskTitleInput.value.trim()) {
-        showNotification("Title is required", "warning");
+        showNotification("El título es obligatorio", "warning");
         return;
       }
       const payload = {
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : `${APP_CONFIG.API_BASE_URL}/tasks/tasks/`;
       try {
         await makeApiRequest(url, method, payload);
-        showNotification("Task saved", "success");
+        showNotification("Tarea guardada", "success");
         const taskEditModalEl = document.getElementById("taskEditModal");
         if (taskEditModalEl) {
           const inst =

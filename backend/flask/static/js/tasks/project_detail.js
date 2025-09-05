@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const handleSave = async () => {
     if (!state.selectedDate) {
-      showNotification("Please select a day.", "warning");
+      showNotification("Por favor selecciona un día.", "warning");
       return;
     }
     const payload = {
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         payload,
       );
       if (response) {
-        showNotification("Planning saved successfully!", "success");
+        showNotification("¡Planificación guardada exitosamente!", "success");
         hidePopup();
       }
     } catch (error) {
