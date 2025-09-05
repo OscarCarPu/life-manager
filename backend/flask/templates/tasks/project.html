@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Projects{% endblock %}
+{% block title %}Proyectos{% endblock %}
 
 {% block main %}
   <div class="projects-container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="mb-0">Projects</h1>
+      <h1 class="mb-0">Proyectos</h1>
       <button class="btn btn-primary btn-sm" id="btn-open-project-modal">
-        <i class="fa fa-plus"></i> Add Project
+        <i class="fa fa-plus"></i> Añadir Proyecto
       </button>
     </div>
     {% if projects is defined and projects %}
@@ -41,7 +41,7 @@
                   </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between align-items-center">
-                  <small class="text-muted">Tasks: {{ proj.tasks | length }}</small>
+                  <small class="text-muted">Tareas: {{ proj.pending_tasks_count }}</small>
                 </div>
               </div>
             </a>
@@ -49,7 +49,7 @@
         {% endfor %}
       </div>
     {% else %}
-      <div class="text-center text-muted mt-5">No projects to show.</div>
+      <div class="text-center text-muted mt-5">No hay proyectos para mostrar.</div>
     {% endif %}
   </div>
   {% include 'tasks/components/project_modal.html' %}

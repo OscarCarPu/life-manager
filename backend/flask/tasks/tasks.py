@@ -110,7 +110,9 @@ def pending_tasks():
         # Get all pending tasks with their due dates
         pending_tasks = (
             db.query(Task)
+            .join(Project)
             .options(selectinload(Task.project))
+            .filter(Project.state == "in_progress")
             .filter(Task.state.in_(["pending", "in_progress"]))
             .order_by(Task.due_date.asc(), Task.updated_at.desc())
             .all()

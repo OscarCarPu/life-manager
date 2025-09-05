@@ -57,6 +57,10 @@ class Project(Base):
     # One-to-many relationship with Note
     notes = relationship("Note", back_populates="project", cascade="all, delete-orphan")
 
+    @property
+    def pending_tasks_count(self):
+        return len([task for task in self.tasks if task.state in ["pending", "in_progress"]])
+
     def __repr__(self):
         return f"<Project(id={self.id}, name='{self.name}', state='{self.state}')>"
 

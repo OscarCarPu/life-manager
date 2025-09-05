@@ -451,6 +451,12 @@ class PendingTasksCalendar {
       planningPopup.classList.add(config.classes.visible);
       planningPopup.style.top = `${rect.bottom + window.scrollY}px`;
       planningPopup.style.left = `${rect.left + window.scrollX}px`;
+
+      // Adjust for scroll position
+      const container = document.querySelector(".container-fluid");
+      const containerRect = container.getBoundingClientRect();
+      planningPopup.style.top = `${event.clientY - containerRect.top}px`;
+      planningPopup.style.left = `${event.clientX - containerRect.left}px`;
     };
 
     const hidePopup = () => {
