@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Perspectivas Diarias{% endblock %}
+
+{% block styles %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid mt-3">
+  <h2>Perspectivas Diarias</h2>
+
+  <!-- Add Insight Form -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Agregar Nueva Perspectiva</h5>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('insights.add_insight') }}">
+        <div class="row">
+          <div class="col-md-3">
+            <label for="date" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="date" name="date" value="{{ today.isoformat() }}" required>
+          </div>
+          <div class="col-md-3">
+            <label for="type" class="form-label">Tipo</label>
+            <select class="form-select" id="type" name="type" required>
+              <option value="job">Trabajo</option>
+              <option value="day">Día</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="text" class="form-label">Texto</label>
+            <textarea class="form-control" id="text" name="text" rows="2" required></textarea>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-3">
+            <label for="focus_score" class="form-label">Puntuación de Enfoque (0-10)</label>
+            <input type="number" class="form-control" id="focus_score" name="focus_score" min="0" max="10">
+          </div>
+          <div class="col-md-3">
+            <label for="productivity_score" class="form-label">Puntuación de Productividad (0-10)</label>
+            <input type="number" class="form-control" id="productivity_score" name="productivity_score" min="0" max="10">
+          </div>
+          <div class="col-md-3">
+            <label for="sentiment_score" class="form-label">Puntuación de Sentimiento (0-10)</label>
+            <input type="number" class="form-control" id="sentiment_score" name="sentiment_score" min="0" max="10">
+          </div>
+          <div class="col-md-3">
+            <label for="general_score" class="form-label">Puntuación General (0-10)</label>
+            <input type="number" class="form-control" id="general_score" name="general_score" min="0" max="10">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Agregar Perspectiva</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Perspectivas por Tipo -->
+  <div class="row">
+    <!-- Trabajo -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Trabajo</h5>
+        </div>
+        <div class="card-body">
+          <div id="jobChart" style="width:100%;height:300px;"></div>
+          <h6>Histórico de Textos</h6>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Enfoque</th>
+                  <th>Productividad</th>
+                  <th>Sentimiento</th>
+                  <th>General</th>
+                  <th>Texto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for insight in insights %}
+                  {% if insight.type == 'job' %}
+                    <tr>
+                      <td>{{ insight.date }}</td>
+                      <td>{{ insight.focus_score or '-' }}</td>
+                      <td>{{ insight.productivity_score or '-' }}</td>
+                      <td>{{ insight.sentiment_score or '-' }}</td>
+                      <td>{{ insight.general_score or '-' }}</td>
+                      <td><button class="btn btn-sm btn-info" onclick="showText('{{ insight.date }}', '{{ insight.type }}')">Ver Texto</button></td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Día -->
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Día</h5>
+        </div>
+        <div class="card-body">
+          <div id="dayChart" style="width:100%;height:300px;"></div>
+          <h6>Histórico de Textos</h6>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Enfoque</th>
+                  <th>Productividad</th>
+                  <th>Sentimiento</th>
+                  <th>General</th>
+                  <th>Texto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for insight in insights %}
+                  {% if insight.type == 'day' %}
+                    <tr>
+                      <td>{{ insight.date }}</td>
+                      <td>{{ insight.focus_score or '-' }}</td>
+                      <td>{{ insight.productivity_score or '-' }}</td>
+                      <td>{{ insight.sentiment_score or '-' }}</td>
+                      <td>{{ insight.general_score or '-' }}</td>
+                      <td><button class="btn btn-sm btn-info" onclick="showText('{{ insight.date }}', '{{ insight.type }}')">Ver Texto</button></td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Text -->
+  <div class="modal fade" id="textModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Texto de la Perspectiva</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p id="insightText"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.insightsData = {{ insights|tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/insights/index.js') }}"></script>
+{% endblock %}

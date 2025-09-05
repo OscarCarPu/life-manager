@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 from flask_babel import Babel
 from flask_login import LoginManager, UserMixin, current_user, login_user
+from insights.insights import insights_bp
 from tasks.tasks import tasks_bp
 from werkzeug.security import check_password_hash
 
@@ -53,6 +54,7 @@ def before_request():
 
 
 app.register_blueprint(tasks_bp)
+app.register_blueprint(insights_bp)
 
 
 @app.route("/healthcheck")
@@ -73,13 +75,6 @@ def login():
         if password_hash and check_password_hash(password_hash, password):
             user = User()
             login_user(user)
-            api_url = os.getenv("API_BASE_URL", "http://localhost:8001")
-            if not api_url.startswith("http"):
-                api_url = f"http://{api_url}"
-            try:
-                requests.get(f"{api_url}/healthcheck", timeout=1)
-            except Exception:
-                pass
             return redirect(url_for("index"))
         return f"{password_hash} {password}", 401
     return render_template("login.html")

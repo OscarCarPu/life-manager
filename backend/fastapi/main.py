@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from insights.router import router as insights_router
 from tasks.router import router as tasks_router
 
 load_dotenv()
@@ -29,6 +30,7 @@ app.add_middleware(
 )
 
 app.include_router(tasks_router, prefix="/tasks", dependencies=[Depends(get_api_key)])
+app.include_router(insights_router, prefix="/insights", dependencies=[Depends(get_api_key)])
 
 
 @app.get("/healthcheck")
