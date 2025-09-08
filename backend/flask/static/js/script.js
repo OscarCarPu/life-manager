@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (dueInput) dueInput.value = data.due_date || "";
         if (stateSelect && data.state) stateSelect.value = data.state;
         if (prioritySelect && data.priority)
-          prioritySelect.value = data.priority;
+          prioritySelect.value = data.priority.toString();
         if (label) label.textContent = "Edit Task";
 
         openStackedModal(taskModalElement, taskEditModalEl);

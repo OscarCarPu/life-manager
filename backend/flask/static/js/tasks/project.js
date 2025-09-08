@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const taskModalEl = document.getElementById("taskEditModal");
   const taskModal = taskModalEl ? new bootstrap.Modal(taskModalEl) : null;
+  const taskModalLabel = document.getElementById("taskEditModalLabel");
   const btnAddTask = document.getElementById("btn-add-task");
   const saveTaskBtn = document.getElementById("save-task");
 
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const taskTitleInput = document.getElementById("task-title");
   const taskDescriptionInput = document.getElementById("task-description");
   const taskDueDateInput = document.getElementById("task-due-date");
+  const taskStateSelect = document.getElementById("task-state");
   const taskPrioritySelect = document.getElementById("task-priority");
 
   const tasksList = document.getElementById("project-tasks-list");
@@ -105,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     taskDueDateInput.value = data.due_date || "";
     if (data.state) taskStateSelect.value = data.state;
     if (data.project_id) taskProjectIdInput.value = data.project_id;
-    if (data.priority) taskPrioritySelect.value = data.priority;
+    if (data.priority) taskPrioritySelect.value = data.priority.toString();
   };
 
   btnOpenProjectModal &&
@@ -180,12 +182,14 @@ document.addEventListener("DOMContentLoaded", () => {
           ? parseInt(taskProjectIdInput.value)
           : null,
         state: taskStateSelect.value,
-        priority: taskPrioritySelect.value
-          ? parseInt(taskPrioritySelect.value)
-          : null,
       };
+
+      // Only add priority if it has a value
+      if (taskPrioritySelect.value) {
+        payload.priority = parseInt(taskPrioritySelect.value);
+      }
       const tid = taskIdInput.value;
-      const method = tid ? "PUT" : "POST";
+      const method = tid ? "PATCH" : "POST";
       const url = tid
         ? `${APP_CONFIG.API_BASE_URL}/tasks/tasks/${tid}`
         : `${APP_CONFIG.API_BASE_URL}/tasks/tasks/`;
