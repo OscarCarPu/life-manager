@@ -407,6 +407,8 @@ class PendingTasksCalendar {
         prioritiesContainer: "#planning-priorities",
         startTimeInput: "#planning-start-time",
         endTimeInput: "#planning-end-time",
+        dateInput: "#planning-date",
+        dateButton: "#planning-date-btn",
       },
       classes: { active: "selected", visible: "visible" },
       dayNames: [
@@ -442,6 +444,32 @@ class PendingTasksCalendar {
       config.selectors.startTimeInput,
     );
     const endTimeInput = document.querySelector(config.selectors.endTimeInput);
+    const dateInput = document.querySelector(config.selectors.dateInput);
+    const dateButton = document.querySelector(config.selectors.dateButton);
+
+    // Add event listener for date button
+    if (dateButton && dateInput) {
+      dateButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        dateInput.click();
+      });
+    }
+
+    // Add event listener for date input
+    if (dateInput) {
+      dateInput.addEventListener("change", (e) => {
+        state.selectedDate = e.target.value;
+        // Clear day selection
+        const activeDay = daysContainer.querySelector(
+          `.${config.classes.active}`,
+        );
+        if (activeDay) activeDay.classList.remove(config.classes.active);
+        // Update button appearance
+        if (dateButton) {
+          dateButton.classList.add(config.classes.active);
+        }
+      });
+    }
 
     const showPopup = (taskId, event) => {
       taskIdInput.value = taskId;
@@ -453,6 +481,7 @@ class PendingTasksCalendar {
         prioritiesContainer,
         startTimeInput,
         endTimeInput,
+        dateInput,
       );
       const rect = event.target.getBoundingClientRect();
       planningPopup.classList.add(config.classes.visible);
@@ -566,6 +595,15 @@ class PendingTasksCalendar {
         }
         e.currentTarget.classList.add(config.classes.active);
         state.selectedDate = e.currentTarget.dataset.date;
+        // Clear date input
+        const dateInput = document.querySelector(config.selectors.dateInput);
+        const dateButton = document.querySelector(config.selectors.dateButton);
+        if (dateInput) {
+          dateInput.value = "";
+        }
+        if (dateButton) {
+          dateButton.classList.remove(config.classes.active);
+        }
       });
       daysContainer.appendChild(button);
     }
@@ -578,11 +616,17 @@ class PendingTasksCalendar {
     prioritiesContainer,
     startTimeInput,
     endTimeInput,
+    dateInput,
   ) {
     state.selectedDate = null;
     state.selectedPriority = null;
     startTimeInput.value = "";
     endTimeInput.value = "";
+    dateInput.value = "";
+    const dateButton = document.querySelector(config.selectors.dateButton);
+    if (dateButton) {
+      dateButton.classList.remove(config.classes.active);
+    }
     const activeDay = daysContainer.querySelector(`.${config.classes.active}`);
     if (activeDay) activeDay.classList.remove(config.classes.active);
     const activePriority = prioritiesContainer.querySelector(

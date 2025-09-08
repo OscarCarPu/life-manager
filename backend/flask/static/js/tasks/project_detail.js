@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
       prioritiesContainer: "#planning-priorities",
       startTimeInput: "#planning-start-time",
       endTimeInput: "#planning-end-time",
+      dateInput: "#planning-date",
+      dateButton: "#planning-date-btn",
     },
     classes: { active: "selected", visible: "visible" },
     dayNames: [
@@ -42,6 +44,32 @@ document.addEventListener("DOMContentLoaded", () => {
     config.selectors.startTimeInput,
   );
   const endTimeInput = document.querySelector(config.selectors.endTimeInput);
+  const dateInput = document.querySelector(config.selectors.dateInput);
+  const dateButton = document.querySelector(config.selectors.dateButton);
+
+  // Add event listener for date button
+  if (dateButton && dateInput) {
+    dateButton.addEventListener("click", (e) => {
+      e.preventDefault();
+      dateInput.click();
+    });
+  }
+
+  // Add event listener for date input
+  if (dateInput) {
+    dateInput.addEventListener("change", (e) => {
+      state.selectedDate = e.target.value;
+      // Clear day selection
+      const activeDay = daysContainer.querySelector(
+        `.${config.classes.active}`,
+      );
+      if (activeDay) activeDay.classList.remove(config.classes.active);
+      // Update button appearance
+      if (dateButton) {
+        dateButton.classList.add(config.classes.active);
+      }
+    });
+  }
 
   const showPopup = (event) => {
     event.preventDefault();
@@ -63,6 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
     state.selectedPriority = null;
     startTimeInput.value = "";
     endTimeInput.value = "";
+    dateInput.value = "";
+    if (dateButton) {
+      dateButton.classList.remove(config.classes.active);
+    }
     const activeDay = daysContainer.querySelector(`.${config.classes.active}`);
     if (activeDay) activeDay.classList.remove(config.classes.active);
     const activePriority = prioritiesContainer.querySelector(
@@ -118,6 +150,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         e.currentTarget.classList.add(config.classes.active);
         state.selectedDate = e.currentTarget.dataset.date;
+        // Clear date input
+        if (dateInput) {
+          dateInput.value = "";
+        }
+        if (dateButton) {
+          dateButton.classList.remove(config.classes.active);
+        }
       });
       daysContainer.appendChild(button);
     }

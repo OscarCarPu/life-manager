@@ -184,6 +184,10 @@
   color: #fff;
 }
 
+.planning-popup #planning-date {
+  width: 100%;
+}
+
 .planning-popup .btn-group {
   flex-wrap: wrap;
 }
