@@ -616,3 +616,71 @@ INSERT INTO daily_insights (date, text, type, focus_score, productivity_score, s
 (CURRENT_DATE - INTERVAL '1 day', 'Ayudé a un nuevo compañero con un problema. Disfruté compartiendo mi conocimiento y me sentí parte importante del equipo.', 'job', 10, 10, 10, 10),
 (CURRENT_DATE - INTERVAL '0 days', 'Hoy me siento en un buen lugar, mental y profesionalmente. Sigo aprendiendo y trabajando en mis metas. Confío en el proceso.', 'day', 10, 10, 10, 10),
 (CURRENT_DATE - INTERVAL '0 days', 'Recibí una propuesta de trabajo que me parece muy interesante. Me sentí satisfecho por mi evolución y el reconocimiento que recibí.', 'job', 10, 10, 10, 10);
+
+-- Habits and Metrics seed
+-- Base Habits
+INSERT INTO habit (name, description, type) VALUES
+('Meditación', 'Sesión corta de mindfulness', 'boolean'),
+('Leer 20 minutos', 'Lectura diaria para aprendizaje', 'boolean'),
+('Ejercicio', 'Entrenamiento físico con puntuación subjetiva 1-10', 'score')
+ON CONFLICT DO NOTHING;
+
+-- Base Metrics
+INSERT INTO metric (name, description, unit) VALUES
+('Peso', 'Peso corporal matutino', 'kg'),
+('Horas de sueño', 'Duración total de sueño', 'h'),
+('Pasos', 'Conteo diario de pasos', 'steps')
+ON CONFLICT DO NOTHING;
+
+-- 40 days of Habit Entries (boolean)
+INSERT INTO habit_entry (habit_id, date, completed)
+SELECT h.id, gs::date AS date,
+      CASE WHEN (EXTRACT(DOW FROM gs)::int IN (0,6)) THEN (RANDOM() < 0.7) ELSE (RANDOM() < 0.85) END AS completed
+FROM generate_series(CURRENT_DATE - INTERVAL '39 days', CURRENT_DATE, INTERVAL '1 day') AS gs
+JOIN habit h ON h.name = 'Meditación'
+ON CONFLICT (habit_id, date) DO NOTHING;
+
+INSERT INTO habit_entry (habit_id, date, completed)
+SELECT h.id, gs::date AS date,
+      CASE WHEN (EXTRACT(DOW FROM gs)::int IN (0,6)) THEN (RANDOM() < 0.6) ELSE (RANDOM() < 0.8) END AS completed
+FROM generate_series(CURRENT_DATE - INTERVAL '39 days', CURRENT_DATE, INTERVAL '1 day') AS gs
+JOIN habit h ON h.name = 'Leer 20 minutos'
+ON CONFLICT (habit_id, date) DO NOTHING;
+
+-- 40 days of Habit Entries (score)
+INSERT INTO habit_entry (habit_id, date, score)
+SELECT h.id, gs::date AS date,
+      GREATEST(1, LEAST(10, ROUND((5 + 2 * SIN(EXTRACT(EPOCH FROM gs)/86400.0) + (RANDOM()*2-1)*1.5)::numeric)))::int AS score
+FROM generate_series(CURRENT_DATE - INTERVAL '39 days', CURRENT_DATE, INTERVAL '1 day') AS gs
+JOIN habit h ON h.name = 'Ejercicio'
+ON CONFLICT (habit_id, date) DO NOTHING;
+
+-- 40 days of Metric Entries
+-- Peso: tendencia ligera a la baja con ruido
+INSERT INTO metric_entry (metric_id, date, value)
+SELECT m.id, gs::date AS date,
+      ROUND((78.0 - 0.05 * (CURRENT_DATE - gs::date) + (RANDOM()-0.5)*0.8)::numeric, 1) AS value
+FROM generate_series(CURRENT_DATE - INTERVAL '39 days', CURRENT_DATE, INTERVAL '1 day') AS gs
+JOIN metric m ON m.name = 'Peso'
+ON CONFLICT (metric_id, date) DO NOTHING;
+
+-- Horas de sueño: alrededor de 7.2h con variación
+INSERT INTO metric_entry (metric_id, date, value)
+SELECT m.id, gs::date AS date,
+      ROUND((7.2 + 0.5 * SIN(2 * PI() * (EXTRACT(DOW FROM gs)::int) / 7.0) + (RANDOM()-0.5)*0.8)::numeric, 2) AS value
+FROM generate_series(CURRENT_DATE - INTERVAL '39 days', CURRENT_DATE, INTERVAL '1 day') AS gs
+JOIN metric m ON m.name = 'Horas de sueño'
+ON CONFLICT (metric_id, date) DO NOTHING;
+
+-- Pasos: más pasos en días laborables, menos en fin de semana, con ruido
+INSERT INTO metric_entry (metric_id, date, value)
+SELECT m.id, gs::date AS date,
+      GREATEST(0, ROUND(
+         (CASE WHEN EXTRACT(DOW FROM gs)::int IN (0,6)
+             THEN 6500 + (RANDOM()-0.5)*2500
+             ELSE 9000 + (RANDOM()-0.5)*3000
+         END)::numeric
+      )) AS value
+FROM generate_series(CURRENT_DATE - INTERVAL '39 days', CURRENT_DATE, INTERVAL '1 day') AS gs
+JOIN metric m ON m.name = 'Pasos'
+ON CONFLICT (metric_id, date) DO NOTHING;
