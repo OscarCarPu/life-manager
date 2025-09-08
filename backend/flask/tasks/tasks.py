@@ -47,7 +47,11 @@ def project_detail(project_id):
 
         project.tasks = sorted(
             project.tasks,
-            key=lambda t: (TASK_STATE_ORDER.get(t.state, 4), -t.updated_at.timestamp()),
+            key=lambda t: (
+                TASK_STATE_ORDER.get(t.state, 4),
+                -t.priority if hasattr(t, "priority") and t.priority is not None else 0,
+                -t.updated_at.timestamp(),
+            ),
         )
 
         category_path = []
@@ -132,6 +136,7 @@ def pending_tasks():
                     "title": task.title,
                     "state": task.state,
                     "due_date": date_str,
+                    "priority": task.priority,
                     "project": (
                         {"id": task.project.id, "name": task.project.name} if task.project else None
                     ),

@@ -236,9 +236,16 @@ class PendingTasksCalendar {
     dayTasks.forEach((task) => {
       const taskElement = document.createElement("div");
       taskElement.className = "calendar-task";
-      taskElement.textContent = task.title;
       taskElement.dataset.taskId = task.id;
       taskElement.draggable = true;
+
+      // Add priority circle if priority exists
+      let taskContent = task.title;
+      if (task.priority) {
+        taskContent = `<span class="priority-circle priority-${task.priority}" title="Priority ${task.priority}">${task.priority}</span> ${task.title}`;
+      }
+
+      taskElement.innerHTML = taskContent;
       taskElement.addEventListener("contextmenu", (e) => {
         e.preventDefault();
         this.showTaskPlanningForTask(task.id, e);

@@ -36,8 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const taskTitleInput = document.getElementById("task-title");
   const taskDescriptionInput = document.getElementById("task-description");
   const taskDueDateInput = document.getElementById("task-due-date");
-  const taskStateSelect = document.getElementById("task-state");
-  const taskModalLabel = document.getElementById("taskEditModalLabel");
+  const taskPrioritySelect = document.getElementById("task-priority");
 
   const tasksList = document.getElementById("project-tasks-list");
 
@@ -96,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     taskDescriptionInput.value = "";
     taskDueDateInput.value = "";
     taskStateSelect.value = "pending";
+    taskPrioritySelect.value = "";
   };
 
   const fillTaskForm = (data) => {
@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     taskDueDateInput.value = data.due_date || "";
     if (data.state) taskStateSelect.value = data.state;
     if (data.project_id) taskProjectIdInput.value = data.project_id;
+    if (data.priority) taskPrioritySelect.value = data.priority;
   };
 
   btnOpenProjectModal &&
@@ -179,6 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
           ? parseInt(taskProjectIdInput.value)
           : null,
         state: taskStateSelect.value,
+        priority: taskPrioritySelect.value
+          ? parseInt(taskPrioritySelect.value)
+          : null,
       };
       const tid = taskIdInput.value;
       const method = tid ? "PUT" : "POST";

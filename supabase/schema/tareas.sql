@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS task (
     state VARCHAR(50) CHECK (
         state IN ('pending', 'completed', 'in_progress', 'archived')
     ) DEFAULT 'pending',
+    priority INTEGER CHECK (priority >= 1 AND priority <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

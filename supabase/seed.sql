@@ -123,14 +123,14 @@ INSERT INTO project (
 );
 ---
 -- Tasks for the new projects
-INSERT INTO task (title, description, project_id, state, due_date) VALUES
+INSERT INTO task (title, description, project_id, state, due_date, priority) VALUES
 (
     'Define campaign target audience',
     'Identify the key demographics and interests for the Q4 marketing campaign.',
     (
         SELECT id FROM project
         WHERE name = 'Q4 Marketing Campaign'
-    ), 'completed', CURRENT_DATE - INTERVAL '1 week'
+    ), 'completed', CURRENT_DATE - INTERVAL '1 week', 3
 ),
 (
     'Create social media content calendar',
@@ -138,7 +138,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Q4 Marketing Campaign'
-    ), 'in_progress', CURRENT_DATE + INTERVAL '1 month'
+    ), 'in_progress', CURRENT_DATE + INTERVAL '1 month', 4
 ),
 (
     'Finalize ad creatives',
@@ -146,7 +146,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Q4 Marketing Campaign'
-    ), 'pending', CURRENT_DATE + INTERVAL '1 month 1 week'
+    ), 'pending', CURRENT_DATE + INTERVAL '1 month 1 week', 2
 ),
 (
     'Map out weekly running schedule',
@@ -154,7 +154,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = '10k Race Training Plan'
-    ), 'in_progress', CURRENT_DATE + INTERVAL '1 week'
+    ), 'in_progress', CURRENT_DATE + INTERVAL '1 week', 5
 ),
 (
     'Research running shoes',
@@ -162,7 +162,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = '10k Race Training Plan'
-    ), 'pending', CURRENT_DATE
+    ), 'pending', CURRENT_DATE, 3
 ),
 (
     'Hire an electrician',
@@ -170,7 +170,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '3 days'
+    ), 'pending', CURRENT_DATE + INTERVAL '3 days', 4
 ),
 (
     'Complete Module 3',
@@ -178,7 +178,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Agile Project Management Course'
-    ), 'in_progress', CURRENT_DATE + INTERVAL '2 days'
+    ), 'in_progress', CURRENT_DATE + INTERVAL '2 days', 2
 ),
 (
     'Write final report',
@@ -186,32 +186,32 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Agile Project Management Course'
-    ), 'pending', CURRENT_DATE + INTERVAL '1 week'
+    ), 'pending', CURRENT_DATE + INTERVAL '1 week', 3
 ),
 (
     'Buy groceries',
     'Purchase food and household items for the week from the supermarket.',
     NULL,
     'pending',
-    CURRENT_DATE + INTERVAL '1 day'
+    CURRENT_DATE + INTERVAL '1 day', 1
 ),
 (
     'Morning cardio',
     '30-minute high-intensity cardio session.',
     NULL,
     'pending',
-    CURRENT_DATE
+    CURRENT_DATE, 2
 );
 ---
 -- More tasks for existing projects
-INSERT INTO task (title, description, project_id, state, due_date) VALUES
+INSERT INTO task (title, description, project_id, state, due_date, priority) VALUES
 (
     'Select kitchen countertops',
     'Visit showrooms and select granite or quartz countertops.',
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '2 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '2 weeks', 3
 ),
 (
     'Order bathroom tiles',
@@ -219,7 +219,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '3 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '3 weeks', 4
 ),
 (
     'Demolish existing kitchen cabinets',
@@ -227,7 +227,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '4 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '4 weeks', 5
 ),
 (
     'Install new kitchen flooring',
@@ -235,7 +235,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '5 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '5 weeks', 4
 ),
 (
     'Assemble and install new kitchen cabinets',
@@ -243,7 +243,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '6 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '6 weeks', 3
 ),
 (
     'Install kitchen backsplash',
@@ -251,7 +251,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '7 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '7 weeks', 2
 ),
 (
     'Paint kitchen walls',
@@ -259,7 +259,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '8 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '8 weeks', 1
 ),
 (
     'Install new lighting fixtures in kitchen',
@@ -267,7 +267,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '9 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '9 weeks', 3
 ),
 (
     'Final plumbing and electrical connections for kitchen',
@@ -275,7 +275,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', CURRENT_DATE + INTERVAL '10 weeks'
+    ), 'pending', CURRENT_DATE + INTERVAL '10 weeks', 5
 ),
 (
     'Draft wireframes',
@@ -283,7 +283,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Website Redesign'
-    ), 'completed', CURRENT_DATE - INTERVAL '5 months'
+    ), 'completed', CURRENT_DATE - INTERVAL '5 months', 4
 ),
 (
     'Develop front-end',
@@ -291,7 +291,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Website Redesign'
-    ), 'completed', CURRENT_DATE - INTERVAL '3 months'
+    ), 'completed', CURRENT_DATE - INTERVAL '3 months', 5
 ),
 (
     'Review peer assignments',
@@ -299,7 +299,7 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Agile Project Management Course'
-    ), 'pending', CURRENT_DATE + INTERVAL '4 days'
+    ), 'pending', CURRENT_DATE + INTERVAL '4 days', 2
 );
 ---
 -- Task Planning with varied priorities and times
@@ -495,29 +495,29 @@ INSERT INTO note (content, project_id, task_id) VALUES
 );
 
 -- Additional tasks without due_date for testing
-INSERT INTO task (title, description, project_id, state, due_date) VALUES
+INSERT INTO task (title, description, project_id, state, due_date, priority) VALUES
 (
     'Organizar escritorio de trabajo',
     'Limpiar y reorganizar el escritorio para mejorar la productividad.',
     (
         SELECT id FROM project
         WHERE name = 'Annual Home Renovation'
-    ), 'pending', NULL
+    ), 'pending', NULL, 2
 ),
 (
     'Revisar documentos fiscales',
     'Revisar y organizar todos los documentos necesarios para la próxima declaración de impuestos.',
-    NULL, 'pending', NULL
+    NULL, 'pending', NULL, 4
 ),
 (
     'Comprar suministros de oficina',
     'Hacer una lista y comprar bolígrafos, papel, y otros suministros necesarios.',
-    NULL, 'in_progress', NULL
+    NULL, 'in_progress', NULL, 1
 ),
 (
     'Llamar al dentista',
     'Programar una cita para la limpieza dental rutinaria.',
-    NULL, 'pending', NULL
+    NULL, 'pending', NULL, 3
 ),
 (
     'Investigar cursos online',
@@ -525,12 +525,12 @@ INSERT INTO task (title, description, project_id, state, due_date) VALUES
     (
         SELECT id FROM project
         WHERE name = 'Personal Development Initiative'
-    ), 'pending', NULL
+    ), 'pending', NULL, 2
 ),
 (
     'Backup de fotos familiares',
     'Hacer respaldo de todas las fotos familiares en un disco duro externo.',
-    NULL, 'pending', NULL
+    NULL, 'pending', NULL, 3
 );
 
 INSERT INTO daily_insights (date, text, type, focus_score, productivity_score, sentiment_score, general_score) VALUES

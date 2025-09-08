@@ -54,7 +54,12 @@
                 {% for task in project.tasks %}
                   <li class="list-group-item d-flex justify-content-between align-items-start task-item" data-task-id="{{ task.id }}" data-project-id="{{ project.id }}">
                     <div class="task-click" style="cursor:pointer;">
-                      <strong class="task-title">{{ task.title }}</strong>
+                      <strong class="task-title">
+                        {{ task.title }}
+                        {% if task.priority %}
+                          <span class="priority-circle priority-{{ task.priority }}" title="Priority {{ task.priority }}">{{ task.priority }}</span>
+                        {% endif %}
+                      </strong>
                       {% if task.due_date %}
                         <div class="text-muted small">Vencimiento: {{ task.due_date }}</div>
                       {% endif %}

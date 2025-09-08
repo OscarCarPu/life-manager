@@ -23,6 +23,16 @@ const showTaskDetails = async (event, planningItem) => {
       statusElement.className = getStatusCssClass(status);
     }
 
+    const priorityElement = document.getElementById("taskPriority");
+    if (priorityElement) {
+      if (task.priority) {
+        priorityElement.innerHTML = `<span class="priority-circle priority-${task.priority}" title="Priority ${task.priority}">${task.priority}</span>`;
+        priorityElement.style.display = "inline-block";
+      } else {
+        priorityElement.style.display = "none";
+      }
+    }
+
     const projectSection = document.getElementById("projectSection");
     if (task.project) {
       safeSetTextContent("projectName", task.project.name);
@@ -151,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const descInput = document.getElementById("task-description");
         const dueInput = document.getElementById("task-due-date");
         const stateSelect = document.getElementById("task-state");
+        const prioritySelect = document.getElementById("task-priority");
         const label = document.getElementById("taskEditModalLabel");
         if (idInput) idInput.value = data.id || "";
         if (projInput)
@@ -160,6 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (descInput) descInput.value = data.description || "";
         if (dueInput) dueInput.value = data.due_date || "";
         if (stateSelect && data.state) stateSelect.value = data.state;
+        if (prioritySelect && data.priority)
+          prioritySelect.value = data.priority;
         if (label) label.textContent = "Edit Task";
 
         openStackedModal(taskModalElement, taskEditModalEl);

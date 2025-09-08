@@ -74,6 +74,7 @@ class Task(Base):
     description = Column(Text)
     project_id = Column(Integer, ForeignKey("project.id", ondelete="CASCADE"))
     state = Column(String(50), default=TaskState.PENDING.value)
+    priority = Column(Integer)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 

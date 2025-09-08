@@ -197,3 +197,32 @@
   width: 100%;
   background-color: #dc3545;
 }
+
+.priority-circle {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  margin-left: 5px;
+  line-height: 16px;
+  vertical-align: middle;
+}
+.priority-circle.priority-1 {
+  background-color: var(--priority-1-color);
+}
+.priority-circle.priority-2 {
+  background-color: var(--priority-2-color);
+}
+.priority-circle.priority-3 {
+  background-color: var(--priority-3-color);
+}
+.priority-circle.priority-4 {
+  background-color: var(--priority-4-color);
+}
+.priority-circle.priority-5 {
+  background-color: var(--priority-5-color);
+}

@@ -74,6 +74,13 @@ class TaskBase(BaseModel):
     description: Optional[str] = None
     project_id: Optional[int] = None
     state: Optional[TaskState] = TaskState.PENDING
+    priority: Optional[int] = None
+
+    @validator("priority")
+    def priority_must_be_valid(cls, v):
+        if v is not None and (v < MIN_PRIORITY or v > MAX_PRIORITY):
+            raise ValueError(f"Priority must be between {MIN_PRIORITY} and {MAX_PRIORITY}")
+        return v
 
 
 class TaskCreate(TaskBase):

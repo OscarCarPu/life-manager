@@ -82,7 +82,12 @@
           {% for task in tasks_without_due_date %}
           <div class="task-item" data-task-id="{{ task.id }}" draggable="true">
             <div class="task-content">
-              <div class="task-title">{{ task.title }}</div>
+              <div class="task-title">
+                {{ task.title }}
+                {% if task.priority %}
+                  <span class="priority-circle priority-{{ task.priority }}" title="Priority {{ task.priority }}">{{ task.priority }}</span>
+                {% endif %}
+              </div>
               <div class="task-project text-muted small">
                 {% if task.project %}{{ task.project.name }}{% endif %}
               </div>

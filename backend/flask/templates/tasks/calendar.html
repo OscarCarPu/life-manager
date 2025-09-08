@@ -80,7 +80,14 @@
                           data-task-state="{{ planning.task.state }}">
                         <div class="d-flex justify-content-between align-items-start">
                           <div class="planning-content">
-                            <strong class="planning-task">{{ planning.task.title }}</strong>
+                            <strong class="planning-task">
+                              {{ planning.task.title }}
+                              {% if planning.task.priority %}
+                                <span class="priority-circle priority-{{ planning.task.priority }}" title="Priority {{ planning.task.priority }}">
+                                  {{ planning.task.priority }}
+                                </span>
+                              {% endif %}
+                            </strong>
                             {% if planning.task.state == 'completed' %}
                               <i class="fas fa-check-circle planning-icon"></i>
                             {% elif planning.task.state == 'in_progress' %}
