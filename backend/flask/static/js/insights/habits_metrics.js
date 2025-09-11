@@ -190,15 +190,15 @@
       };
       Plotly.newPlot(chartDiv, traces, layout, { responsive: true });
     } else {
-      // Boolean: show completion markers + 7-day moving average line
+      // Boolean: show completion markers + 15-day moving average line
       const yBool = sliced.map((e) => (e.completed ? 1 : 0));
-      const avg7 = movingAverage(yBool, 7);
+      const avg15 = movingAverage(yBool, 15);
       traces.push({
         x,
-        y: avg7,
+        y: avg15,
         type: "scatter",
         mode: "lines",
-        name: "Media 7d",
+        name: "Media 15d",
         line: { color: "#198754" },
       });
       const completedDates = sliced
@@ -245,6 +245,18 @@
       name: unit || "Valor",
       line: { color: "#fd7e14" },
     });
+    // Media móvil de 15 días para métricas
+    if (y.length > 0) {
+      const avg15 = movingAverage(y, 15);
+      traces.push({
+        x,
+        y: avg15,
+        type: "scatter",
+        mode: "lines",
+        name: "Media 15d",
+        line: { color: "#198754", dash: "dot" },
+      });
+    }
     const layout = {
       margin: { t: 10, r: 10, b: 30, l: 35 },
       yaxis: { title: unit || "Valor" },
