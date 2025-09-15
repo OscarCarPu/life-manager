@@ -166,6 +166,13 @@
     } catch {}
   }
 
+  function getMovingAverageWindow() {
+    const input = document.getElementById("input-moving-average");
+    let val = parseInt(input?.value, 10);
+    if (!val || val < 1) val = 15;
+    return val;
+  }
+
   function renderHabitChart(entries, habitType) {
     const sorted = [...entries].sort(
       (a, b) => new Date(a.date) - new Date(b.date),
@@ -173,6 +180,7 @@
     const sliced = sorted.slice(Math.max(0, sorted.length - 50));
     const x = sliced.map((e) => e.date);
     let traces = [];
+    const windowSize = getMovingAverageWindow();
     if (habitType === "score") {
       const y = sliced.map((e) => e.score ?? null);
       traces.push({
@@ -190,15 +198,15 @@
       };
       Plotly.newPlot(chartDiv, traces, layout, { responsive: true });
     } else {
-      // Boolean: show completion markers + 7-day moving average line
+      // Boolean: show completion markers + moving average line
       const yBool = sliced.map((e) => (e.completed ? 1 : 0));
-      const avg7 = movingAverage(yBool, 7);
+      const avg = movingAverage(yBool, windowSize);
       traces.push({
         x,
-        y: avg7,
+        y: avg,
         type: "scatter",
         mode: "lines",
-        name: "Media 7d",
+        name: `Media ${windowSize}d`,
         line: { color: "#198754" },
       });
       const completedDates = sliced
@@ -237,6 +245,7 @@
     const x = sliced.map((e) => e.date);
     const y = sliced.map((e) => Number(e.value));
     let traces = [];
+    const windowSize = getMovingAverageWindow();
     traces.push({
       x,
       y,
@@ -245,6 +254,18 @@
       name: unit || "Valor",
       line: { color: "#fd7e14" },
     });
+    // Media móvil para métricas
+    if (y.length > 0) {
+      const avg = movingAverage(y, windowSize);
+      traces.push({
+        x,
+        y: avg,
+        type: "scatter",
+        mode: "lines",
+        name: `Media ${windowSize}d`,
+        line: { color: "#198754", dash: "dot" },
+      });
+    }
     const layout = {
       margin: { t: 10, r: 10, b: 30, l: 35 },
       yaxis: { title: unit || "Valor" },
@@ -252,6 +273,19 @@
     };
     Plotly.newPlot(chartDiv, traces, layout, { responsive: true });
   }
+  // Redibujar gráfico al cambiar el input de media móvil
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("input-moving-average");
+    if (input) {
+      input.addEventListener("change", () => {
+        if (selected.type === "habit") {
+          loadHabitEntries(selected.id, selected.meta.habitType);
+        } else if (selected.type === "metric") {
+          loadMetricEntries(selected.id, selected.meta.unit);
+        }
+      });
+    }
+  });
 
   // Utils: moving average and linear regression
   function movingAverage(values, windowSize) {
