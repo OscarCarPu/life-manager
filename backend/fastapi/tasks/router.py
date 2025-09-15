@@ -6,5 +6,5 @@ from .endpoints import router as endpoints_router
 router = APIRouter()
 
 # Include all CRUD operations from main.py
-router.include_router(crud_router)
-router.include_router(endpoints_router)
+router.include_router(endpoints_router, tags=["tasks"])
+router.include_router(crud_router, tags=["CRUD"])

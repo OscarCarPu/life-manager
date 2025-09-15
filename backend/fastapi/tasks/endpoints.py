@@ -2,6 +2,9 @@ from datetime import datetime, timedelta
 
 import common.tasks.models as models
 from common.database import get_db
+from common.tasks.recommendations import (
+    get_task_recommendations as get_common_task_recommendations,
+)
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -52,3 +55,9 @@ def get_task_general_info(task_id: int, db: Session = Depends(get_db)):
         ],
     )
     return task_info
+
+
+@router.get("/tasks/recommendations", response_model=list[schemas.TaskRecommendation])
+def get_task_recommendations(db: Session = Depends(get_db)):
+    recommendations = get_common_task_recommendations(db)
+    return [schemas.TaskRecommendation(task=r["task"], score=r["score"]) for r in recommendations]

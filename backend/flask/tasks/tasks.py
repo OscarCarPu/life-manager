@@ -3,11 +3,13 @@ from datetime import date, timedelta
 
 from common.database import get_db_context as get_db
 from common.tasks.models import Project, Task, TaskPlanning
+from common.tasks.recommendations import get_task_recommendations
 from flask import Blueprint, jsonify, render_template
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import case
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks", template_folder="templates")
+
 
 TASK_STATE_ORDER = {"in_progress": 0, "pending": 1, "completed": 2, "archived": 3}
 
@@ -113,12 +115,14 @@ def calendar():
             if planning.planned_date in plannings_by_day:
                 plannings_by_day[planning.planned_date].append(planning)
 
+        recommended_tasks = get_task_recommendations(db, 12)
     return render_template(
         "tasks/calendar.html",
         planning_by_day=plannings_by_day,
         start_date=start_date,
         prev_start=(start_date - timedelta(days=1)),
         next_start=(start_date + timedelta(days=1)),
+        recommended_tasks=recommended_tasks,
     )
 
 

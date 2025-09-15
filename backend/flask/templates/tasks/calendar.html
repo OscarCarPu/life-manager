@@ -58,9 +58,38 @@
         </div>
       </div>
       <div class="col-6">
-        <div class="h-100 d-flex flex-column justify-content-center align-items-center rounded"
-             style="background: #f8f9fa;">
-          <span class="text-muted text-center w-100">Futura recomendación de tareas</span>
+        <div class="h-100 d-flex flex-column p-2 rounded" style="background: #f8f9fa;">
+          <h5 class="text-center mb-2">Tareas Recomendadas</h5>
+          {% if recommended_tasks %}
+            <div class="row g-2">
+              <div class="col-6">
+                <ul class="list-group" id="recommended-tasks-list-col1">
+                  {% for recommendation in recommended_tasks[:6] %}
+                    <li class="list-group-item recommended-task-item" draggable="true" data-task-id="{{ recommendation.task.id }}">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-truncate me-1" title="{{ recommendation.task.title }}">{{ recommendation.task.title }}</span>
+                        <span class="badge bg-info">{{ "%.2f"|format(recommendation.score) }}</span>
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div class="col-6">
+                <ul class="list-group" id="recommended-tasks-list-col2">
+                  {% for recommendation in recommended_tasks[6:12] %}
+                    <li class="list-group-item recommended-task-item" draggable="true" data-task-id="{{ recommendation.task.id }}">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-truncate me-1" title="{{ recommendation.task.title }}">{{ recommendation.task.title }}</span>
+                        <span class="badge bg-info">{{ "%.2f"|format(recommendation.score) }}</span>
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% else %}
+            <div class="text-center text-muted">No hay tareas recomendadas.</div>
+          {% endif %}
         </div>
       </div>
     </div>

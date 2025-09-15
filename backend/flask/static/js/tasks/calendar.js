@@ -2,6 +2,8 @@ const dndState = {
   draggedElement: null,
   draggedPlanningId: null,
   originalDate: null,
+  isRecommendedTask: false,
+  draggedTaskId: null,
 };
 
 // Parse "HH:MM" into minutes. Returns MAX_MINUTES when invalid/empty to sort to the end
@@ -268,8 +270,22 @@ function onDragStart(ev) {
     el.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.PLANNING_ID) || "";
   dndState.originalDate =
     el.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.CURRENT_DATE) || "";
+  dndState.isRecommendedTask = false;
+  dndState.draggedTaskId = null;
   ev.dataTransfer.effectAllowed = "move";
   ev.dataTransfer.setData("text/plain", dndState.draggedPlanningId);
+}
+
+function onRecommendedTaskDragStart(ev) {
+  const el = ev.currentTarget;
+  el.classList.add(APP_CONFIG.CLASSES.DRAGGING);
+  dndState.draggedElement = el;
+  dndState.draggedPlanningId = null;
+  dndState.originalDate = null;
+  dndState.isRecommendedTask = true;
+  dndState.draggedTaskId = el.getAttribute("data-task-id") || "";
+  ev.dataTransfer.effectAllowed = "move";
+  ev.dataTransfer.setData("text/plain", dndState.draggedTaskId);
 }
 
 async function onDropToDuplicate(ev) {
@@ -387,8 +403,39 @@ function onDragEnter(ev) {
   zone.classList.add(APP_CONFIG.CLASSES.DRAG_OVER);
   const placeholder = zone.querySelector(`.${APP_CONFIG.CLASSES.NO_PLANNINGS}`);
   if (placeholder) {
-    placeholder.textContent = "Drop here to move planning";
+    if (dndState.isRecommendedTask) {
+      placeholder.textContent = "Drop here to create planning";
+    } else {
+      placeholder.textContent = "Drop here to move planning";
+    }
     placeholder.classList.add(APP_CONFIG.CLASSES.DRAG_OVER_TEXT);
+  }
+}
+
+function onActionDragEnter(ev) {
+  // Don't show drag over effects for recommended tasks on action zones
+  if (dndState.isRecommendedTask) {
+    return;
+  }
+  const zone = ev.currentTarget;
+  zone.classList.add(APP_CONFIG.CLASSES.DRAG_OVER);
+}
+
+function onActionDragLeave(ev) {
+  // Don't handle drag leave for recommended tasks on action zones
+  if (dndState.isRecommendedTask) {
+    return;
+  }
+  const zone = ev.currentTarget;
+  const rect = zone.getBoundingClientRect();
+  // Only clear if cursor is truly outside
+  if (
+    ev.clientX < rect.left ||
+    ev.clientX > rect.right ||
+    ev.clientY < rect.top ||
+    ev.clientY > rect.bottom
+  ) {
+    zone.classList.remove(APP_CONFIG.CLASSES.DRAG_OVER);
   }
 }
 
@@ -425,11 +472,80 @@ async function onDropToDay(ev) {
     placeholder.classList.remove(APP_CONFIG.CLASSES.DRAG_OVER_TEXT);
   }
 
-  if (
-    !newDate ||
-    newDate === dndState.originalDate ||
-    !dndState.draggedElement
-  ) {
+  if (!newDate || !dndState.draggedElement) {
+    resetDragState();
+    return;
+  }
+
+  // Handle recommended task drop - create new planning
+  if (dndState.isRecommendedTask) {
+    if (!dndState.draggedTaskId) {
+      resetDragState();
+      return;
+    }
+
+    const payload = {
+      task_id: parseInt(dndState.draggedTaskId, 10),
+      planned_date: newDate,
+      priority: 3, // Default priority for recommended tasks
+    };
+
+    console.log(
+      "Creating planning from recommended task with payload:",
+      payload,
+    );
+
+    try {
+      const newPlanning = await makeApiRequest(
+        `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/`,
+        "POST",
+        payload,
+      );
+
+      console.log("API response:", newPlanning);
+
+      if (newPlanning && newPlanning.id) {
+        // Check if the response includes complete task data
+        if (!newPlanning.task || !newPlanning.task.id) {
+          console.warn(
+            "API response missing task data, attempting to reconstruct from recommended task element",
+          );
+
+          // Try to get task details from the dragged recommended task element
+          const taskTitle =
+            dndState.draggedElement
+              .querySelector("span")
+              ?.textContent?.trim() || "Unknown Task";
+
+          // Create a minimal task object with available data
+          newPlanning.task = {
+            id: payload.task_id,
+            title: taskTitle,
+            state: "pending",
+            priority: null,
+            project: null,
+          };
+        }
+
+        addPlanningToDOM(newPlanning, newDate);
+        showNotification(
+          "Planificación creada exitosamente desde recomendación",
+          "success",
+        );
+      } else {
+        throw new Error("Invalid response from server - missing planning ID");
+      }
+    } catch (err) {
+      console.error("Error creating planning from recommended task:", err);
+      showNotification(`Error: ${err.message}`, "error");
+    } finally {
+      resetDragState();
+    }
+    return;
+  }
+
+  // Handle regular planning item drop - move existing planning
+  if (newDate === dndState.originalDate) {
     resetDragState();
     return;
   }
@@ -470,6 +586,12 @@ async function onDropToAction(ev) {
 
   zone.classList.remove(APP_CONFIG.CLASSES.DRAG_OVER);
   if (!dndState.draggedElement) {
+    resetDragState();
+    return;
+  }
+
+  // Don't allow action zone drops for recommended tasks
+  if (dndState.isRecommendedTask) {
     resetDragState();
     return;
   }
@@ -636,6 +758,8 @@ function resetDragState() {
   dndState.draggedElement = null;
   dndState.draggedPlanningId = null;
   dndState.originalDate = null;
+  dndState.isRecommendedTask = false;
+  dndState.draggedTaskId = null;
 }
 
 function addPlanningToDOM(planning, date) {
@@ -875,8 +999,8 @@ function setupEventListeners() {
 
   document.querySelectorAll(".action-zone").forEach((zone) => {
     zone.addEventListener("dragover", allowDrop);
-    zone.addEventListener("dragenter", onDragEnter);
-    zone.addEventListener("dragleave", onDragLeave);
+    zone.addEventListener("dragenter", onActionDragEnter);
+    zone.addEventListener("dragleave", onActionDragLeave);
     zone.addEventListener("drop", onDropToAction);
   });
 
@@ -888,6 +1012,11 @@ function setupEventListeners() {
       item.addEventListener("contextmenu", (e) => showTimeContextMenu(e, item));
       item.addEventListener("click", (e) => showTaskDetails(e, item)); // uses global showTaskDetails
     });
+
+  // Recommended task items
+  document.querySelectorAll(".recommended-task-item").forEach((item) => {
+    item.addEventListener("dragstart", onRecommendedTaskDragStart);
+  });
 
   document.addEventListener("click", onGlobalClick);
 }

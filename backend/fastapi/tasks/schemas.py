@@ -175,4 +175,9 @@ class TaskGeneralInfo(TaskBase):
     next_plannings: list[TaskPlanningBase] = []
 
 
+class TaskRecommendation(BaseModel):
+    task: Task
+    score: float
+
+
 # endregion
