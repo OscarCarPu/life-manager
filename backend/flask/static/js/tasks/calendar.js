@@ -75,7 +75,54 @@ function applyPlanningVisualState(itemEl) {
     }
   }
 
-  // 2) Priority on the inner .priority-fill as: "priority-fill priority-<n>"
+  // 2) Task Priority Circle - handle task priority icon next to title
+  const titleEl = itemEl.querySelector(".planning-task");
+  if (titleEl) {
+    // Get task priority from data attribute (most reliable source)
+    let taskPriority = null;
+    const taskPriorityAttr = itemEl.getAttribute("data-task-priority");
+    if (taskPriorityAttr) {
+      taskPriority = parseInt(taskPriorityAttr, 10);
+    } else {
+      // Fallback: try to extract from existing circle before removing it
+      const existingCircle = titleEl.querySelector(".priority-circle");
+      if (existingCircle) {
+        const priorityText = existingCircle.textContent?.trim();
+        if (priorityText && !isNaN(parseInt(priorityText, 10))) {
+          taskPriority = parseInt(priorityText, 10);
+          // Store it for future use
+          itemEl.setAttribute("data-task-priority", taskPriority);
+        }
+      }
+    }
+
+    // Check if we need to update the priority circle
+    const existingCircle = titleEl.querySelector(".priority-circle");
+    const needsUpdate =
+      !existingCircle ||
+      (taskPriority &&
+        !existingCircle.classList.contains(`priority-${taskPriority}`)) ||
+      (taskPriority &&
+        existingCircle.textContent.trim() !== String(taskPriority)) ||
+      (!taskPriority && existingCircle);
+
+    // Only update if circle is missing, incorrect, or priority changed
+    if (needsUpdate) {
+      // Remove existing circle if any
+      if (existingCircle) existingCircle.remove();
+
+      // If we have a valid task priority, create the circle
+      if (taskPriority && taskPriority >= 1 && taskPriority <= 5) {
+        const circle = document.createElement("span");
+        circle.className = `priority-circle priority-${taskPriority}`;
+        circle.setAttribute("title", `Priority ${taskPriority}`);
+        circle.textContent = taskPriority;
+        titleEl.appendChild(circle);
+      }
+    }
+  }
+
+  // 3) Planning Priority on the inner .priority-fill as: "priority-fill priority-<n>"
   let fill = itemEl.querySelector(".priority-fill");
   if (!fill) {
     // Create structure if missing to mirror initial template
@@ -112,6 +159,17 @@ function orderAndApplyClasses(listEl) {
 
   // Apply classes, normalize priority, and attach listeners
   items.forEach((el) => {
+    // Extract and store task priority if not already stored
+    if (!el.hasAttribute("data-task-priority")) {
+      const priorityCircle = el.querySelector(".priority-circle");
+      if (priorityCircle) {
+        const priorityText = priorityCircle.textContent?.trim();
+        if (priorityText && !isNaN(parseInt(priorityText, 10))) {
+          el.setAttribute("data-task-priority", priorityText);
+        }
+      }
+    }
+
     applyPlanningVisualState(el);
 
     // Ensure draggable attribute exists for accessibility
@@ -212,6 +270,111 @@ function onDragStart(ev) {
     el.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.CURRENT_DATE) || "";
   ev.dataTransfer.effectAllowed = "move";
   ev.dataTransfer.setData("text/plain", dndState.draggedPlanningId);
+}
+
+async function onDropToDuplicate(ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const zone = ev.currentTarget;
+  const card = zone.closest(".card");
+  const newDate = card.getAttribute(APP_CONFIG.DATA_ATTRIBUTES.DATE);
+
+  zone.classList.remove(APP_CONFIG.CLASSES.DRAG_OVER);
+
+  if (!newDate || !dndState.draggedElement) {
+    resetDragState();
+    return;
+  }
+
+  const taskId = dndState.draggedElement.getAttribute(
+    APP_CONFIG.DATA_ATTRIBUTES.TASK_ID,
+  );
+  const priorityElement =
+    dndState.draggedElement.querySelector(".priority-fill");
+
+  // Get priority from the planning (not the task)
+  let priority = 3; // default priority
+  if (priorityElement) {
+    const priorityAttr = priorityElement.getAttribute(
+      APP_CONFIG.DATA_ATTRIBUTES.PRIORITY,
+    );
+    if (priorityAttr) {
+      priority = parseInt(priorityAttr, 10);
+      if (isNaN(priority)) priority = 3;
+    }
+  }
+
+  const payload = {
+    task_id: parseInt(taskId, 10),
+    planned_date: newDate,
+    priority: priority,
+  };
+
+  console.log("Duplicating planning with payload:", payload);
+
+  try {
+    const newPlanning = await makeApiRequest(
+      `${APP_CONFIG.API_BASE_URL}/tasks/task_planning/`,
+      "POST",
+      payload,
+    );
+
+    console.log("API response:", newPlanning);
+
+    if (newPlanning && newPlanning.id) {
+      // Check if the response includes complete task data
+      if (!newPlanning.task || !newPlanning.task.id) {
+        console.warn(
+          "API response missing task data, attempting to reconstruct from original element",
+        );
+
+        // Try to get task details from the original dragged element
+        const originalTaskTitle = dndState.draggedElement
+          .querySelector(".planning-task")
+          ?.textContent?.trim();
+        const originalTaskState = dndState.draggedElement.getAttribute(
+          APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE,
+        );
+
+        // Extract task priority from the original element
+        let originalTaskPriority = null;
+        const taskPriorityAttr =
+          dndState.draggedElement.getAttribute("data-task-priority");
+        if (taskPriorityAttr) {
+          originalTaskPriority = parseInt(taskPriorityAttr, 10);
+        } else {
+          // Try to extract from priority circle if data attribute is missing
+          const priorityCircle =
+            dndState.draggedElement.querySelector(".priority-circle");
+          if (priorityCircle) {
+            const priorityText = priorityCircle.textContent?.trim();
+            if (priorityText && !isNaN(parseInt(priorityText, 10))) {
+              originalTaskPriority = parseInt(priorityText, 10);
+            }
+          }
+        }
+
+        // Create a minimal task object with available data
+        newPlanning.task = {
+          id: payload.task_id,
+          title: originalTaskTitle || "Unknown Task",
+          state: originalTaskState || "pending",
+          priority: originalTaskPriority,
+          project: null,
+        };
+      }
+
+      addPlanningToDOM(newPlanning, newDate);
+      showNotification("Planificación duplicada exitosamente", "success");
+    } else {
+      throw new Error("Invalid response from server - missing planning ID");
+    }
+  } catch (err) {
+    console.error("Error duplicating planning:", err);
+    showNotification(`Error: ${err.message}`, "error");
+  } finally {
+    resetDragState();
+  }
 }
 
 function allowDrop(ev) {
@@ -475,6 +638,112 @@ function resetDragState() {
   dndState.originalDate = null;
 }
 
+function addPlanningToDOM(planning, date) {
+  const listEl = document.getElementById(`plannings-${date}`);
+  if (!listEl) {
+    console.error(`Cannot find list element with ID: plannings-${date}`);
+    return;
+  }
+
+  // Validate planning object structure
+  if (!planning || !planning.id) {
+    console.error("Invalid planning object:", planning);
+    return;
+  }
+
+  // If task data is incomplete, we need to fetch it or use fallback values
+  if (!planning.task || !planning.task.id) {
+    console.error("Planning missing task data:", planning);
+    showNotification("Error: Planning missing task information", "error");
+    return;
+  }
+
+  // Remove the "no plannings" placeholder if it exists
+  const placeholder = listEl.querySelector(
+    `.${APP_CONFIG.CLASSES.NO_PLANNINGS}`,
+  );
+  if (placeholder) {
+    placeholder.remove();
+  }
+
+  const itemEl = document.createElement("li");
+
+  // Safe access to task properties with fallbacks
+  const taskStatus = planning.task.status || planning.task.state || "pending";
+  const taskState = planning.task.state || "pending";
+  const taskTitle = planning.task.title || "Unknown Task";
+  const taskPriority = planning.task.priority || null;
+
+  itemEl.className = `list-group-item planning-item ${planning.done || taskStatus === "DONE" || taskState === "completed" ? "planning-done" : ""}`;
+  itemEl.setAttribute("draggable", "true");
+  itemEl.setAttribute(APP_CONFIG.DATA_ATTRIBUTES.PLANNING_ID, planning.id);
+  itemEl.setAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_ID, planning.task.id);
+  itemEl.setAttribute(APP_CONFIG.DATA_ATTRIBUTES.CURRENT_DATE, date);
+  itemEl.setAttribute(
+    APP_CONFIG.DATA_ATTRIBUTES.DONE,
+    planning.done ? "true" : "false",
+  );
+  itemEl.setAttribute(APP_CONFIG.DATA_ATTRIBUTES.TASK_STATE, taskState);
+
+  // Store task priority as data attribute for applyPlanningVisualState
+  if (taskPriority) {
+    itemEl.setAttribute("data-task-priority", taskPriority);
+  }
+
+  let timeDisplay = "";
+  if (planning.start_hour && planning.end_hour) {
+    timeDisplay = `${planning.start_hour.substring(0, 5)} - ${planning.end_hour.substring(0, 5)}`;
+  } else if (planning.start_hour) {
+    timeDisplay = planning.start_hour.substring(0, 5);
+  }
+
+  let projectBadge = "Sin Proyecto";
+  if (planning.task.project && planning.task.project.name) {
+    projectBadge = planning.task.project.name;
+  }
+
+  // Generate icon based on task state
+  let taskStateIcon = "";
+  if (taskState === "completed") {
+    taskStateIcon = '<i class="fas fa-check-circle planning-icon"></i>';
+  } else if (taskState === "in_progress") {
+    taskStateIcon = '<i class="fas fa-spinner planning-icon"></i>';
+  }
+
+  itemEl.innerHTML = `
+    <div class="d-flex justify-content-between align-items-start">
+      <div class="planning-content">
+        <strong class="planning-task">
+          ${taskTitle}
+          ${
+            taskPriority
+              ? `<span class="priority-circle priority-${taskPriority}" title="Priority ${taskPriority}">${taskPriority}</span>`
+              : ""
+          }
+        </strong>
+        ${taskStateIcon}
+        <span class="planning-hour text-muted">${timeDisplay}</span>
+      </div>
+      <span class="badge bg-secondary">${projectBadge}</span>
+    </div>
+    <div class="priority-line mt-2">
+      <div class="priority-fill priority-${planning.priority || 0}" data-priority="${planning.priority || 0}"></div>
+    </div>
+  `;
+
+  listEl.appendChild(itemEl);
+
+  // Ensure the new element has event listeners attached
+  itemEl.addEventListener("dragstart", onDragStart);
+  itemEl.addEventListener("contextmenu", (e) => showTimeContextMenu(e, itemEl));
+  itemEl.addEventListener("click", (e) => showTaskDetails(e, itemEl));
+  itemEl.dataset.listenersAttached = "true";
+
+  // Apply visual state and sort the list
+  applyPlanningVisualState(itemEl);
+  orderAndApplyClasses(listEl);
+}
+
 function movePlanningInDOM(itemEl, newDate, oldDate, wasDone = false) {
   const oldList = document.getElementById(`plannings-${oldDate}`);
   const newList = document.getElementById(`plannings-${newDate}`);
@@ -590,7 +859,6 @@ function onGlobalClick(ev) {
 }
 
 function setupEventListeners() {
-  // Day columns
   document.querySelectorAll(".drop-zone").forEach((zone) => {
     zone.addEventListener("dragover", allowDrop);
     zone.addEventListener("dragenter", onDragEnter);
@@ -598,7 +866,13 @@ function setupEventListeners() {
     zone.addEventListener("drop", onDropToDay);
   });
 
-  // Sidebar actions (complete, delete, priority)
+  document.querySelectorAll(".drop-zone-duplicate").forEach((zone) => {
+    zone.addEventListener("dragover", allowDrop);
+    zone.addEventListener("dragenter", onDragEnter);
+    zone.addEventListener("dragleave", onDragLeave);
+    zone.addEventListener("drop", onDropToDuplicate);
+  });
+
   document.querySelectorAll(".action-zone").forEach((zone) => {
     zone.addEventListener("dragover", allowDrop);
     zone.addEventListener("dragenter", onDragEnter);
@@ -618,11 +892,20 @@ function setupEventListeners() {
   document.addEventListener("click", onGlobalClick);
 }
 
+function initializeExistingPlannings() {
+  // Initialize all existing planning lists on page load
+  document.querySelectorAll('[id^="plannings-"]').forEach((listEl) => {
+    orderAndApplyClasses(listEl);
+  });
+}
+
 // ensure lists are initialized once file loads (will be re-checked by observer on changes)
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
     setupEventListeners();
+    initializeExistingPlannings();
   });
 } else {
   setupEventListeners();
+  initializeExistingPlannings();
 }
