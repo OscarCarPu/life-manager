@@ -4,7 +4,13 @@
 {% block main %}
   <div class="calendar-container">
     <div class="d-flex align-items-center mb-4">
-      <h1 class="calendar-title mb-0 me-auto">Calendario</h1>
+      <button class="btn btn-outline-secondary me-2" id="calendar-prev" data-target="{{ prev_start.isoformat() }}" title="Día anterior">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <h1 class="calendar-title mb-0">Calendario</h1>
+      <button class="btn btn-outline-secondary ms-2" id="calendar-next" data-target="{{ next_start.isoformat() }}" title="Día siguiente">
+        <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
     <div class="row g-4 mb-3">
       <div class="col-6">

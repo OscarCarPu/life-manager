@@ -904,8 +904,35 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
     setupEventListeners();
     initializeExistingPlannings();
+    setupCalendarNavigation();
   });
 } else {
   setupEventListeners();
   initializeExistingPlannings();
+  setupCalendarNavigation();
+}
+
+function setupCalendarNavigation() {
+  const prevBtn = document.getElementById("calendar-prev");
+  const nextBtn = document.getElementById("calendar-next");
+  const baseUrl = window.location.pathname; // /tasks/calendar
+
+  function goTo(dateStr) {
+    const url = new URL(window.location.origin + baseUrl);
+    url.searchParams.set("start_date", dateStr);
+    window.location.href = url.toString();
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      const target = prevBtn.getAttribute("data-target");
+      if (target) goTo(target);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      const target = nextBtn.getAttribute("data-target");
+      if (target) goTo(target);
+    });
+  }
 }

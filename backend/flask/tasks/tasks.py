@@ -71,15 +71,28 @@ def project_detail(project_id):
 
 @tasks_bp.route("/calendar")
 def calendar():
-    with get_db() as db:
-        today = date.today()
-        four_days = [today + timedelta(days=i) for i in range(4)]
+    from flask import request
 
-        plannings_four_days = (
+    with get_db() as db:
+        # Parse start_date from query params
+        start_date_param = request.args.get("start_date")
+        try:
+            start_date = date.fromisoformat(start_date_param) if start_date_param else date.today()
+        except ValueError:
+            start_date = date.today()
+
+        visible_window_days = [start_date + timedelta(days=i) for i in range(4)]
+
+        # Extended loading range: previous day and next 10 days from start
+        load_start = start_date - timedelta(days=1)
+        load_end = start_date + timedelta(days=10)
+
+        plannings_extended = (
             db.query(TaskPlanning)
             .join(Task)
             .options(joinedload(TaskPlanning.task).selectinload(Task.project))
-            .filter(TaskPlanning.planned_date.in_(four_days))
+            .filter(TaskPlanning.planned_date >= load_start)
+            .filter(TaskPlanning.planned_date <= load_end)
             .order_by(
                 case((Task.state == "completed", 1), else_=0),
                 TaskPlanning.done.asc(),
@@ -91,21 +104,22 @@ def calendar():
             .all()
         )
 
+        # Only build dict for visible 4-day window
         plannings_by_day = defaultdict(list)
-        for day in four_days:
+        for day in visible_window_days:
             plannings_by_day[day] = []
 
-        for planning in plannings_four_days:
-            plannings_by_day[planning.planned_date].append(planning)
+        for planning in plannings_extended:
+            if planning.planned_date in plannings_by_day:
+                plannings_by_day[planning.planned_date].append(planning)
 
-    import logging
-
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    logger.info("Rendering calendar view")
-    logger.info(plannings_by_day)
-
-    return render_template("tasks/calendar.html", planning_by_day=plannings_by_day)
+    return render_template(
+        "tasks/calendar.html",
+        planning_by_day=plannings_by_day,
+        start_date=start_date,
+        prev_start=(start_date - timedelta(days=1)),
+        next_start=(start_date + timedelta(days=1)),
+    )
 
 
 @tasks_bp.route("/pending-tasks")
