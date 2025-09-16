@@ -19,6 +19,8 @@ SCORE_WEIGHTS = {
     "pending_basic": 2,
     "in_progress_planning": 10,
     "pending_planning": 2,
+    "age_limit": 5,
+    "age_multiplier": 0.2,
 }
 
 # Time-related constants
@@ -115,6 +117,11 @@ def get_task_recommendations(
                 score += SCORE_WEIGHTS["in_progress_basic"]
             elif task.state == TaskState.PENDING:
                 score += SCORE_WEIGHTS["pending_basic"]
+
+        # --- Age-related scoring ---
+        if task.created_at:
+            age_days = (today - task.created_at).days
+            score += min(SCORE_WEIGHTS["age_limit"], age_days * SCORE_WEIGHTS["age_multiplier"])
 
         recommendations.append({"task": task, "score": score})
 
