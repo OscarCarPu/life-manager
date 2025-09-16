@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS project (
     state VARCHAR(50) CHECK (
         state IN ('not_started', 'in_progress', 'completed', 'archived')
     ) DEFAULT 'not_started',
+    priority INTEGER CHECK (priority >= 1 AND priority <= 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

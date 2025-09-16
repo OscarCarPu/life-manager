@@ -44,6 +44,13 @@ class ProjectBase(BaseModel):
     expected_start_date: Optional[date] = None
     expected_end_date: Optional[date] = None
     state: Optional[ProjectState] = ProjectState.NOT_STARTED
+    priority: Optional[int] = None
+
+    @validator("priority")
+    def priority_must_be_valid(cls, v):
+        if v is not None and (v < MIN_PRIORITY or v > MAX_PRIORITY):
+            raise ValueError(f"Priority must be between {MIN_PRIORITY} and {MAX_PRIORITY}")
+        return v
 
 
 class ProjectCreate(ProjectBase):
@@ -53,6 +60,7 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(ProjectBase):
     name: Optional[str] = None
     state: Optional[ProjectState] = None
+    priority: Optional[int] = None
 
 
 class Project(ProjectBase):

@@ -57,3 +57,5 @@
 .priority-circle.priority-5 {
   background-color: var(--priority-5-color);
 }
+
+/* (Removed bar visualization; using numeric priority-circle instead) */

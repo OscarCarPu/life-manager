@@ -1014,8 +1014,22 @@ function setupEventListeners() {
     });
 
   // Recommended task items
+
   document.querySelectorAll(".recommended-task-item").forEach((item) => {
     item.addEventListener("dragstart", onRecommendedTaskDragStart);
+    // Add right-click to open details like left-click
+    item.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      if (typeof showTaskDetails === "function") {
+        showTaskDetails(e, item);
+      }
+    });
+    // Add left-click to open details if not already present
+    item.addEventListener("click", (e) => {
+      if (typeof showTaskDetails === "function") {
+        showTaskDetails(e, item);
+      }
+    });
   });
 
   document.addEventListener("click", onGlobalClick);

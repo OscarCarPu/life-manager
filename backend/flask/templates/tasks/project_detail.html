@@ -18,6 +18,9 @@
 
             <div class="d-flex align-items-center mb-3">
               <span class="state-badge {{ project.state }}" id="project-detail-state">{{ project.state.replace('_', ' ') | title }}</span>
+              {% if project.priority %}
+                <span class="priority-circle priority-{{ project.priority }} ms-2" title="Prioridad {{ project.priority }}">{{ project.priority }}</span>
+              {% endif %}
               {% if category_path %}
                 <small class="text-muted ms-2">
                   {% for category in category_path %}

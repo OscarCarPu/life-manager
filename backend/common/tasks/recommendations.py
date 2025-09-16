@@ -8,7 +8,7 @@ from .models import Project, Task, TaskPlanning
 
 # Scoring weights and constants
 SCORE_WEIGHTS = {
-    "priority_multiplier": 1.5,
+    "priority_multiplier": 2,
     "overdue_base": 30,
     "upcoming_base": 20,
     "upcoming_penalty": 2,
@@ -19,8 +19,8 @@ SCORE_WEIGHTS = {
     "pending_basic": 2,
     "in_progress_planning": 10,
     "pending_planning": 2,
-    "age_limit": 5,
-    "age_multiplier": 0.2,
+    "age_limit": 10,
+    "age_multiplier": 0.05,
 }
 
 # Time-related constants
@@ -70,6 +70,10 @@ def get_task_recommendations(
         # Calculate priority score
         if task.priority is not None:
             score += task.priority * SCORE_WEIGHTS["priority_multiplier"]
+
+        # Add project priority to the score
+        if task.project and task.project.priority is not None:
+            score += task.project.priority * SCORE_WEIGHTS["priority_multiplier"] * 2
 
         # Calculate due date score
         if task.due_date:

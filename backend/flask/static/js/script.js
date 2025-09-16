@@ -226,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const taskDescriptionInput = document.getElementById("task-description");
   const taskDueDateInput = document.getElementById("task-due-date");
   const taskStateSelect = document.getElementById("task-state");
+  const taskPrioritySelect = document.getElementById("task-priority");
   if (saveTaskBtn && !saveTaskBtn.dataset.listenerAttached) {
     saveTaskBtn.dataset.listenerAttached = "1";
     saveTaskBtn.addEventListener("click", async () => {
@@ -241,6 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ? parseInt(taskProjectIdInput.value)
           : null,
         state: taskStateSelect.value,
+        priority: taskPrioritySelect.value,
       };
       const tid = taskIdInput.value;
       const method = tid ? "PUT" : "POST";

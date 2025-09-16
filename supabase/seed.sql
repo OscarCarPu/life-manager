@@ -42,7 +42,8 @@ INSERT INTO project (
     category_id,
     state,
     expected_start_date,
-    expected_end_date
+    expected_end_date,
+    priority
 ) VALUES
 (
     'Annual Home Renovation',
@@ -53,7 +54,8 @@ INSERT INTO project (
     ),
     'not_started',
     CURRENT_DATE,
-    CURRENT_DATE + INTERVAL '6 months'
+    CURRENT_DATE + INTERVAL '6 months',
+    4
 ),
 (
     'Q4 Marketing Campaign',
@@ -64,7 +66,8 @@ INSERT INTO project (
     ),
     'in_progress',
     CURRENT_DATE - INTERVAL '1 month',
-    CURRENT_DATE + INTERVAL '3 months'
+    CURRENT_DATE + INTERVAL '3 months',
+    4
 ),
 (
     'Website Redesign',
@@ -75,7 +78,8 @@ INSERT INTO project (
     ),
     'completed',
     CURRENT_DATE - INTERVAL '6 months',
-    CURRENT_DATE - INTERVAL '1 month'
+    CURRENT_DATE - INTERVAL '1 month',
+    3
 ),
 (
     '2023 Tax Filing',
@@ -86,7 +90,8 @@ INSERT INTO project (
     ),
     'archived',
     CURRENT_DATE - INTERVAL '8 months',
-    CURRENT_DATE - INTERVAL '7 months'
+    CURRENT_DATE - INTERVAL '7 months',
+    2
 ),
 (
     '10k Race Training Plan',
@@ -97,7 +102,8 @@ INSERT INTO project (
     ),
     'in_progress',
     CURRENT_DATE - INTERVAL '1 week',
-    CURRENT_DATE + INTERVAL '2 months'
+    CURRENT_DATE + INTERVAL '2 months',
+    3
 ),
 (
     'Agile Project Management Course',
@@ -108,7 +114,8 @@ INSERT INTO project (
     ),
     'in_progress',
     CURRENT_DATE - INTERVAL '2 weeks',
-    CURRENT_DATE + INTERVAL '1 month'
+    CURRENT_DATE + INTERVAL '1 month',
+    2
 ),
 (
     'Budget music festival',
@@ -119,7 +126,8 @@ INSERT INTO project (
     ),
     'not_started',
     CURRENT_DATE,
-    CURRENT_DATE + INTERVAL '2 months'
+    CURRENT_DATE + INTERVAL '2 months',
+    3
 );
 ---
 -- Tasks for the new projects

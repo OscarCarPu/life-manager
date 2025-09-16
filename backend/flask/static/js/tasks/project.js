@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectStartInput = document.getElementById("project-start");
   const projectEndInput = document.getElementById("project-end");
   const projectStateSelect = document.getElementById("project-state");
+  const projectPriorityInput = document.getElementById("project-priority");
   const projectModalLabel = document.getElementById("projectModalLabel");
 
   const projectDetailName = document.getElementById("project-detail-name");
@@ -78,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     projectStartInput.value = "";
     projectEndInput.value = "";
     projectStateSelect.value = "not_started";
+    projectPriorityInput.value = "";
   };
 
   const fillProjectForm = (data) => {
@@ -88,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     projectStartInput.value = data.expected_start_date || "";
     projectEndInput.value = data.expected_end_date || "";
     if (data.state) projectStateSelect.value = data.state;
+    projectPriorityInput.value = data.priority || "";
   };
 
   const clearTaskForm = () => {
@@ -145,6 +148,9 @@ document.addEventListener("DOMContentLoaded", () => {
         expected_start_date: projectStartInput.value || null,
         expected_end_date: projectEndInput.value || null,
         state: projectStateSelect.value,
+        priority: projectPriorityInput.value
+          ? parseInt(projectPriorityInput.value, 5)
+          : null,
       };
       const pid = projectIdInput.value;
       const method = pid ? "PUT" : "POST";

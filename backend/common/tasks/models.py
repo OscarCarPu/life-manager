@@ -48,6 +48,7 @@ class Project(Base):
     expected_start_date = Column(Date)
     expected_end_date = Column(Date)
     state = Column(String(50), default=ProjectState.NOT_STARTED.value)
+    priority = Column(Integer, CheckConstraint("priority >= 1 AND priority <= 5"))
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
