@@ -120,7 +120,7 @@ def get_task_recommendations(
 
         # --- Age-related scoring ---
         if task.created_at:
-            age_days = (today - task.created_at).days
+            age_days = (today - task.created_at.date()).days
             score += min(SCORE_WEIGHTS["age_limit"], age_days * SCORE_WEIGHTS["age_multiplier"])
 
         recommendations.append({"task": task, "score": score})
