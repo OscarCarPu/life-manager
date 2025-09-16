@@ -115,7 +115,7 @@ def calendar():
             if planning.planned_date in plannings_by_day:
                 plannings_by_day[planning.planned_date].append(planning)
 
-        recommended_tasks = get_task_recommendations(db, 12)
+        recommended_tasks = get_task_recommendations(db, 12, for_planning=True)
     return render_template(
         "tasks/calendar.html",
         planning_by_day=plannings_by_day,
@@ -143,6 +143,22 @@ def pending_tasks():
         # Separate tasks with and without due dates
         tasks_with_due_date = [task for task in pending_tasks if task.due_date]
         tasks_without_due_date = [task for task in pending_tasks if not task.due_date]
+
+        # Order tasks without due date by recommendation scores
+        if tasks_without_due_date:
+            # Get recommendations for all tasks without due dates
+            all_recommendations = get_task_recommendations(db)
+
+            # Create a mapping of task_id to score for tasks without due dates
+            task_scores = {}
+            tasks_without_due_date_ids = {task.id for task in tasks_without_due_date}
+
+            for recommendation in all_recommendations:
+                if recommendation["task"].id in tasks_without_due_date_ids:
+                    task_scores[recommendation["task"].id] = recommendation["score"]
+
+            # Sort tasks without due date by their recommendation scores (descending)
+            tasks_without_due_date.sort(key=lambda task: task_scores.get(task.id, 0), reverse=True)
 
         # Group tasks by due date (convert date to string for JSON serialization)
         tasks_by_date = defaultdict(list)

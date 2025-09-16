@@ -1,76 +1,123 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 from sqlalchemy.orm import Session
 
-from . import models
 from .enums import ProjectState, TaskState
+from .models import Project, Task, TaskPlanning
+
+# Scoring weights and constants
+SCORE_WEIGHTS = {
+    "priority_multiplier": 1.5,
+    "overdue_base": 30,
+    "upcoming_base": 20,
+    "upcoming_penalty": 2,
+    "future_base": 5,
+    "future_decay": 10,
+    "no_future_plans_bonus": 15,
+    "in_progress_basic": 5,
+    "pending_basic": 2,
+    "in_progress_planning": 10,
+    "pending_planning": 2,
+}
+
+# Time-related constants
+TIME_CONSTANTS = {
+    "upcoming_days": 7,
+    "planning_window_days": 4,
+}
 
 
-def get_task_recommendations(db: Session, limit: int) -> List[Dict[str, Any]]:
-    """
-    Generates a list of recommended tasks based on a scoring system.
-    """
-    today = datetime.utcnow().date()
+def get_task_recommendations(
+    db: Session, limit: int = None, for_planning: bool = False
+) -> List[Dict[str, Any]]:
+    today = datetime.now().date()
 
-    # 1. Get tasks from in-progress projects that are not done or archived
+    # Retrieve IDs of projects that are currently in progress
     in_progress_projects = (
-        db.query(models.Project.id)
-        .filter(models.Project.state == ProjectState.IN_PROGRESS)
-        .subquery()
+        db.query(Project.id).filter(Project.state == ProjectState.IN_PROGRESS).subquery()
     )
 
+    # Fetch tasks from in-progress projects that are pending or in progress
     tasks = (
-        db.query(models.Task)
+        db.query(Task)
         .filter(
-            models.Task.project_id.in_(in_progress_projects),
-            models.Task.state.in_([TaskState.PENDING, TaskState.IN_PROGRESS]),
+            Task.project_id.in_(in_progress_projects),
+            Task.state.in_([TaskState.PENDING, TaskState.IN_PROGRESS]),
         )
         .all()
     )
+
+    # --- Pre-fetch all relevant plannings to avoid N+1 queries ---
+    task_ids = [t.id for t in tasks]
+    future_plannings = (
+        db.query(TaskPlanning)
+        .filter(TaskPlanning.task_id.in_(task_ids), TaskPlanning.planned_date >= today)
+        .all()
+    )
+
+    # Map plannings to tasks for efficient lookup
+    plannings_by_task = {}
+    for planning in future_plannings:
+        plannings_by_task.setdefault(planning.task_id, []).append(planning)
 
     recommendations = []
     for task in tasks:
         score = 0.0
 
-        # Priority score (normalized)
+        # Calculate priority score
         if task.priority is not None:
-            score += task.priority * 2  # Assuming priority is 1-5, this gives 2-10 points
+            score += task.priority * SCORE_WEIGHTS["priority_multiplier"]
 
-        # Due date score
+        # Calculate due date score
         if task.due_date:
             delta_days = (task.due_date - today).days
             if delta_days < 0:
-                # Overdue tasks get a high score, increasing with delay
-                score += 20 + abs(delta_days)
-            elif delta_days <= 7:
-                # Due in the next week, closer date gets higher score
-                score += 10 - delta_days
+                score += SCORE_WEIGHTS["overdue_base"] + abs(delta_days)
+            elif delta_days <= TIME_CONSTANTS["upcoming_days"]:
+                score += (
+                    SCORE_WEIGHTS["upcoming_base"] - delta_days * SCORE_WEIGHTS["upcoming_penalty"]
+                )
             else:
-                # Due later, diminishing score
-                score += max(0, 5 - delta_days / 7)
+                score += max(
+                    0, SCORE_WEIGHTS["future_base"] - delta_days / SCORE_WEIGHTS["future_decay"]
+                )
 
-        # Future planning score
-        future_plannings_count = (
-            db.query(models.TaskPlanning)
-            .filter(
-                models.TaskPlanning.task_id == task.id,
-                models.TaskPlanning.planned_date >= today,
+        # --- Dynamic Scoring based on `for_planning` flag ---
+        if for_planning:
+            # Get pre-fetched plannings for this task
+            current_plannings = plannings_by_task.get(task.id, [])
+
+            # Check for plannings that are after the due date
+            has_valid_plan = False
+            for planning in current_plannings:
+                if task.due_date is None or planning.planned_date <= task.due_date:
+                    has_valid_plan = True
+                    break
+
+            if not has_valid_plan:
+                score += SCORE_WEIGHTS["no_future_plans_bonus"]
+
+            # Refined task state score: in-progress tasks without near-term plans get a boost
+            has_near_term_plan = any(
+                p.planned_date < today + timedelta(days=TIME_CONSTANTS["planning_window_days"])
+                for p in current_plannings
             )
-            .count()
-        )
-        if future_plannings_count == 0:
-            score += 15  # High score for no future plans
 
-        # Task state score
-        if task.state == TaskState.IN_PROGRESS:
-            score += 5
-        elif task.state == TaskState.PENDING:
-            score += 2
+            if task.state == TaskState.IN_PROGRESS and not has_near_term_plan:
+                score += SCORE_WEIGHTS["in_progress_planning"]
+            elif task.state == TaskState.PENDING:
+                score += SCORE_WEIGHTS["pending_planning"]
+
+        else:
+            # Basic task state score
+            if task.state == TaskState.IN_PROGRESS:
+                score += SCORE_WEIGHTS["in_progress_basic"]
+            elif task.state == TaskState.PENDING:
+                score += SCORE_WEIGHTS["pending_basic"]
 
         recommendations.append({"task": task, "score": score})
 
-    # Sort recommendations by score in descending order
+    # Sort and return
     recommendations.sort(key=lambda r: r["score"], reverse=True)
-
-    return recommendations[:limit]
+    return recommendations[:limit] if limit else recommendations
