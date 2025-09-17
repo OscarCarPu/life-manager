@@ -65,6 +65,18 @@ def get_task_recommendations(
 
     recommendations = []
     for task in tasks:
+        # --- Skip tasks that are already planned in the near future when planning ---
+        if for_planning:
+            current_plannings = plannings_by_task.get(task.id, [])
+            has_near_term_plan = any(
+                p.planned_date < today + timedelta(days=TIME_CONSTANTS["planning_window_days"])
+                for p in current_plannings
+            )
+
+            # Skip this task if it's already planned within the planning window
+            if has_near_term_plan:
+                continue
+
         score = 0.0
 
         # Calculate priority score
@@ -104,13 +116,8 @@ def get_task_recommendations(
             if not has_valid_plan:
                 score += SCORE_WEIGHTS["no_future_plans_bonus"]
 
-            # Refined task state score: in-progress tasks without near-term plans get a boost
-            has_near_term_plan = any(
-                p.planned_date < today + timedelta(days=TIME_CONSTANTS["planning_window_days"])
-                for p in current_plannings
-            )
-
-            if task.state == TaskState.IN_PROGRESS and not has_near_term_plan:
+            # Simplified task state score since we already filtered out near-term planned tasks
+            if task.state == TaskState.IN_PROGRESS:
                 score += SCORE_WEIGHTS["in_progress_planning"]
             elif task.state == TaskState.PENDING:
                 score += SCORE_WEIGHTS["pending_planning"]
