@@ -67,3 +67,8 @@ def habits_metrics():
     ]
 
     return render_template("insights/habits_metrics.html", habits=habits_data, metrics=metrics_data)
+
+
+@insights_bp.route("/pomodoro")
+def pomodoro():
+    return render_template("insights/pomodoro.html")
