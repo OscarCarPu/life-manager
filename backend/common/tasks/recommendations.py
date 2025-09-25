@@ -83,9 +83,9 @@ def get_task_recommendations(
         if task.priority is not None:
             score += task.priority * SCORE_WEIGHTS["priority_multiplier"]
 
-        # Add project priority to the score
-        if task.project and task.project.priority is not None:
-            score += task.project.priority * SCORE_WEIGHTS["priority_multiplier"] * 2
+        # Remove the previous project priority addition, as it will now be a multiplier
+        # if task.project and task.project.priority is not None:
+        #     score += task.project.priority * SCORE_WEIGHTS["priority_multiplier"] * 2
 
         # Calculate due date score
         if task.due_date:
@@ -133,6 +133,12 @@ def get_task_recommendations(
         if task.created_at:
             age_days = (today - task.created_at.date()).days
             score += min(SCORE_WEIGHTS["age_limit"], age_days * SCORE_WEIGHTS["age_multiplier"])
+
+        # --- Apply project priority as a global multiplier ---
+        project_priority = 1
+        if task.project and task.project.priority is not None:
+            project_priority = task.project.priority
+        score *= project_priority * 0.7
 
         recommendations.append({"task": task, "score": score})
 
