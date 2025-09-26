@@ -138,7 +138,7 @@ def get_task_recommendations(
         project_priority = 1
         if task.project and task.project.priority is not None:
             project_priority = task.project.priority
-        score *= project_priority * 0.5
+        score *= project_priority * 0.3
 
         recommendations.append({"task": task, "score": score})
 
