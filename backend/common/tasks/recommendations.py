@@ -10,7 +10,7 @@ from .models import Project, Task, TaskPlanning
 SCORE_WEIGHTS = {
     "priority_multiplier": 2,
     "overdue_base": 30,
-    "upcoming_base": 20,
+    "upcoming_base": 15,
     "upcoming_penalty": 2,
     "future_base": 5,
     "future_decay": 10,
@@ -138,7 +138,7 @@ def get_task_recommendations(
         project_priority = 1
         if task.project and task.project.priority is not None:
             project_priority = task.project.priority
-        score *= project_priority * 0.7
+        score *= project_priority * 0.5
 
         recommendations.append({"task": task, "score": score})
 
